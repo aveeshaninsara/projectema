@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- Prevent zooming issues -->
     <title>EMA - Elephant Monitoring App</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -58,44 +58,40 @@
             --theme-on-error: var(--md-sys-color-on-error);
         }
 
-        /* Ensure no scrollbars on body during load */
+        /* Ensure no scrollbars on body during load and allow scrolling once loaded */
         html, body {
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevent scrollbars initially */
-            height: 100%;
+            /* Crucial for preventing initial scrollbars and fitting content */
             width: 100%;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            height: 100%;
+            overflow: hidden; /* Hide scrollbars initially */
         }
 
         body {
             background-color: var(--theme-surface);
             color: var(--theme-on-surface);
+            /* min-height ensures it takes at least full viewport height */
             min-height: 100vh;
+            /* Use flexbox for centering the main content */
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 16px;
+            align-items: flex-start; /* Align items to the top */
+            padding: 16px; /* Add padding for smaller screens */
             position: relative; /* For FAB positioning */
-            overflow: auto; /* Allow scrolling once content loads */
+            overflow: auto; /* Allow scrolling if content overflows */
         }
 
         .screen {
             width: 100%;
-            max-width: 500px;
-            display: none;
+            max-width: 500px; /* Max width for larger screens */
+            display: none; /* Hide all screens by default */
             flex-direction: column;
-            gap: 20px;
+            gap: 20px; /* Space between cards */
         }
 
         .active {
-            display: flex;
+            display: flex; /* Show the active screen */
         }
 
         .card {
@@ -104,7 +100,7 @@
             box-shadow: var(--md-sys-elevation-1);
             padding: 20px;
             width: 100%;
-            flex-shrink: 0;
+            flex-shrink: 0; /* Prevent cards from shrinking */
             border: 1px solid var(--theme-outline);
         }
 
@@ -112,8 +108,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            /* Ensure it covers the full viewport */
+            width: 100vw;
             height: 100vh;
-            width: 100vw; /* Full viewport width/height */
             background-color: var(--theme-surface);
             position: fixed;
             top: 0;
@@ -258,12 +255,19 @@
             margin-top: 4px;
         }
 
+        .warning {
+             color: #FF9800; /* Orange warning color */
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
         /* --- Home Screen Specific Styles --- */
         .home-header {
             display: flex;
             justify-content: flex-end; /* Align user button to the right */
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* Space below header */
+            padding: 0; /* Remove default padding */
         }
 
         .user-btn {
@@ -279,7 +283,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            overflow: hidden; /* Hide overflow for image */
         }
 
         .user-btn:hover {
@@ -303,10 +307,13 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 14px 0;
+            padding: 14px 0; /* Padding top and bottom */
             cursor: pointer;
+            /* Remove the small circle avatar from here */
+            /* Remove top padding from the main card */
         }
 
+        /* The avatar inside the user card */
         .avatar {
             width: 52px;
             height: 52px;
@@ -692,6 +699,7 @@
             min-height: auto; /* Override default min-height */
         }
 
+        /* --- Enhanced Alert Card Styles --- */
         .alert-card {
             background-color: var(--theme-surface-variant);
             border-radius: var(--md-sys-shape-corner-medium);
@@ -699,6 +707,7 @@
             margin-bottom: 16px;
             overflow: hidden; /* Contain expanded content */
             transition: box-shadow 0.2s;
+            border: 1px solid var(--theme-outline);
         }
 
         .alert-card:hover {
@@ -783,7 +792,7 @@
         }
 
         .alert-card-body {
-            padding: 0 16px 16px 16px; /* Closed state: no padding */
+            padding: 0 16px 16px 16px; /* Closed state: minimal padding on sides/bottom */
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease, padding 0.3s ease;
@@ -791,7 +800,7 @@
 
         .alert-card.expanded .alert-card-body {
             padding: 16px; /* Open state: full padding */
-            max-height: 1000px; /* Large enough value */
+            max-height: 1000px; /* Large enough value to accommodate content */
         }
 
         .alert-card-details {
@@ -803,21 +812,24 @@
             font-size: 14px;
         }
 
-        .alert-card-image {
-            width: 100%;
-            max-width: 300px; /* Limit image width */
-            height: auto;
+        /* --- Image Thumbnail Style --- */
+        .alert-card-image-thumbnail {
+            width: 100px; /* Thumbnail size */
+            height: 100px;
+            object-fit: cover;
             border-radius: var(--md-sys-shape-corner-medium);
             cursor: pointer;
             display: block;
-            margin: 0 auto;
+            margin: 10px 0;
             box-shadow: var(--md-sys-elevation-1);
             transition: transform 0.2s;
+            border: 1px solid var(--theme-outline);
         }
 
-        .alert-card-image:hover {
-            transform: scale(1.02);
+        .alert-card-image-thumbnail:hover {
+            transform: scale(1.05);
         }
+        /* --- End Image Thumbnail Style --- */
 
         .chevron-icon {
             transition: transform 0.3s ease;
@@ -864,7 +876,64 @@
             background-color: rgba(0, 0, 0, 0.7);
         }
         /* --- End Image Zoom Modal --- */
-        /* --- End Alerts Modal Enhancements --- */
+
+        /* --- Map Modal for Alerts --- */
+        #alert-map-modal .modal-content {
+            max-width: 95vw;
+            max-height: 95vh;
+        }
+
+        #alert-map-container {
+            height: 70vh; /* Adjust map height */
+            width: 100%;
+            border-radius: var(--md-sys-shape-corner-medium);
+            border: 1px solid var(--theme-outline);
+        }
+        /* --- End Map Modal for Alerts --- */
+
+
+        /* --- ID Card Download Styles --- */
+        #id-card-download {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1002;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #id-card-download.active {
+            display: flex;
+        }
+
+        #id-card-canvas-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--md-sys-shape-corner-large);
+            box-shadow: var(--md-sys-elevation-2);
+        }
+
+        #id-card-canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        #id-card-download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        #id-card-download-buttons .btn {
+            min-width: 120px;
+        }
+        /* --- End ID Card Download Styles --- */
 
 
         .hidden {
@@ -928,7 +997,7 @@
             <div class="input-group">
                 <label for="full-name">Full Name</label>
                 <input type="text" id="full-name" placeholder="Enter your full name">
-                <div id="name-warning" class="error hidden"></div> <!-- Warning for name format -->
+                <div id="name-warning" class="warning hidden"></div> <!-- Warning for name format -->
                 <div id="name-error" class="error hidden"></div>
             </div>
             <div class="input-group">
@@ -962,7 +1031,7 @@
              <div class="input-group">
                 <label for="profile-picture">Profile Picture</label>
                 <input type="file" accept="image/*" id="profile-picture" />
-                <div id="profile-picture-warning" class="error hidden"></div> <!-- Warning for profile picture -->
+                <div id="profile-picture-warning" class="warning hidden"></div> <!-- Warning for profile picture -->
                 <div id="profile-picture-error" class="error hidden"></div>
                  <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
                  <button id="crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
@@ -985,7 +1054,7 @@
                     <img class="user-btn-avatar" id="top-user-avatar" src="" alt="Profile">
                 </button>
             </div>
-             <!-- User Card at the top -->
+             <!-- Main User Card at the top (without small circle/padding issues) -->
             <div class="user-card" id="user-card">
                 <div class="avatar" id="home-user-avatar">
                     <img id="home-user-avatar-img" src="" alt="Profile">
@@ -1138,7 +1207,10 @@
                         <p><strong>Mobile:</strong> <span id="popup-user-mobile">077XXXXXXX</span></p>
                     </div>
                     <div class="user-popup-actions" id="user-popup-actions">
-                        <!-- Buttons will be dynamically added/removed based on user type -->
+                        <!-- Buttons will be dynamically shown/hidden -->
+                        <button id="request-agent-mode-btn" class="btn btn-secondary btn-full">
+                            <i class="fas fa-user-shield"></i> Request Agent Mode
+                        </button>
                         <button id="edit-profile-btn" class="btn btn-secondary btn-full">
                             <i class="fas fa-edit"></i> Edit Profile
                         </button>
@@ -1210,7 +1282,7 @@
         </div>
     </div>
 
-    <!-- Image Zoom Modal -->
+     <!-- Image Zoom Modal -->
     <div id="image-zoom-modal" class="modal">
         <div class="modal-content">
             <div class="modal-body">
@@ -1219,6 +1291,22 @@
             <button id="close-image-zoom-modal" class="close-modal-btn">
                 <i class="fas fa-times"></i>
             </button>
+        </div>
+    </div>
+
+    <!-- Map Modal for Alerts -->
+    <div id="alert-map-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Report Location</h2>
+                <button id="close-alert-map-modal" class="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="alert-map-container"></div>
+                 <p id="alert-map-coordinates" class="text-center mt-16">Latitude: --, Longitude: --</p>
+            </div>
         </div>
     </div>
 
@@ -1236,6 +1324,39 @@
                 <p id="map-coordinates" class="text-center mb-16">Click on the map to select a location.</p>
                 <button id="confirm-location-btn" class="btn btn-primary btn-full">
                     <i class="fas fa-check"></i> Confirm Location
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qr-scanner-modal" class="modal">
+        <div class="scanner-container">
+            <button id="close-scanner-btn" class="close-scanner-btn">
+                <i class="fas fa-times"></i>
+            </button>
+            <video id="qr-video" playsinline></video>
+            <div class="scanner-instructions">
+                <p>Point your camera at your EMA ID QR code</p>
+                <p><i class="fas fa-qrcode fa-2x"></i></p>
+            </div>
+            <div id="qr-result" class="qr-result hidden"></div>
+        </div>
+    </div>
+
+    <!-- ID Card Download Modal -->
+    <div id="id-card-download" class="modal">
+        <div id="id-card-canvas-container">
+            <canvas id="id-card-canvas" width="800" height="500"></canvas> <!-- Landscape format -->
+            <div id="id-card-download-buttons">
+                <button id="print-id-card-btn" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button id="download-id-card-btn" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button id="close-id-card-download-btn" class="btn btn-text">
+                    <i class="fas fa-times"></i> Close
                 </button>
             </div>
         </div>
@@ -1277,7 +1398,7 @@
             startup: document.getElementById('startup-screen'),
             login: document.getElementById('login-screen'),
             register: document.getElementById('register-screen'),
-            home: document.getElementById('home-screen') // Removed idDisplay screen
+            home: document.getElementById('home-screen')
         };
 
         const modals = {
@@ -1286,8 +1407,10 @@
             ai: document.getElementById('ai-modal'),
             alerts: document.getElementById('alerts-modal'),
             imageZoom: document.getElementById('image-zoom-modal'), // Add Image Zoom Modal
+            alertMap: document.getElementById('alert-map-modal'), // Add Alert Map Modal
             map: document.getElementById('map-modal'),
-            qrScanner: document.getElementById('qr-scanner-modal') // If QR scanner modal exists
+            qrScanner: document.getElementById('qr-scanner-modal'),
+            idCardDownload: document.getElementById('id-card-download') // Add ID Card Download Modal
         };
 
         const chatMessages = document.getElementById('chat-messages');
@@ -1297,6 +1420,8 @@
         const cropBtn = document.getElementById('crop-btn');
         const mapElement = document.getElementById('map');
         const mapCoordinatesElement = document.getElementById('map-coordinates');
+        const alertMapContainer = document.getElementById('alert-map-container'); // Add Alert Map Container
+        const alertMapCoordinatesElement = document.getElementById('alert-map-coordinates'); // Add Alert Map Coordinates Element
 
         // Floating Action Button
         const quickReportBtn = document.getElementById('quick-report-btn');
@@ -1341,9 +1466,21 @@
         let marker = null;
         let selectedLocation = null;
 
+        // Alert Map variable
+        let alertMap = null;
+        let alertMarker = null;
+
         // Firebase references (will be initialized after SDK loads)
         let userDb = null;
         let reportDb = null;
+
+        // --- QR Scanner Variables ---
+        const qrVideo = document.getElementById('qr-video');
+        const qrCanvasElement = document.createElement('canvas');
+        const qrCanvas = qrCanvasElement.getContext('2d');
+        let qrScanning = false;
+        let qrStream = null;
+        let lastScannedResult = null; // To prevent duplicate scans
 
         // --- Initialize App ---
         async function initApp() {
@@ -1433,7 +1570,7 @@
                 if (data) {
                     updateStatistics(data);
                 } else {
-                    // Handle case where there are no reports
+                     // Handle case where there are no reports
                     updateStatistics({});
                 }
             });
@@ -1554,10 +1691,9 @@
         function setupEventListeners() {
             // --- Login Screen ---
             document.getElementById('access-app-btn').addEventListener('click', handleLogin);
+            document.getElementById('quick-login-btn').addEventListener('click', startQRScanner); // Add QR Scan listener
             document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
             document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
-            // Add QR Scan listener if applicable
-            // document.getElementById('quick-login-btn').addEventListener('click', startQRScanner);
 
             // --- Registration Screen ---
             document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
@@ -1607,10 +1743,10 @@
 
             // --- User Popup Modal ---
             document.getElementById('close-user-popup').addEventListener('click', () => closeModal('userPopup'));
-            // Add listeners for edit profile, sign out, delete account if modals/functions exist
-            // document.getElementById('edit-profile-btn').addEventListener('click', openEditProfileModal);
+            document.getElementById('request-agent-mode-btn').addEventListener('click', openAgentRequestForm); // Add Agent Request listener
+            document.getElementById('edit-profile-btn').addEventListener('click', openEditProfileModal);
             document.getElementById('sign-out-btn').addEventListener('click', handleLogout);
-            // document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
+            document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
 
             // --- AI Assistant Modal ---
             document.getElementById('close-ai-modal').addEventListener('click', () => closeModal('ai'));
@@ -1664,13 +1800,29 @@
             document.getElementById('close-image-zoom-modal').addEventListener('click', () => closeModal('imageZoom'));
             document.getElementById('zoomed-image').addEventListener('click', () => closeModal('imageZoom')); // Close on image click too
 
+            // --- Alert Map Modal ---
+            document.getElementById('close-alert-map-modal').addEventListener('click', () => closeModal('alertMap'));
+
             // --- Map Modal ---
             document.getElementById('close-map-modal').addEventListener('click', () => closeModal('map'));
             document.getElementById('confirm-location-btn').addEventListener('click', confirmLocation);
 
-             // --- Name Validation for Registration (if applicable) ---
-            // document.getElementById('full-name').addEventListener('blur', validateRegistrationName);
-            // document.getElementById('profile-picture').addEventListener('change', validateProfilePictureName);
+            // --- QR Scanner Modal ---
+            document.getElementById('close-scanner-btn').addEventListener('click', stopQRScanner);
+
+            // --- ID Card Download Modal ---
+            document.getElementById('close-id-card-download-btn').addEventListener('click', () => closeModal('idCardDownload'));
+            document.getElementById('print-id-card-btn').addEventListener('click', printIDCard);
+            document.getElementById('download-id-card-btn').addEventListener('click', downloadIDCardFinal);
+
+             // --- Name Validation for Registration ---
+            document.getElementById('full-name').addEventListener('blur', validateRegistrationName);
+            document.getElementById('profile-picture').addEventListener('change', validateProfilePictureName);
+
+             // --- Name Validation for Edit Profile ---
+            // (Assuming an edit profile modal exists)
+            // document.getElementById('edit-full-name').addEventListener('blur', validateEditProfileName);
+            // document.getElementById('edit-profile-picture').addEventListener('change', validateEditProfilePictureName);
 
         }
 
@@ -1698,6 +1850,74 @@
             }
             // Add logic for other actions (map, radar) here
         }
+
+        // --- Name Validation Functions ---
+        function validateRegistrationName() {
+            const fullName = document.getElementById('full-name').value.trim();
+            const warningElement = document.getElementById('name-warning');
+            const errorElement = document.getElementById('name-error');
+
+            // Clear previous warnings/errors
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
+            errorElement.classList.add('hidden');
+            errorElement.textContent = '';
+
+            if (!fullName) return; // Don't validate if empty
+
+            const parts = fullName.split(/\s+/); // Split by whitespace
+            const hasSymbolsOrNumbers = /[0-9!@#$%^&*(),.?":{}|<>[\]\\;'`~_+=/-]/.test(fullName);
+
+            if (parts.length < 2) {
+                // Show warning for single name part
+                warningElement.textContent = "Consider using your full name (e.g., 'John Doe'). Accounts with incomplete names may be reviewed.";
+                warningElement.classList.remove('hidden');
+            }
+
+            if (hasSymbolsOrNumbers) {
+                // Show warning for symbols/numbers
+                warningElement.textContent = "Names should generally not contain symbols or numbers. Accounts with unusual names may be reviewed.";
+                warningElement.classList.remove('hidden');
+            }
+        }
+
+        function validateProfilePictureName() {
+            const file = document.getElementById('profile-picture').files[0];
+            const fullName = document.getElementById('full-name').value.trim();
+            const warningElement = document.getElementById('profile-picture-warning');
+
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
+
+            if (file && fullName) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        // Simple check: if name is incomplete, remind about image clarity.
+                        const parts = fullName.split(/\s+/);
+                        if (parts.length < 2) {
+                             warningElement.textContent = "If your name has multiple parts, please ensure your profile picture clearly shows your full name.";
+                             warningElement.classList.remove('hidden');
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function validateEditProfileName() {
+            // Similar logic as validateRegistrationName, applied to edit profile fields
+            // (Assuming an edit profile modal exists)
+        }
+
+        function validateEditProfilePictureName() {
+            // Similar logic as validateProfilePictureName, applied to edit profile fields
+            // (Assuming an edit profile modal exists)
+        }
+        // --- End Name Validation Functions ---
+
 
         // --- Authentication Logic ---
 
@@ -1919,8 +2139,7 @@
                 await window.userSet(window.userRef(userDb, `users/${userId}`), userData);
 
                 currentUser = userData;
-                showHomeScreen(); // Go directly to home after registration
-                listenForStatsUpdates(); // Start listening for stats
+                showIDCardDownload(userId); // Show ID card download modal instead of navigating to a separate screen
             } catch (error) {
                 console.error("Registration error:", error);
                 if (error.code === 'PERMISSION_DENIED') {
@@ -1929,6 +2148,141 @@
                     showError(mobileError, 'Registration failed. Try again later.');
                 }
             }
+        }
+
+        // Show ID Card Download Modal with QR Code
+        function showIDCardDownload(userId) {
+             openModal('idCardDownload');
+
+            const canvas = document.getElementById('id-card-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background
+            ctx.fillStyle = '#ffffff'; // White background
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw logo
+            const logo = new Image();
+            logo.crossOrigin = "Anonymous";
+            logo.onload = function () {
+                // Center the logo
+                const logoWidth = 150;
+                const logoHeight = 150;
+                const logoX = (canvas.width - logoWidth) / 2;
+                const logoY = 50; // Position from top
+                ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+
+                // Draw title
+                ctx.fillStyle = '#4CAF50'; // Green color
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('EMA ID Card', canvas.width / 2, logoY + logoHeight + 50);
+
+                // Draw ID
+                ctx.fillStyle = '#212121'; // Dark text
+                ctx.font = '28px Arial';
+                ctx.fillText(userId, canvas.width / 2, logoY + logoHeight + 100);
+
+                // Generate and draw QR Code
+                const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(userId)}&size=150`; // Larger QR for print
+                const qrCode = new Image();
+                qrCode.crossOrigin = "Anonymous";
+                qrCode.onload = function () {
+                    // Position QR code below the ID
+                    const qrX = (canvas.width - 150) / 2;
+                    const qrY = logoY + logoHeight + 120; // Below the ID text
+                    ctx.drawImage(qrCode, qrX, qrY, 150, 150);
+
+                     // Draw footer note
+                    ctx.fillStyle = '#9E9E9E'; // Light gray
+                    ctx.font = '16px Arial';
+                    ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
+
+                     // Re-trigger the final draw to ensure QR is included
+                     // This is a simple way to ensure the QR is drawn before the modal becomes active
+                     // In a more complex scenario, you might use Promises or async/await
+                     setTimeout(() => {
+                          // The canvas is now fully drawn with the QR code
+                          // The modal is already open, so the user sees the final result
+                     }, 100); // Short delay to ensure image load and draw
+
+                };
+                qrCode.onerror = function() {
+                     console.error("Failed to load QR code image for ID card.");
+                     // The rest of the card is still drawn, just without the QR
+                     // Draw footer note even if QR fails
+                     ctx.fillStyle = '#9E9E9E';
+                     ctx.font = '16px Arial';
+                     ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
+                };
+                qrCode.src = qrCodeUrl;
+            };
+            logo.onerror = function() {
+                 console.error("Failed to load logo for ID card.");
+                 // Proceed with drawing the rest, perhaps with a placeholder or text
+                 // For simplicity, we'll just call the onload handler to continue drawing
+                 logo.onload();
+            };
+            logo.src = 'https://i.ibb.co/jvN2hV16/logo.png';
+        }
+
+        // Print ID Card
+        function printIDCard() {
+             const canvas = document.getElementById('id-card-canvas');
+            const dataUrl = canvas.toDataURL('image/png');
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print EMA ID Card</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            background-color: #f0f0f0;
+                        }
+                        img {
+                            max-width: 100%;
+                            height: auto;
+                            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+                        }
+                        @media print {
+                            body {
+                                background-color: white;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <img src="${dataUrl}" alt="EMA ID Card" />
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            // window.close(); // Optional: close the window after printing
+                        };
+                    </script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // Download ID Card
+        function downloadIDCardFinal() {
+            const canvas = document.getElementById('id-card-canvas');
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `EMA_ID_${currentUser.userId}_Card.png`;
+            link.href = dataUrl;
+            link.click();
         }
 
         // Show home screen
@@ -1972,13 +2326,16 @@
                     });
                     initialsElements.forEach(span => span.style.display = 'none');
                 } else {
-                    profileImgElements.forEach(img => img.style.display = 'none');
-                    initialsElements.forEach(span => span.style.display = 'block');
+                    profileImgElements.forEach(img => img.style.display = 'none';
+                    initialsElements.forEach(span => span.style.display = 'block';
                 }
 
                 showScreen('home');
                 // Show FAB on home screen
                 quickReportBtn.style.display = 'flex';
+
+                // Configure UI based on user type (Guest vs Regular)
+                configureUIForUserType();
 
             } else {
                 showScreen('login');
@@ -1986,6 +2343,36 @@
                 quickReportBtn.style.display = 'none';
             }
         }
+
+        // Configure UI based on user type (Guest vs Regular)
+        function configureUIForUserType() {
+            const isGuest = currentUser.userId === 'GUEST';
+            const userPopupActions = document.getElementById('user-popup-actions');
+
+            if (isGuest) {
+                // Hide edit profile, delete account, and request agent mode for guests
+                document.getElementById('edit-profile-btn').style.display = 'none';
+                document.getElementById('delete-account-btn').style.display = 'none';
+                document.getElementById('request-agent-mode-btn').style.display = 'none'; // Hide agent request for guests
+
+                // Optionally, you can customize the guest popup further
+                // For example, change the title or add a guest-specific message
+                document.querySelector('#user-popup-modal .modal-header h2').textContent = "Guest User";
+
+            } else {
+                // Ensure edit profile, delete account, and request agent mode are visible for regular users
+                document.getElementById('edit-profile-btn').style.display = 'block';
+                document.getElementById('delete-account-btn').style.display = 'block';
+                document.getElementById('request-agent-mode-btn').style.display = 'block'; // Show agent request for users
+
+                 // Reset title for regular users
+                document.querySelector('#user-popup-modal .modal-header h2').textContent = "User Information";
+            }
+
+            // Show sign out for both
+            document.getElementById('sign-out-btn').style.display = 'block';
+        }
+
 
         // Open User Popup
         function openUserPopup() {
@@ -2011,39 +2398,22 @@
                 initialsElement.style.display = 'block';
             }
 
-            // Configure UI based on user type (Guest vs Regular)
-            configureUIForUserType();
-
             openModal('userPopup');
         }
 
-        // Configure UI based on user type (Guest vs Regular)
-        function configureUIForUserType() {
-            const isGuest = currentUser.userId === 'GUEST';
-            const userPopupActions = document.getElementById('user-popup-actions');
-
-            if (isGuest) {
-                // Hide edit profile and delete account for guests
-                document.getElementById('edit-profile-btn').style.display = 'none';
-                document.getElementById('delete-account-btn').style.display = 'none';
-
-                // Optionally, you can customize the guest popup further
-                // For example, change the title or add a guest-specific message
-                document.querySelector('#user-popup-modal .modal-header h2').textContent = "Guest User";
-
-            } else {
-                // Ensure edit profile and delete account are visible for regular users
-                document.getElementById('edit-profile-btn').style.display = 'block';
-                document.getElementById('delete-account-btn').style.display = 'block';
-
-                 // Reset title for regular users
-                document.querySelector('#user-popup-modal .modal-header h2').textContent = "User Information";
-            }
-
-            // Show sign out for both
-            document.getElementById('sign-out-btn').style.display = 'block';
+        // Open Agent Request Form (Placeholder)
+        function openAgentRequestForm() {
+            alert("Agent Mode request feature is being implemented. You will be able to request access soon.");
+            closeModal('userPopup'); // Close user popup
+             // TODO: Implement agent request form/modal
         }
 
+        // Open Edit Profile Modal (Placeholder)
+        function openEditProfileModal() {
+            alert("Edit Profile feature is being implemented.");
+            closeModal('userPopup'); // Close user popup
+             // TODO: Implement edit profile modal/form
+        }
 
         // Logout handler
         function handleLogout() {
@@ -2052,6 +2422,36 @@
             closeModal('userPopup');
             showScreen('login');
             // Hide FAB on logout
+            quickReportBtn.style.display = 'none';
+        }
+
+        // Delete Account handler
+        async function handleDeleteAccount() {
+            if (!currentUser || !currentUser.userId || !userDb) {
+                alert("Cannot delete account: User not found or database not initialized.");
+                return;
+            }
+
+            const confirmation = confirm(`Are you sure you want to delete your account (${currentUser.userId})? This action cannot be undone.`);
+            if (!confirmation) return;
+
+            try {
+                const userRef = window.userRef(userDb, `users/${currentUser.userId}`);
+                await window.userRemove(userRef);
+                console.log("Account deleted successfully from database.");
+            } catch (error) {
+                console.error("Error deleting account from database:", error);
+                alert("Failed to delete account from database. Please try again or contact support.");
+                return; // Don't proceed if DB delete failed
+            }
+
+            // If DB delete was successful, clear local session and redirect
+            currentUser = null;
+            sessionStorage.removeItem('emaUser');
+            closeModal('userPopup');
+            alert("Your account has been deleted.");
+            showScreen('login');
+            // Hide FAB on delete
             quickReportBtn.style.display = 'none';
         }
 
@@ -2232,7 +2632,7 @@
                 });
             }
 
-            // --- Enhanced Report Submission with Precise Timestamp ---
+            // --- Enhanced Report Submission with Precise Timestamp and Reporter Info ---
             const preciseTimestamp = new Date().toISOString(); // Capture precise timestamp
 
             const reportData = {
@@ -2245,7 +2645,8 @@
                 district: district,
                 description: description || null,
                 image: imageBase64, // Will be null if no image
-                timestamp: preciseTimestamp // Use the precise timestamp
+                timestamp: preciseTimestamp, // Use the precise timestamp
+                status: 'pending' // Add status for agent review
                 // Add other fields that might be useful for future features here
                 // e.g., deviceId, appVersion, etc. (would need to be captured)
             };
@@ -2256,6 +2657,11 @@
                 await window.reportPush(window.reportRef(reportDb, 'reports'), reportData);
                 alert("Report submitted successfully!");
                 closeModal('report');
+                // Reset form
+                document.getElementById('report-form').reset();
+                document.getElementById('location').value = "Click 'Get Location' or 'Pick on Map'";
+                document.getElementById('num-elephants').value = 1;
+                selectedLocation = null;
                 // The statistics should update automatically due to the real-time listener
             } catch (error) {
                 console.error("Error submitting report:", error);
@@ -2275,10 +2681,8 @@
             }
 
             try {
-                // Use onValue for real-time updates, or get for a one-time load
-                // For this implementation, we'll use get for simplicity when filtering
                 const reportsRef = window.reportRef(reportDb, 'reports');
-                const snapshot = await window.userGet(reportsRef); // One-time read for filtering
+                const snapshot = await window.userGet(reportsRef); // Use get for a one-time read for filtering
                 const data = snapshot.val();
 
                 if (!data) {
@@ -2286,9 +2690,9 @@
                     return;
                 }
 
-                // Filter reports
+                // Filter reports (only show 'accepted' reports in alerts)
                 let filteredReports = [];
-                const reportsArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                const reportsArray = Object.keys(data).map(key => ({ id: key, ...data[key] })).filter(report => report.status === 'accepted');
 
                 if (filterType === 'all') {
                     filteredReports = reportsArray;
@@ -2330,6 +2734,12 @@
                         reporterAvatarHtml = `<span>${reporterInitials}</span>`;
                     }
 
+                    // Determine image thumbnail HTML
+                    let imageThumbnailHtml = '';
+                    if (report.image) {
+                        imageThumbnailHtml = `<img src="${report.image}" alt="Report Image" class="alert-card-image-thumbnail" data-image-url="${report.image}">`;
+                    }
+
                     reportCard.innerHTML = `
                         <div class="alert-card-header">
                             <div class="alert-card-user-info">
@@ -2353,7 +2763,10 @@
                                 <p><strong>Elephants:</strong> ${report.numElephants}</p>
                                 ${report.elephantNames ? `<p><strong>Names:</strong> ${report.elephantNames}</p>` : ''}
                                 ${report.description ? `<p><strong>Description:</strong> ${report.description}</p>` : ''}
-                                ${report.image ? `<img src="${report.image}" alt="Report Image" class="alert-card-image" data-image-url="${report.image}">` : ''}
+                                ${imageThumbnailHtml}
+                                <button class="btn btn-secondary btn-full mt-8 view-map-btn" data-lat="${report.location.lat}" data-lng="${report.location.lng}">
+                                    <i class="fas fa-map-marker-alt"></i> View on Map
+                                </button>
                             </div>
                         </div>
                     `;
@@ -2362,22 +2775,31 @@
                     // Add click listener to header for expand/collapse
                     const header = reportCard.querySelector('.alert-card-header');
                     header.addEventListener('click', function(e) {
-                        // Prevent collapse if clicking on the image (which has its own handler)
-                        if (e.target.classList.contains('alert-card-image')) {
+                        // Prevent collapse if clicking on the image thumbnail or View Map button (which have their own handlers)
+                        if (e.target.classList.contains('alert-card-image-thumbnail') || e.target.closest('.view-map-btn')) {
                             return;
                         }
                         reportCard.classList.toggle('expanded');
                     });
 
-                    // Add click listener to image for zooming
-                    const imageElement = reportCard.querySelector('.alert-card-image');
-                    if (imageElement) {
-                        imageElement.addEventListener('click', function() {
+                    // Add click listener to image thumbnail for zooming
+                    const imageThumbnailElement = reportCard.querySelector('.alert-card-image-thumbnail');
+                    if (imageThumbnailElement) {
+                        imageThumbnailElement.addEventListener('click', function() {
                             const imageUrl = this.getAttribute('data-image-url');
                             document.getElementById('zoomed-image').src = imageUrl;
                             openModal('imageZoom');
                         });
                     }
+
+                    // Add click listener to View Map button
+                    const viewMapBtn = reportCard.querySelector('.view-map-btn');
+                    viewMapBtn.addEventListener('click', function() {
+                         const lat = parseFloat(this.getAttribute('data-lat'));
+                         const lng = parseFloat(this.getAttribute('data-lng'));
+                         openAlertMap(lat, lng);
+                    });
+
                 });
 
             } catch (error) {
@@ -2385,7 +2807,133 @@
                 alertsListElement.innerHTML = '<p class="text-center error">Failed to load reports. Please try again.</p>';
             }
         }
+
+        // Open Map Modal for a specific Alert
+        function openAlertMap(lat, lng) {
+            openModal('alertMap');
+            alertMapCoordinatesElement.textContent = `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`;
+
+            // Initialize map only when modal is opened
+            if (!alertMap) {
+                alertMap = L.map('alert-map-container').setView([lat, lng], 13); // Center on the report location, zoomed in
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(alertMap);
+
+                // Add marker for the report location
+                alertMarker = L.marker([lat, lng]).addTo(alertMap)
+                    .bindPopup(`Report Location<br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`)
+                    .openPopup();
+            } else {
+                // If map already exists, update view and marker
+                alertMap.setView([lat, lng], 13);
+                if (alertMarker) {
+                    alertMap.removeLayer(alertMarker);
+                }
+                alertMarker = L.marker([lat, lng]).addTo(alertMap)
+                    .bindPopup(`Report Location<br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`)
+                    .openPopup();
+            }
+        }
         // --- End Alerts Modal Logic ---
+
+        // --- QR Code Scanning Logic ---
+        function startQRScanner() {
+            modals.qrScanner.classList.add('active'); // Use the modals object
+            lastScannedResult = null; // Reset last scan
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Sorry, your browser does not support camera access for QR scanning.");
+                stopQRScanner();
+                return;
+            }
+
+            // Get access to the camera (prefer rear camera for mobile)
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function (mediaStream) {
+                    qrStream = mediaStream;
+                    qrVideo.srcObject = mediaStream;
+                    qrVideo.setAttribute("playsinline", true); // Required for iOS Safari
+                    qrVideo.play();
+                    qrScanning = true;
+                    requestAnimationFrame(qrTick); // Start the scanning loop
+                })
+                .catch(function (err) {
+                    console.error("Camera access error:", err);
+                    const errorMessage = err.name === 'NotAllowedError' ?
+                        "Camera access denied. Please allow camera permission and try again." :
+                        "Could not access the camera. Please ensure you have granted permission.";
+                    alert(errorMessage);
+                    stopQRScanner();
+                });
+        }
+
+        function stopQRScanner() {
+            qrScanning = false;
+            if (qrStream) {
+                const tracks = qrStream.getTracks();
+                tracks.forEach(track => track.stop()); // Stop all tracks
+                qrStream = null;
+            }
+            if (qrVideo.srcObject) {
+                qrVideo.srcObject = null;
+            }
+            modals.qrScanner.classList.remove('active'); // Use the modals object
+            // Clear any previous result display
+            document.getElementById('qr-result').textContent = '';
+            document.getElementById('qr-result').classList.add('hidden');
+        }
+
+        function qrTick() {
+            if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA && qrScanning) {
+                qrCanvasElement.height = qrVideo.videoHeight;
+                qrCanvasElement.width = qrVideo.videoWidth;
+                qrCanvas.drawImage(qrVideo, 0, 0, qrCanvasElement.width, qrCanvasElement.height);
+                const imageData = qrCanvas.getImageData(0, 0, qrCanvasElement.width, qrCanvasElement.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    // Check if the decoded data matches the EMA ID format and hasn't been scanned recently
+                    const idRegex = /^EMA-\d{6}$/;
+                    if (idRegex.test(code.data) && code.data !== lastScannedResult) {
+                        console.log("QR Code found:", code.data);
+                        lastScannedResult = code.data; // Store to prevent re-scanning
+                        // Display result temporarily
+                        const resultElement = document.getElementById('qr-result');
+                        resultElement.textContent = `Scanned: ${code.data}`;
+                        resultElement.classList.remove('hidden');
+                        // Stop the camera
+                        stopQRScanner();
+                        // Simulate entering the ID and clicking login
+                        document.getElementById('login-id').value = code.data;
+                        // Use a small delay to ensure the value is set before calling handleLogin
+                        setTimeout(() => {
+                             // Call the existing login handler
+                             handleLogin();
+                        }, 500); // Slightly longer delay to allow UI feedback
+                        return; // Exit the tick loop
+                    } else if(code.data !== lastScannedResult) {
+                        console.log("Scanned QR code does not match EMA ID format:", code.data);
+                        // Optionally, show a message to the user for a short time
+                        const resultElement = document.getElementById('qr-result');
+                        resultElement.textContent = "Not a valid EMA ID QR code.";
+                        resultElement.classList.remove('hidden');
+                        setTimeout(() => {
+                            if (!resultElement.classList.contains('hidden')) {
+                                 resultElement.classList.add('hidden');
+                            }
+                        }, 2000); // Hide after 2 seconds
+                    }
+                }
+                requestAnimationFrame(qrTick); // Continue scanning
+            } else if (qrScanning) {
+                 requestAnimationFrame(qrTick); // Keep trying if not ready
+            }
+        }
+        // --- End QR Code Scanning Logic ---
 
 
         // Initialize the app when the DOM is fully loaded
