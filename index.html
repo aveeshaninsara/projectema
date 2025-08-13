@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMA - Elephant Monitoring App</title>
+    <title>EMA - Login</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- jsQR Library for QR Code scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
         :root {
             --md-sys-color-primary: #606c38;
@@ -156,6 +158,7 @@
             text-decoration: none;
             gap: 8px;
             min-height: 48px;
+            width: 100%; /* Make buttons full width */
         }
 
         .btn-primary {
@@ -226,115 +229,11 @@
             margin-top: 4px;
         }
 
-        .user-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 0;
+        .hidden {
+            display: none !important;
         }
 
-        .avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background-color: var(--md-sys-color-primary-container);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--md-sys-color-on-primary-container);
-            flex-shrink: 0;
-        }
-
-        .user-info h3 {
-            margin: 0;
-            font-size: 17px;
-            word-break: break-word;
-        }
-
-        .user-info p {
-            margin: 3px 0 0;
-            color: var(--md-sys-color-on-surface-variant);
-            font-size: 13px;
-        }
-
-        .stats-grid, .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 14px;
-            margin-top: 14px;
-        }
-
-        .stat-card, .feature-card {
-            background-color: var(--md-sys-color-surface-variant);
-            border-radius: var(--md-sys-shape-corner-medium);
-            padding: 14px;
-            text-align: center;
-            box-shadow: var(--md-sys-elevation-1);
-        }
-
-        .stat-card i, .feature-card i {
-            font-size: 22px;
-            color: var(--md-sys-color-primary);
-            margin-bottom: 6px;
-        }
-
-        .stat-card .value {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 6px 0;
-        }
-
-        .stat-card .label, .feature-card .label {
-            font-size: 13px;
-            color: var(--md-sys-color-on-surface-variant);
-        }
-
-        .features-grid {
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        }
-
-        .feature-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 14px;
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-
-        .feature-card:hover {
-            background-color: #d5d8c9;
-            transform: translateY(-2px);
-        }
-
-        .id-display {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .user-id {
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--md-sys-color-primary);
-            word-break: break-all;
-            background-color: var(--md-sys-color-primary-container);
-            padding: 14px;
-            border-radius: var(--md-sys-shape-corner-medium);
-            margin: 14px 0;
-        }
-
-        .qr-code {
-            margin: 20px auto;
-            display: block;
-            max-width: 100%;
-            height: auto;
-            width: 180px;
-            height: 180px;
-        }
-
+        /* QR Scanner Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -342,7 +241,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.9); /* Darker background */
             z-index: 1001;
             justify-content: center;
             align-items: center;
@@ -353,145 +252,52 @@
             display: flex;
         }
 
-        .modal-content {
-            background-color: white;
-            border-radius: var(--md-sys-shape-corner-large);
+        .scanner-container {
             width: 100%;
             max-width: 500px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
+            background-color: white;
+            border-radius: var(--md-sys-shape-corner-large);
+            overflow: hidden;
             box-shadow: var(--md-sys-elevation-2);
+            position: relative; /* For positioning the close button */
         }
 
-        /* --- IMPROVED MODAL HEADER --- */
-        .modal-header {
-            padding: 16px 20px; /* Increased padding */
-            border-bottom: 1px solid var(--md-sys-color-outline);
-            display: flex;
-            justify-content: space-between; /* This pushes items to edges */
-            align-items: center;
+        #video {
+            width: 100%;
+            display: block;
         }
 
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-            flex-grow: 1; /* Allows title to take space */
-            text-align: center; /* Center title */
+        .scanner-instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: var(--md-sys-shape-corner-medium);
+            width: 80%;
         }
 
-        .close-modal-btn {
-            background: none;
+        .close-scanner-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
             border: none;
-            color: var(--md-sys-color-on-surface-variant);
-            font-size: 1.2rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
             cursor: pointer;
-            padding: 8px; /* Increased touch area */
-            border-radius: 50%;
-            transition: background-color 0.2s;
-            margin-left: auto; /* Pushes button to the right */
+            z-index: 10; /* Above video */
         }
 
-        .close-modal-btn:hover {
-            background-color: var(--md-sys-color-surface-variant);
-            color: var(--md-sys-color-error); /* Optional: change color on hover */
-        }
-        /* --- END IMPROVED MODAL HEADER --- */
-
-
-        .modal-body {
-            padding: 16px 20px; /* Increased padding */
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .chat-messages {
-            display: flex;
-            flex-direction: column;
-            gap: 16px; /* Increased gap */
-        }
-
-        .message {
-            max-width: 85%;
-            padding: 14px 16px; /* Increased padding */
-            border-radius: var(--md-sys-shape-corner-medium);
-            position: relative;
-            animation: fadeIn 0.3s ease;
-            line-height: 1.5; /* Slightly increased line height */
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-message {
-            align-self: flex-start;
-            background-color: var(--md-sys-color-surface-variant);
-            color: var(--md-sys-color-on-surface-variant);
-            border-bottom-left-radius: 4px;
-        }
-
-        .typing-indicator {
-            display: none;
-            align-self: flex-start;
-            background-color: var(--md-sys-color-surface-variant);
-            padding: 14px 16px; /* Increased padding */
-            border-radius: var(--md-sys-shape-corner-medium);
-            border-bottom-left-radius: 4px;
-        }
-
-        .typing-indicator span {
-            height: 8px;
-            width: 8px;
-            background-color: var(--md-sys-color-on-surface-variant);
-            border-radius: 50%;
-            display: inline-block;
-            margin: 0 2px;
-            animation: bounce 1.3s linear infinite;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.15s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        @keyframes bounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
-
-        .modal-footer {
-            padding: 16px 20px; /* Increased padding */
-            border-top: 1px solid var(--md-sys-color-outline);
-            display: flex;
-            gap: 10px; /* Increased gap */
-        }
-
-        .modal-footer input {
-            flex-grow: 1;
-            min-height: 46px; /* Slightly taller input */
-            padding: 0 14px; /* Add padding inside input */
-        }
-
-        .modal-footer .btn {
-            min-width: 46px; /* Match input height */
-            min-height: 46px;
-            padding: 0; /* Remove default padding for icon button */
-        }
-
-        .hidden {
-            display: none !important;
+        .close-scanner-btn:hover {
+             background: rgba(0, 0, 0, 0.7);
         }
 
         @media (max-width: 360px) {
@@ -503,9 +309,6 @@
             }
             .btn {
                 padding: 10px 16px;
-            }
-            .stat-card, .feature-card {
-                padding: 12px;
             }
             .modal-content {
                 max-height: 95vh;
@@ -528,17 +331,17 @@
                 <input type="text" id="login-id" placeholder="EMA-XXXXXX">
                 <div id="login-error" class="error hidden"></div>
             </div>
-            <button id="access-app-btn" class="btn btn-primary btn-full">
+            <button id="access-app-btn" class="btn btn-primary">
                 <i class="fas fa-sign-in-alt"></i> Access App
             </button>
-            <button id="register-btn" class="btn btn-secondary btn-full mt-16">
+            <button id="quick-login-btn" class="btn btn-secondary mt-16">
+                <i class="fas fa-qrcode"></i> Quick Login (Scan ID)
+            </button>
+            <button id="register-btn" class="btn btn-text mt-16">
                 <i class="fas fa-user-plus"></i> New User? Register
             </button>
             <button id="guest-btn" class="btn btn-text">
                 <i class="fas fa-user-secret"></i> Continue as Guest
-            </button>
-            <button id="forgot-id-btn" class="btn btn-text">
-                <i class="fas fa-question-circle"></i> Forgot ID?
             </button>
         </div>
     </div>
@@ -580,7 +383,12 @@
                 <input type="tel" id="mobile" placeholder="0771234567">
                 <div id="mobile-error" class="error hidden"></div>
             </div>
-            <button id="generate-id-btn" class="btn btn-primary btn-full">
+            <div class="input-group">
+                <label for="profile-picture">Profile Picture</label>
+                <input type="file" accept="image/*" id="profile-picture" />
+                <div id="profile-picture-error" class="error hidden"></div>
+            </div>
+            <button id="generate-id-btn" class="btn btn-primary">
                 <i class="fas fa-id-card"></i> Generate My ID
             </button>
             <button id="back-to-login-btn" class="btn btn-text mt-16">
@@ -605,107 +413,16 @@
         </div>
     </div>
 
-    <!-- Home Screen -->
-    <div id="home-screen" class="screen">
-        <div class="card">
-            <div class="user-header">
-                <div class="avatar" id="user-avatar">U</div>
-                <div class="user-info">
-                    <h3 id="home-user-name">User Name</h3>
-                    <p id="home-user-id">EMA-XXXXXX</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-file-alt"></i>
-                    <div class="value">12</div>
-                    <div class="label">Reports</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-elephant"></i>
-                    <div class="value">8</div>
-                    <div class="label">Elephants</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div class="value">5</div>
-                    <div class="label">Locations</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-bell"></i>
-                    <div class="value">3</div>
-                    <div class="label">Alerts</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <i class="fas fa-bullhorn"></i>
-                    <div class="label">Report Elephant</div>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <div class="label">View Map</div>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-history"></i>
-                    <div class="label">History</div>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div class="label">Alerts</div>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-user"></i>
-                    <div class="label">Profile</div>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-cog"></i>
-                    <div class="label">Settings</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card text-center">
-            <button id="logout-btn" class="btn btn-primary btn-full">
-                <i class="fas fa-sign-out-alt"></i> Logout
+    <!-- QR Scanner Modal -->
+    <div id="qr-scanner-modal" class="modal">
+        <div class="scanner-container">
+            <button id="close-scanner-btn" class="close-scanner-btn">
+                <i class="fas fa-times"></i>
             </button>
-        </div>
-    </div>
-
-    <!-- AI Assistant Modal -->
-    <div id="ai-modal" class="modal">
-        <div class="modal-content">
-            <!-- --- IMPROVED MODAL HEADER --- -->
-            <div class="modal-header">
-                <h2>EMA ID Recovery</h2>
-                <button id="close-modal-btn" class="close-modal-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <!-- --- END IMPROVED MODAL HEADER --- -->
-            <div class="modal-body">
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Messages will be added here dynamically -->
-                </div>
-                <div class="typing-indicator" id="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <input type="text" id="user-message" placeholder="Type your message...">
-                <button id="send-message-btn" class="btn btn-primary">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+            <video id="video" playsinline></video>
+            <div class="scanner-instructions">
+                <p>Point your camera at your EMA ID QR code</p>
+                <p><i class="fas fa-qrcode fa-2x"></i></p>
             </div>
         </div>
     </div>
@@ -728,14 +445,17 @@
             startup: document.getElementById('startup-screen'),
             login: document.getElementById('login-screen'),
             register: document.getElementById('register-screen'),
-            idDisplay: document.getElementById('id-display-screen'),
-            home: document.getElementById('home-screen')
+            idDisplay: document.getElementById('id-display-screen')
         };
 
-        const modal = document.getElementById('ai-modal');
-        const chatMessages = document.getElementById('chat-messages');
-        const typingIndicator = document.getElementById('typing-indicator');
-        const userMessageInput = document.getElementById('user-message');
+        const provinceSelect = document.getElementById('province');
+        const districtSelect = document.getElementById('district');
+        const qrScannerModal = document.getElementById('qr-scanner-modal');
+        const video = document.getElementById('video');
+        const canvasElement = document.createElement('canvas');
+        const canvas = canvasElement.getContext('2d');
+        let scanning = false;
+        let stream = null; // To hold the camera stream
 
         // District data
         const districts = {
@@ -750,21 +470,9 @@
             "Sabaragamuwa": ["Ratnapura", "Kegalle"]
         };
 
-        // OpenRouter API Key - *** PLEASE VERIFY THIS IS CORRECT ***
-        const OPENROUTER_API_KEY = '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';
-
-        // Session data
-        let currentUser = null;
-        let conversationHistory = [
-             {
-                role: 'system',
-                content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users recover their EMA ID if they forget it. Here is the secure process: 1. Ask the user for their registered mobile number (format: 0XXXXXXXXX). 2. When they provide it, you MUST use the internal database lookup tool. 3. If the database tool finds a user, it will respond with "DB_LOOKUP_RESULT: FOUND: EMA-XXXXXX: Full Name: XXX XXX, Province: XXX". You must then ask the user to confirm a detail from this information (e.g., the first letter of their first name or the first three letters of their province) for security. 4. Only after they provide the correct confirmation detail should you tell them their full EMA ID. 5. If the database tool responds with "DB_LOOKUP_RESULT: NOT_FOUND", tell the user you could not find an account and suggest they check the number or register. 6. If the user asks about anything else, politely remind them you are here to help recover their ID and ask for their mobile number. Never reveal an ID without confirmation. Never make up an ID.'
-            }
-        ];
-
-
         // Firebase references (will be initialized after SDK loads)
         let db;
+        let currentUser = null; // Needed for handleLoginFromQR
 
         // Initialize app after Firebase SDK loads
         async function initApp() {
@@ -798,9 +506,6 @@
                 setupEventListeners();
 
                 // Populate districts
-                const provinceSelect = document.getElementById('province');
-                const districtSelect = document.getElementById('district');
-
                 provinceSelect.addEventListener('change', function() {
                     const selectedProvince = this.value;
                     districtSelect.innerHTML = '<option value="">Select District</option>';
@@ -818,33 +523,14 @@
                     }
                 });
 
-                // Initialize AI chat
-                initAIChat();
-
             } catch (error) {
                 console.error("Failed to load Firebase SDK:", error);
                 alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
                 screens.startup.style.display = 'none';
                 showScreen('login');
                 setupEventListeners();
-                initAIChat();
             }
         }
-
-        // Initialize AI Chat with welcome message
-        function initAIChat() {
-            chatMessages.innerHTML = '';
-             conversationHistory = [
-                 {
-                    role: 'system',
-                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users recover their EMA ID if they forget it. Here is the secure process: 1. Ask the user for their registered mobile number (format: 0XXXXXXXXX). 2. When they provide it, you MUST use the internal database lookup tool. 3. If the database tool finds a user, it will respond with "DB_LOOKUP_RESULT: FOUND: EMA-XXXXXX: Full Name: XXX XXX, Province: XXX". You must then ask the user to confirm a detail from this information (e.g., the first letter of their first name or the first three letters of their province) for security. 4. Only after they provide the correct confirmation detail should you tell them their full EMA ID. 5. If the database tool responds with "DB_LOOKUP_RESULT: NOT_FOUND", tell the user you could not find an account and suggest they check the number or register. 6. If the user asks about anything else, politely remind them you are here to help recover their ID and ask for their mobile number. Never reveal an ID without confirmation. Never make up an ID.'
-                }
-            ];
-            // Add initial AI message
-            addMessageToChat("Hello! I'm the EMA ID Recovery Assistant. Please tell me your registered mobile number (e.g., 0771234567).", 'ai');
-            conversationHistory.push({ role: 'assistant', content: "Hello! I'm the EMA ID Recovery Assistant. Please tell me your registered mobile number (e.g., 0771234567)." });
-        }
-
 
         // Screen navigation
         function showScreen(screenName) {
@@ -856,39 +542,15 @@
         // Event listeners
         function setupEventListeners() {
             document.getElementById('access-app-btn').addEventListener('click', handleLogin);
+            document.getElementById('quick-login-btn').addEventListener('click', startQRScanner);
             document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
             document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
-            document.getElementById('forgot-id-btn').addEventListener('click', () => {
-                modal.classList.add('active');
-                initAIChat();
-                setTimeout(() => {
-                    chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
-                }, 100);
-            });
-
             document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
             document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
+            document.getElementById('profile-picture').addEventListener('change', handleProfilePictureUpload);
 
-            document.getElementById('download-id-btn').addEventListener('click', downloadIDCard);
-            document.getElementById('use-id-btn').addEventListener('click', () => {
-                if (currentUser) {
-                    showHomeScreen();
-                } else {
-                    showScreen('login');
-                }
-            });
-
-            document.getElementById('logout-btn').addEventListener('click', handleLogout);
-
-            document.getElementById('close-modal-btn').addEventListener('click', () => {
-                modal.classList.remove('active');
-            });
-            document.getElementById('send-message-btn').addEventListener('click', sendUserMessageToAI);
-            userMessageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendUserMessageToAI();
-                }
-            });
+            // QR Scanner Modal Listeners
+            document.getElementById('close-scanner-btn').addEventListener('click', stopQRScanner);
         }
 
         // Login handler
@@ -904,6 +566,13 @@
             if (!userId) {
                 showError(errorElement, 'Please enter your ID');
                 return;
+            }
+
+            // Validate EMA ID format
+            const idRegex = /^EMA-\d{6}$/;
+            if (!idRegex.test(userId)) {
+                 showError(errorElement, 'Please enter a valid EMA ID (e.g., EMA-123456)');
+                 return;
             }
 
             try {
@@ -922,6 +591,79 @@
                 showError(errorElement, 'An error occurred. Please try again.');
             }
         }
+
+        // --- QR Code Scanning Logic ---
+        function startQRScanner() {
+            qrScannerModal.classList.add('active');
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Sorry, your browser does not support camera access. Please try a different browser.");
+                stopQRScanner();
+                return;
+            }
+
+            // Get access to the camera
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function(mediaStream) {
+                    stream = mediaStream; // Store the stream
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true); // Required for iOS Safari
+                    video.play();
+                    scanning = true;
+                    requestAnimationFrame(tick); // Start the scanning loop
+                })
+                .catch(function(err) {
+                    console.error("Camera access error:", err);
+                    alert("Could not access the camera. Please ensure you have granted permission and try again.");
+                    stopQRScanner();
+                });
+        }
+
+        function stopQRScanner() {
+            scanning = false;
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop()); // Stop all tracks
+                stream = null;
+            }
+            qrScannerModal.classList.remove('active');
+        }
+
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA && scanning) {
+                canvasElement.height = video.videoHeight;
+                canvasElement.width = video.videoWidth;
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    // Check if the decoded data matches the EMA ID format
+                    const idRegex = /^EMA-\d{6}$/;
+                    if (idRegex.test(code.data)) {
+                        console.log("QR Code found:", code.data);
+                        stopQRScanner(); // Stop the camera
+                        // Simulate entering the ID and clicking login
+                        document.getElementById('login-id').value = code.data;
+                        // Use a small delay to ensure the value is set before calling handleLogin
+                        setTimeout(() => {
+                             // Call the existing login handler
+                             handleLogin();
+                        }, 100);
+                        return; // Exit the tick loop
+                    } else {
+                        console.log("Scanned QR code does not match EMA ID format:", code.data);
+                        // Optionally, show a message to the user
+                    }
+                }
+                requestAnimationFrame(tick); // Continue scanning
+            } else if (scanning) {
+                 requestAnimationFrame(tick); // Keep trying if not ready
+            }
+        }
+        // --- End QR Code Scanning Logic ---
 
         // Guest login
         function handleGuestLogin() {
@@ -947,13 +689,16 @@
             const province = document.getElementById('province').value;
             const district = document.getElementById('district').value;
             const mobile = document.getElementById('mobile').value.trim();
+            const profilePictureInput = document.getElementById('profile-picture');
+            let profilePictureBase64 = null;
 
             const nameError = document.getElementById('name-error');
             const provinceError = document.getElementById('province-error');
             const districtError = document.getElementById('district-error');
             const mobileError = document.getElementById('mobile-error');
+            const profilePictureError = document.getElementById('profile-picture-error');
 
-            [nameError, provinceError, districtError, mobileError].forEach(el => {
+            [nameError, provinceError, districtError, mobileError, profilePictureError].forEach(el => {
                 el.classList.add('hidden');
                 el.textContent = '';
             });
@@ -984,6 +729,11 @@
                 isValid = false;
             }
 
+            if (!profilePictureInput.files[0]) {
+                showError(profilePictureError, 'Profile picture is required');
+                isValid = false;
+            }
+
             if (!isValid) return;
 
             try {
@@ -1007,11 +757,18 @@
                     registeredAt: new Date().toISOString()
                 };
 
-                // Attempt to save user data
-                await window.firebaseSet(window.firebaseRef(db, `users/${userId}`), userData);
-
-                currentUser = userData;
-                showIDScreen(userId);
+                // Handle profile picture upload
+                const file = profilePictureInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        profilePictureBase64 = event.target.result;
+                        saveUserData(userId, userData, profilePictureBase64);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    saveUserData(userId, userData, null);
+                }
             } catch (error) {
                 console.error("Registration error:", error);
                 // Provide more specific error messages
@@ -1025,6 +782,20 @@
             }
         }
 
+        async function saveUserData(userId, userData, profilePictureBase64) {
+            try {
+                await window.firebaseSet(window.firebaseRef(db, `users/${userId}`), {
+                    ...userData,
+                    profilePicture: profilePictureBase64
+                });
+
+                currentUser = { userId, ...userData, profilePicture: profilePictureBase64 };
+                showIDScreen(userId);
+            } catch (error) {
+                console.error("Error saving user data:", error);
+                showError(document.getElementById('mobile-error'), 'Failed to save user data. Please try again.');
+            }
+        }
 
         // Show ID screen
         function showIDScreen(userId) {
@@ -1034,218 +805,34 @@
             showScreen('idDisplay');
         }
 
-        // Download ID card
-        function downloadIDCard() {
-            const userId = document.getElementById('user-id-display').textContent;
-            const qrCodeSrc = document.getElementById('qr-code').src;
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 400;
-            canvas.height = 300;
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const logo = new Image();
-            logo.crossOrigin = "Anonymous";
-            logo.onload = function() {
-                ctx.drawImage(logo, canvas.width/2 - 50, 20, 100, 100);
-
-                ctx.fillStyle = '#000000';
-                ctx.font = 'bold 24px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('EMA ID Card', canvas.width/2, 150);
-
-                ctx.font = '18px Arial';
-                ctx.fillText(userId, canvas.width/2, 180);
-
-                const qrCode = new Image();
-                qrCode.onload = function() {
-                    ctx.drawImage(qrCode, canvas.width/2 - 50, 200, 100, 100);
-
-                    const link = document.createElement('a');
-                    link.download = `${userId}_ID_Card.png`;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                };
-                qrCode.src = qrCodeSrc;
-            };
-            logo.src = 'https://i.ibb.co/jvN2hV16/logo.png';
-        }
-
-        // Show home screen
-        function showHomeScreen() {
-            if (!currentUser) {
-                currentUser = JSON.parse(sessionStorage.getItem('emaUser'));
-            }
-
-            if (currentUser) {
-                document.getElementById('home-user-name').textContent = currentUser.fullName;
-                document.getElementById('home-user-id').textContent = currentUser.userId;
-                const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-                document.getElementById('user-avatar').textContent = initials;
-                showScreen('home');
-            } else {
-                showScreen('login');
-            }
-        }
-
-        // Logout handler
-        function handleLogout() {
-            currentUser = null;
-            sessionStorage.removeItem('emaUser');
-            showScreen('login');
-        }
-
         // Show error message
         function showError(element, message) {
             element.textContent = message;
             element.classList.remove('hidden');
         }
 
-       // AI Assistant functions - Simplified to use OpenRouter primarily
-        async function sendUserMessageToAI() {
-            const message = userMessageInput.value.trim();
-            if (!message) return;
-
-            // Add user message to chat and history
-            addMessageToChat(message, 'user');
-            conversationHistory.push({ role: 'user', content: message });
-            userMessageInput.value = '';
-
-            // Show typing indicator
-            typingIndicator.style.display = 'flex';
-            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
-
-            try {
-                 // Check for mobile number in the latest user message for database lookup
-                const mobileRegex = /0[0-9]{9}/;
-                const mobileMatch = message.match(mobileRegex);
-
-                let fullResponse = "";
-
-                if (mobileMatch) {
-                    const mobileNumber = mobileMatch[0];
-                    console.log("Attempting DB lookup for:", mobileNumber);
-                    const dbResult = await lookupUserByMobileForAI(mobileNumber);
-                    console.log("DB Lookup Result:", dbResult);
-
-                    // Inject database result into conversation history for AI to process
-                    const dbMessage = { role: 'system', content: `DB_LOOKUP_RESULT: ${dbResult}` };
-                    conversationHistory.push(dbMessage);
-                    fullResponse = `DB_LOOKUP_RESULT: ${dbResult}`; // For immediate processing
-                }
-
-
-                // --- IMPROVED AI API CALL ---
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        // Ensure the Authorization header is correctly formatted
-                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-                        'Content-Type': 'application/json'
-                        // Optional: Add a User-Agent if needed by the API
-                        // 'User-Agent': 'EMA-App/1.0'
-                    },
-                    body: JSON.stringify({
-                        model: 'google/gemma-7b-it:free',
-                        messages: conversationHistory,
-                        temperature: 0.7,
-                        max_tokens: 500
-                    })
-                });
-
-                console.log("AI API Response Status:", response.status); // Debugging
-                console.log("AI API Response OK?", response.ok);       // Debugging
-
-                if (!response.ok) {
-                    // Try to read the error body for more details
-                    let errorMsg = `API request failed with status ${response.status}`;
-                    try {
-                        const errorData = await response.json();
-                        console.error("AI API Error Details:", errorData); // Log details
-                        errorMsg += ` - ${errorData.message || JSON.stringify(errorData)}`;
-                    } catch (e) {
-                        // If parsing error body fails, just log the status text
-                        console.error("Could not parse AI API error body:", e);
-                        errorMsg += ` - ${response.statusText}`;
-                    }
-                    throw new Error(errorMsg);
-                }
-
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
-
-                // Hide typing indicator and show AI response
-                typingIndicator.style.display = 'none';
-                addMessageToChat(aiResponse, 'ai');
-                conversationHistory.push({ role: 'assistant', content: aiResponse });
-
-            } catch (error) {
-                console.error('AI Assistant error:', error);
-                typingIndicator.style.display = 'none';
-                // Provide a more detailed error message to the user if possible
-                const userErrorMsg = error.message.includes('401') ?
-                    'Authentication failed. Please check the API key.' :
-                    'Sorry, I encountered an error. Please try again.';
-                addMessageToChat(userErrorMsg, 'ai');
-                // Add error message to history so AI knows it failed
-                conversationHistory.push({ role: 'assistant', content: userErrorMsg });
+        // Handle profile picture upload
+        function handleProfilePictureUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const base64Image = event.target.result;
+                    // You can preview the image here if needed
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        // Add message to chat
-        function addMessageToChat(content, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-            messageDiv.textContent = content;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+        // Show home screen (redirect to home.html)
+        function showHomeScreen() {
+             // Redirect to home.html
+             window.location.href = 'home.html';
         }
-
-        // Lookup user by mobile number FOR AI ASSISTANT (returns formatted string)
-        async function lookupUserByMobileForAI(mobileNumber) {
-            if (!db) {
-                 return "ERROR: Database not initialized.";
-            }
-
-            try {
-                const usersRef = window.firebaseRef(db, 'users');
-                const mobileQuery = window.firebaseQuery(usersRef, window.firebaseOrderByChild('mobile'), window.firebaseEqualTo(mobileNumber));
-                const snapshot = await window.firebaseGet(mobileQuery);
-
-                if (snapshot.exists()) {
-                    const users = snapshot.val();
-                    const userId = Object.keys(users)[0];
-                    const userData = users[userId];
-                    // Return a specific format the AI can recognize and parse
-                    return `FOUND: ${userData.userId}: Full Name: ${userData.fullName}, Province: ${userData.province}`;
-                } else {
-                     return "NOT_FOUND";
-                }
-            } catch (error) {
-                console.error('Database lookup error for AI:', error);
-                if (error.code === 'PERMISSION_DENIED') {
-                     return "ERROR: Permission denied for database lookup.";
-                }
-                return `ERROR: ${error.message}`;
-            }
-        }
-
 
         // Check for existing session and initialize app
         window.addEventListener('DOMContentLoaded', () => {
-            const storedUser = sessionStorage.getItem('emaUser');
-            if (storedUser) {
-                currentUser = JSON.parse(storedUser);
-                initApp().then(() => {
-                     setTimeout(showHomeScreen, 100);
-                });
-            } else {
-                initApp();
-            }
+            initApp();
         });
     </script>
 </body>
