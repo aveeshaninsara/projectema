@@ -2,26 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- Prevent zooming issues -->
-    <title>EMAp</title>
-    <!-- Font Awesome -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EMA - Elephant Monitoring App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- jsQR Library for QR Code scanning -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <!-- Load Firebase SDKs directly for better reliability -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <style>
         :root {
-            /* Refined Green/Nature Palette */
-            --md-sys-color-primary: #4CAF50; /* Main Green */
+            --md-sys-color-primary: #4CAF50;
             --md-sys-color-on-primary: #FFFFFF;
-            --md-sys-color-primary-container: #C8E6C9; /* Light Green */
+            --md-sys-color-primary-container: #C8E6C9;
             --md-sys-color-on-primary-container: #1B5E20;
-            --md-sys-color-secondary: #81C784; /* Softer Green */
+            --md-sys-color-secondary: #81C784;
             --md-sys-color-on-secondary: #FFFFFF;
             --md-sys-color-secondary-container: #E8F5E9;
             --md-sys-color-on-secondary-container: #2E7D32;
-            --md-sys-color-surface: #F5F5F5; /* Very Light Gray/Greenish */
+            --md-sys-color-surface: #F5F5F5;
             --md-sys-color-on-surface: #212121;
             --md-sys-color-outline: #BDBDBD;
             --md-sys-color-error: #F44336;
@@ -41,8 +40,6 @@
             --md-sys-state-focus-opacity: 0.12;
             --md-sys-state-pressed-opacity: 0.12;
             --md-sys-state-dragged-opacity: 0.16;
-
-            /* Dark Theme Colors (default to light) */
             --theme-surface: var(--md-sys-color-surface);
             --theme-on-surface: var(--md-sys-color-on-surface);
             --theme-surface-variant: var(--md-sys-color-surface-variant);
@@ -58,40 +55,37 @@
             --theme-on-error: var(--md-sys-color-on-error);
         }
 
-        /* Ensure no scrollbars on body during load and allow scrolling once loaded */
         html, body {
             margin: 0;
             padding: 0;
-            /* Crucial for preventing initial scrollbars and fitting content */
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Hide scrollbars initially */
+            overflow: hidden;
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
         }
 
         body {
             background-color: var(--theme-surface);
             color: var(--theme-on-surface);
-            /* min-height ensures it takes at least full viewport height */
             min-height: 100vh;
-            /* Use flexbox for centering the main content */
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align items to the top */
-            padding: 16px; /* Add padding for smaller screens */
-            position: relative; /* For FAB positioning */
-            overflow: auto; /* Allow scrolling if content overflows */
+            align-items: flex-start;
+            padding: 16px;
+            position: relative;
+            overflow: auto;
         }
 
         .screen {
             width: 100%;
-            max-width: 500px; /* Max width for larger screens */
-            display: none; /* Hide all screens by default */
+            max-width: 500px;
+            display: none;
             flex-direction: column;
-            gap: 20px; /* Space between cards */
+            gap: 20px;
         }
 
         .active {
-            display: flex; /* Show the active screen */
+            display: flex;
         }
 
         .card {
@@ -100,7 +94,7 @@
             box-shadow: var(--md-sys-elevation-1);
             padding: 20px;
             width: 100%;
-            flex-shrink: 0; /* Prevent cards from shrinking */
+            flex-shrink: 0;
             border: 1px solid var(--theme-outline);
         }
 
@@ -108,7 +102,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Ensure it covers the full viewport */
             width: 100vw;
             height: 100vh;
             background-color: var(--theme-surface);
@@ -195,7 +188,7 @@
         }
 
         .btn-primary:hover {
-            background-color: #43A047; /* Darken primary for hover */
+            background-color: #43A047;
         }
 
         .btn-secondary {
@@ -204,7 +197,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: #A5D6A7; /* Lighten secondary for hover */
+            background-color: #A5D6A7;
         }
 
         .btn-text {
@@ -250,24 +243,23 @@
         }
 
         .success {
-            color: #4CAF50; /* Keep success green */
+            color: #4CAF50;
             font-size: 14px;
             margin-top: 4px;
         }
 
         .warning {
-             color: #FF9800; /* Orange warning color */
+             color: #FF9800;
             font-size: 14px;
             margin-top: 4px;
         }
 
-        /* --- Home Screen Specific Styles --- */
         .home-header {
             display: flex;
-            justify-content: flex-end; /* Align user button to the right */
+            justify-content: flex-end;
             align-items: center;
-            margin-bottom: 20px; /* Space below header */
-            padding: 0; /* Remove default padding */
+            margin-bottom: 20px;
+            padding: 0;
         }
 
         .user-btn {
@@ -283,37 +275,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Hide overflow for image */
+            overflow: hidden;
         }
 
         .user-btn:hover {
-             background-color: rgba(76, 175, 80, 0.1); /* Subtle hover */
+             background-color: rgba(76, 175, 80, 0.1);
         }
 
         .user-btn-avatar {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            object-fit: cover; /* Cover the area, potentially cropping */
-            display: none; /* Hidden by default */
+            object-fit: cover;
+            display: none;
         }
 
         .user-btn-initials {
             font-weight: bold;
         }
 
-
         .user-card {
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 14px 0; /* Padding top and bottom */
+            padding: 14px 0;
             cursor: pointer;
-            /* Remove the small circle avatar from here */
-            /* Remove top padding from the main card */
         }
 
-        /* The avatar inside the user card */
         .avatar {
             width: 52px;
             height: 52px;
@@ -326,14 +314,14 @@
             font-weight: bold;
             color: var(--theme-on-primary-container);
             flex-shrink: 0;
-            overflow: hidden; /* Hide overflow for image */
+            overflow: hidden;
         }
 
         .avatar img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Cover the area, potentially cropping */
-            display: none; /* Hidden by default */
+            object-fit: cover;
+            display: none;
         }
 
         .user-info h3 {
@@ -395,7 +383,7 @@
         }
 
         .action-card:hover {
-            background-color: #d5d8c9; /* Lighten surface-variant for hover */
+            background-color: #d5d8c9;
             transform: translateY(-2px);
         }
 
@@ -424,7 +412,6 @@
             height: 180px;
         }
 
-        /* Floating Action Button (FAB) */
         .fab {
             position: fixed;
             bottom: 20px;
@@ -446,11 +433,10 @@
         }
 
         .fab:hover {
-            background-color: #43A047; /* Darken primary for hover */
+            background-color: #43A047;
             transform: scale(1.05);
         }
 
-        /* --- Modals --- */
         .modal {
             display: none;
             position: fixed;
@@ -481,7 +467,6 @@
             border: 1px solid var(--theme-outline);
         }
 
-        /* --- IMPROVED MODAL HEADER --- */
         .modal-header {
             padding: 16px 20px;
             border-bottom: 1px solid var(--theme-outline);
@@ -514,8 +499,6 @@
             background-color: var(--theme-surface-variant);
             color: var(--theme-error);
         }
-        /* --- END IMPROVED MODAL HEADER --- */
-
 
         .modal-body {
             padding: 16px 20px;
@@ -608,7 +591,6 @@
             padding: 0;
         }
 
-        /* --- User Info Popup --- */
         .user-popup-content {
              text-align: center;
         }
@@ -624,13 +606,13 @@
             font-size: 40px;
             font-weight: bold;
             color: var(--theme-on-primary-container);
-            overflow: hidden; /* Hide overflow for image */
+            overflow: hidden;
         }
         .user-popup-avatar img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Cover the area, potentially cropping */
-            display: none; /* Hidden by default */
+            object-fit: cover;
+            display: none;
         }
         .user-popup-info h3 {
             margin: 0 0 8px 0;
@@ -647,9 +629,7 @@
             flex-direction: column;
             gap: 10px;
         }
-        /* --- End User Info Popup --- */
 
-        /* --- Report Form Styles --- */
         .elephant-counter {
             display: flex;
             align-items: center;
@@ -675,37 +655,34 @@
             border-radius: var(--md-sys-shape-corner-medium);
             border: 1px solid var(--theme-outline);
         }
-        /* --- End Report Form Styles --- */
 
-        /* --- Alerts Modal Enhancements --- */
         .alerts-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
-            flex-wrap: wrap; /* Allow wrapping on small screens */
+            flex-wrap: wrap;
             gap: 10px;
         }
 
         .alerts-filters {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap; /* Allow wrapping on small screens */
+            flex-wrap: wrap;
         }
 
         .alerts-filters .btn {
-            padding: 8px 12px; /* Smaller padding for filter buttons */
+            padding: 8px 12px;
             font-size: 14px;
-            min-height: auto; /* Override default min-height */
+            min-height: auto;
         }
 
-        /* --- Enhanced Alert Card Styles --- */
         .alert-card {
             background-color: var(--theme-surface-variant);
             border-radius: var(--md-sys-shape-corner-medium);
             box-shadow: var(--md-sys-elevation-1);
             margin-bottom: 16px;
-            overflow: hidden; /* Contain expanded content */
+            overflow: hidden;
             transition: box-shadow 0.2s;
             border: 1px solid var(--theme-outline);
         }
@@ -724,7 +701,7 @@
         }
 
         .alert-card-header:hover {
-            background-color: #bbdeb9; /* Lighten header on hover */
+            background-color: #bbdeb9;
         }
 
         .alert-card-user-info {
@@ -792,15 +769,15 @@
         }
 
         .alert-card-body {
-            padding: 0 16px 16px 16px; /* Closed state: minimal padding on sides/bottom */
+            padding: 0 16px 16px 16px;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease, padding 0.3s ease;
         }
 
         .alert-card.expanded .alert-card-body {
-            padding: 16px; /* Open state: full padding */
-            max-height: 1000px; /* Large enough value to accommodate content */
+            padding: 16px;
+            max-height: 1000px;
         }
 
         .alert-card-details {
@@ -812,9 +789,8 @@
             font-size: 14px;
         }
 
-        /* --- Image Thumbnail Style --- */
         .alert-card-image-thumbnail {
-            width: 100px; /* Thumbnail size */
+            width: 100px;
             height: 100px;
             object-fit: cover;
             border-radius: var(--md-sys-shape-corner-medium);
@@ -829,7 +805,6 @@
         .alert-card-image-thumbnail:hover {
             transform: scale(1.05);
         }
-        /* --- End Image Thumbnail Style --- */
 
         .chevron-icon {
             transition: transform 0.3s ease;
@@ -839,7 +814,6 @@
             transform: rotate(180deg);
         }
 
-        /* --- Image Zoom Modal --- */
         #image-zoom-modal .modal-content {
             max-width: 90vw;
             max-height: 90vh;
@@ -875,26 +849,21 @@
         #image-zoom-modal .close-modal-btn:hover {
             background-color: rgba(0, 0, 0, 0.7);
         }
-        /* --- End Image Zoom Modal --- */
 
-        /* --- Map Modal for Alerts --- */
         #alert-map-modal .modal-content {
             max-width: 95vw;
             max-height: 95vh;
         }
 
         #alert-map-container {
-            height: 70vh; /* Adjust map height */
+            height: 70vh;
             width: 100%;
             border-radius: var(--md-sys-shape-corner-medium);
             border: 1px solid var(--theme-outline);
         }
-        /* --- End Map Modal for Alerts --- */
 
-
-        /* --- ID Card Download Styles --- */
         #id-card-download {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -933,8 +902,6 @@
         #id-card-download-buttons .btn {
             min-width: 120px;
         }
-        /* --- End ID Card Download Styles --- */
-
 
         .hidden {
             display: none !important;
@@ -960,12 +927,10 @@
     </style>
 </head>
 <body>
-    <!-- Startup Screen -->
     <div id="startup-screen" class="logo-container">
         <img src="https://i.ibb.co/jvN2hV16/logo.png" alt="EMA Logo" class="logo">
     </div>
 
-    <!-- Login Screen -->
     <div id="login-screen" class="screen">
         <div class="card">
             <h1>Welcome to EMA</h1>
@@ -977,7 +942,6 @@
             <button id="access-app-btn" class="btn btn-primary btn-full">
                 <i class="fas fa-sign-in-alt"></i> Access App
             </button>
-             <!-- Quick Login Button -->
             <button id="quick-login-btn" class="btn btn-secondary btn-full mt-16">
                 <i class="fas fa-qrcode"></i> Quick Login (Scan ID)
             </button>
@@ -990,14 +954,13 @@
         </div>
     </div>
 
-    <!-- Registration Screen -->
     <div id="register-screen" class="screen">
         <div class="card">
             <h1>Register</h1>
             <div class="input-group">
                 <label for="full-name">Full Name</label>
                 <input type="text" id="full-name" placeholder="Enter your full name">
-                <div id="name-warning" class="warning hidden"></div> <!-- Warning for name format -->
+                <div id="name-warning" class="warning hidden"></div>
                 <div id="name-error" class="error hidden"></div>
             </div>
             <div class="input-group">
@@ -1031,7 +994,7 @@
              <div class="input-group">
                 <label for="profile-picture">Profile Picture</label>
                 <input type="file" accept="image/*" id="profile-picture" />
-                <div id="profile-picture-warning" class="warning hidden"></div> <!-- Warning for profile picture -->
+                <div id="profile-picture-warning" class="warning hidden"></div>
                 <div id="profile-picture-error" class="error hidden"></div>
                  <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
                  <button id="crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
@@ -1045,7 +1008,6 @@
         </div>
     </div>
 
-    <!-- Home Screen -->
     <div id="home-screen" class="screen">
         <div class="card">
             <div class="home-header">
@@ -1054,8 +1016,7 @@
                     <img class="user-btn-avatar" id="top-user-avatar" src="" alt="Profile">
                 </button>
             </div>
-             <!-- Main User Card at the top (without small circle/padding issues) -->
-            <div class="user-card" id="user-card">
+             <div class="user-card" id="user-card">
                 <div class="avatar" id="home-user-avatar">
                     <img id="home-user-avatar-img" src="" alt="Profile">
                     <span id="home-user-initials">U</span>
@@ -1064,7 +1025,7 @@
                     <h3 id="home-user-name">User Name</h3>
                     <p id="home-user-id">EMA-XXXXXX</p>
                 </div>
-                <i class="fas fa-chevron-right"></i> <!-- Chevron icon -->
+                <i class="fas fa-chevron-right"></i>
             </div>
         </div>
 
@@ -1072,22 +1033,22 @@
             <h2>Statistics</h2>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <i class="fas fa-file-alt"></i> <!-- Report icon -->
+                    <i class="fas fa-file-alt"></i>
                     <div class="value" id="total-reports">0</div>
                     <div class="label">Reports</div>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-elephant"></i> <!-- Elephant icon -->
+                    <i class="fas fa-elephant"></i>
                     <div class="value" id="total-elephants">0</div>
                     <div class="label">Elephants</div>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-map-marker-alt"></i> <!-- Location icon -->
+                    <i class="fas fa-map-marker-alt"></i>
                     <div class="value" id="unique-locations">0</div>
                     <div class="label">Locations</div>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-bell"></i> <!-- Alert icon -->
+                    <i class="fas fa-bell"></i>
                     <div class="value" id="recent-alerts">0</div>
                     <div class="label">Alerts</div>
                 </div>
@@ -1095,38 +1056,36 @@
         </div>
 
         <div class="card">
-            <h2>Actions</h2> <!-- Changed from Features to Actions -->
+            <h2>Actions</h2>
             <div class="actions-grid">
                 <div class="action-card" data-action="report">
-                    <i class="fas fa-bullhorn"></i> <!-- Report Elephant icon -->
+                    <i class="fas fa-bullhorn"></i>
                     <div class="label">Report Elephant</div>
                 </div>
                 <div class="action-card" data-action="map">
-                    <i class="fas fa-map-marked-alt"></i> <!-- View Map icon -->
+                    <i class="fas fa-map-marked-alt"></i>
                     <div class="label">View Map</div>
                 </div>
                 <div class="action-card" data-action="radar">
-                     <i class="fas fa-radar"></i> <!-- Radar icon -->
+                     <i class="fas fa-radar"></i>
                     <div class="label">Radar</div>
                 </div>
                 <div class="action-card" data-action="ai">
-                    <i class="fas fa-robot"></i> <!-- AI Chatbot icon -->
+                    <i class="fas fa-robot"></i>
                     <div class="label">AI Chatbot</div>
                 </div>
                  <div class="action-card" data-action="alerts">
-                    <i class="fas fa-exclamation-triangle"></i> <!-- Alerts icon -->
+                    <i class="fas fa-exclamation-triangle"></i>
                     <div class="label">Alerts</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Floating Action Button -->
     <button class="fab" id="quick-report-btn" title="Quick Report">
         <i class="fas fa-plus"></i>
     </button>
 
-    <!-- Report Modal -->
     <div id="report-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1165,7 +1124,6 @@
                         <label for="report-district">District</label>
                         <select id="report-district">
                             <option value="">Select District</option>
-                            <!-- Populate districts dynamically -->
                         </select>
                     </div>
                     <div class="input-group">
@@ -1184,7 +1142,6 @@
         </div>
     </div>
 
-    <!-- User Info Popup Modal -->
     <div id="user-popup-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1207,7 +1164,6 @@
                         <p><strong>Mobile:</strong> <span id="popup-user-mobile">077XXXXXXX</span></p>
                     </div>
                     <div class="user-popup-actions" id="user-popup-actions">
-                        <!-- Buttons will be dynamically shown/hidden -->
                         <button id="request-agent-mode-btn" class="btn btn-secondary btn-full">
                             <i class="fas fa-user-shield"></i> Request Agent Mode
                         </button>
@@ -1226,7 +1182,6 @@
         </div>
     </div>
 
-    <!-- AI Assistant Modal -->
     <div id="ai-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1237,7 +1192,6 @@
             </div>
             <div class="modal-body">
                 <div class="chat-messages" id="chat-messages">
-                    <!-- Messages will be added here dynamically -->
                 </div>
                 <div class="typing-indicator" id="typing-indicator">
                     <span></span>
@@ -1254,7 +1208,6 @@
         </div>
     </div>
 
-    <!-- Alerts Modal -->
     <div id="alerts-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1268,21 +1221,18 @@
                     <div class="alerts-filters">
                         <button id="filter-all" class="btn btn-secondary">All Districts</button>
                         <button id="filter-my-district" class="btn btn-secondary">My District</button>
-                        <!-- District filter dropdown will be populated dynamically -->
                         <select id="filter-by-district" class="btn btn-secondary">
                             <option value="">Filter by District</option>
                         </select>
                     </div>
                 </div>
                 <div class="alerts-list" id="alerts-list">
-                    <!-- Alerts will be populated here dynamically as expandable cards -->
                     <p class="text-center">Loading reports...</p>
                 </div>
             </div>
         </div>
     </div>
 
-     <!-- Image Zoom Modal -->
     <div id="image-zoom-modal" class="modal">
         <div class="modal-content">
             <div class="modal-body">
@@ -1294,7 +1244,6 @@
         </div>
     </div>
 
-    <!-- Map Modal for Alerts -->
     <div id="alert-map-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1310,7 +1259,6 @@
         </div>
     </div>
 
-    <!-- Leaflet Map for Location Picker -->
     <div id="map-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1329,7 +1277,6 @@
         </div>
     </div>
 
-    <!-- QR Scanner Modal -->
     <div id="qr-scanner-modal" class="modal">
         <div class="scanner-container">
             <button id="close-scanner-btn" class="close-scanner-btn">
@@ -1344,10 +1291,9 @@
         </div>
     </div>
 
-    <!-- ID Card Download Modal -->
     <div id="id-card-download" class="modal">
         <div id="id-card-canvas-container">
-            <canvas id="id-card-canvas" width="800" height="500"></canvas> <!-- Landscape format -->
+            <canvas id="id-card-canvas" width="800" height="500"></canvas>
             <div id="id-card-download-buttons">
                 <button id="print-id-card-btn" class="btn btn-primary">
                     <i class="fas fa-print"></i> Print
@@ -1362,11 +1308,9 @@
         </div>
     </div>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script type="module">
+    <script>
         // --- Firebase Configurations ---
-        // User Database (users-ema)
         const userFirebaseConfig = {
             apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
             authDomain: "users-ema.firebaseapp.com",
@@ -1378,7 +1322,6 @@
             measurementId: "G-ZZ04XCWXVQ"
         };
 
-        // Report Database (reports-ema)
         const reportFirebaseConfig = {
             apiKey: "AIzaSyAib835ipwr_zCw5vMJiy6YgYauGgn2yYg",
             authDomain: "reports-ema.firebaseapp.com",
@@ -1390,10 +1333,8 @@
             measurementId: "G-YWEBKKFK6Y"
         };
 
-        // OpenRouter API Key
         const OPENROUTER_API_KEY = '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';
 
-        // DOM Elements
         const screens = {
             startup: document.getElementById('startup-screen'),
             login: document.getElementById('login-screen'),
@@ -1406,11 +1347,11 @@
             userPopup: document.getElementById('user-popup-modal'),
             ai: document.getElementById('ai-modal'),
             alerts: document.getElementById('alerts-modal'),
-            imageZoom: document.getElementById('image-zoom-modal'), // Add Image Zoom Modal
-            alertMap: document.getElementById('alert-map-modal'), // Add Alert Map Modal
+            imageZoom: document.getElementById('image-zoom-modal'),
+            alertMap: document.getElementById('alert-map-modal'),
             map: document.getElementById('map-modal'),
             qrScanner: document.getElementById('qr-scanner-modal'),
-            idCardDownload: document.getElementById('id-card-download') // Add ID Card Download Modal
+            idCardDownload: document.getElementById('id-card-download')
         };
 
         const chatMessages = document.getElementById('chat-messages');
@@ -1420,13 +1361,11 @@
         const cropBtn = document.getElementById('crop-btn');
         const mapElement = document.getElementById('map');
         const mapCoordinatesElement = document.getElementById('map-coordinates');
-        const alertMapContainer = document.getElementById('alert-map-container'); // Add Alert Map Container
-        const alertMapCoordinatesElement = document.getElementById('alert-map-coordinates'); // Add Alert Map Coordinates Element
+        const alertMapContainer = document.getElementById('alert-map-container');
+        const alertMapCoordinatesElement = document.getElementById('alert-map-coordinates');
 
-        // Floating Action Button
         const quickReportBtn = document.getElementById('quick-report-btn');
 
-        // District data (Sri Lankan districts grouped by province)
         const sriLankanProvincesAndDistricts = {
             "Western": ["Colombo", "Gampaha", "Kalutara"],
             "Central": ["Kandy", "Matale", "Nuwara Eliya"],
@@ -1439,7 +1378,6 @@
             "Sabaragamuwa": ["Ratnapura", "Kegalle"]
         };
 
-        // All Sri Lankan districts for report form and filters
         const allSriLankanDistricts = [
             "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
             "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
@@ -1448,7 +1386,6 @@
             "Monaragala", "Ratnapura", "Kegalle"
         ];
 
-        // Session data
         let currentUser = null;
         let conversationHistory = [
             {
@@ -1457,64 +1394,41 @@
             }
         ];
 
-        // Image cropping variables
         let originalImage = null;
         let croppedImageDataUrl = null;
+        let editOriginalImage = null;
+        let editCroppedImageDataUrl = null;
 
-        // Map variables
         let map = null;
         let marker = null;
         let selectedLocation = null;
-
-        // Alert Map variable
         let alertMap = null;
         let alertMarker = null;
 
-        // Firebase references (will be initialized after SDK loads)
         let userDb = null;
         let reportDb = null;
 
-        // --- QR Scanner Variables ---
         const qrVideo = document.getElementById('qr-video');
         const qrCanvasElement = document.createElement('canvas');
         const qrCanvas = qrCanvasElement.getContext('2d');
         let qrScanning = false;
         let qrStream = null;
-        let lastScannedResult = null; // To prevent duplicate scans
+        let lastScannedResult = null;
 
         // --- Initialize App ---
         async function initApp() {
             try {
-                // Dynamically import Firebase SDKs for User DB
-                const { initializeApp: initializeUserApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-                const { getDatabase: getUserDatabase, ref: userRef, get: userGet, set: userSet, update: userUpdate, remove: userRemove, query: userQuery, orderByChild: userOrderByChild, equalTo: userEqualTo, onValue: userOnValue } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
-
-                // Dynamically import Firebase SDKs for Report DB
-                const { initializeApp: initializeReportApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-                const { getDatabase: getReportDatabase, ref: reportRef, push: reportPush, onValue: reportOnValue } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                // Firebase SDKs are now loaded via <script> tags
 
                 // Initialize Firebase Apps
-                const userApp = initializeUserApp(userFirebaseConfig, 'userApp');
-                const reportApp = initializeReportApp(reportFirebaseConfig, 'reportApp');
+                const userApp = firebase.initializeApp(userFirebaseConfig, 'userApp');
+                const reportApp = firebase.initializeApp(reportFirebaseConfig, 'reportApp');
 
                 // Get Database instances
-                userDb = getUserDatabase(userApp);
-                reportDb = getReportDatabase(reportApp);
+                userDb = firebase.database(userApp);
+                reportDb = firebase.database(reportApp);
 
-                // Make Firebase functions globally available for use in handlers
-                window.userRef = userRef;
-                window.userGet = userGet;
-                window.userSet = userSet;
-                window.userUpdate = userUpdate; // Add update function
-                window.userRemove = userRemove;
-                window.userQuery = userQuery;
-                window.userOrderByChild = userOrderByChild;
-                window.userEqualTo = userEqualTo;
-                window.userOnValue = userOnValue; // Add onValue for real-time listeners
-
-                window.reportRef = reportRef;
-                window.reportPush = reportPush;
-                window.reportOnValue = reportOnValue; // Add onValue for real-time listeners
+                console.log("EMA App: Firebase initialized successfully.");
 
                 // Show startup screen
                 setTimeout(() => {
@@ -1538,8 +1452,8 @@
                 checkExistingSession();
 
             } catch (error) {
-                console.error("Failed to load Firebase SDK or initialize app:", error);
-                alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
+                console.error("EMA App: Critical Error during initialization:", error);
+                alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again. Error: " + error.message);
                 screens.startup.style.display = 'none';
                 showScreen('login');
                 setupEventListeners();
@@ -1547,36 +1461,29 @@
             }
         }
 
-        // --- Helper Functions ---
-
-        // Check for existing session
         function checkExistingSession() {
             const storedUser = sessionStorage.getItem('emaUser');
             if (storedUser) {
                 currentUser = JSON.parse(storedUser);
                 showHomeScreen();
-                // Start listening for real-time stats updates
                 listenForStatsUpdates();
             }
         }
 
-        // Listen for real-time updates to statistics
         function listenForStatsUpdates() {
             if (!reportDb) return;
 
-            const reportsRef = window.reportRef(reportDb, 'reports');
-            window.reportOnValue(reportsRef, (snapshot) => {
+            const reportsRef = reportDb.ref('reports');
+            reportsRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     updateStatistics(data);
                 } else {
-                     // Handle case where there are no reports
                     updateStatistics({});
                 }
             });
         }
 
-        // Update statistics on the home screen
         function updateStatistics(reportsData) {
             let totalReports = 0;
             let totalElephants = 0;
@@ -1584,7 +1491,7 @@
             let recentAlerts = 0;
 
             const now = new Date();
-            const oneDayAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000)); // 24 hours ago
+            const oneDayAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
 
             for (const key in reportsData) {
                 if (reportsData.hasOwnProperty(key)) {
@@ -1592,12 +1499,10 @@
                     totalReports++;
                     totalElephants += report.numElephants || 0;
 
-                    // Assuming location is stored as {lat, lng}
                     if (report.location && report.location.lat !== undefined && report.location.lng !== undefined) {
-                        locations.add(`${report.location.lat.toFixed(4)},${report.location.lng.toFixed(4)}`); // Round for uniqueness
+                        locations.add(`${report.location.lat.toFixed(4)},${report.location.lng.toFixed(4)}`);
                     }
 
-                    // Count recent alerts (reports from last 24 hours)
                     const reportTimestamp = new Date(report.timestamp);
                     if (reportTimestamp > oneDayAgo) {
                         recentAlerts++;
@@ -1611,14 +1516,7 @@
             document.getElementById('recent-alerts').textContent = recentAlerts;
         }
 
-
-        // Populate district dropdowns
         function populateDistrictDropdowns() {
-            // Populate registration district dropdown based on province
-            const provinceSelect = document.getElementById('province');
-            const districtSelect = document.getElementById('district');
-
-            // Populate report district dropdown with all districts
             const reportDistrictSelect = document.getElementById('report-district');
             reportDistrictSelect.innerHTML = '<option value="">Select District</option>';
             allSriLankanDistricts.forEach(district => {
@@ -1628,9 +1526,7 @@
                 reportDistrictSelect.appendChild(option);
             });
 
-            // Populate filter-by-district dropdown in Alerts modal
             const filterDistrictSelect = document.getElementById('filter-by-district');
-            // Clear existing options except the first one
             filterDistrictSelect.innerHTML = '<option value="">Filter by District</option>';
             allSriLankanDistricts.forEach(district => {
                 const option = document.createElement('option');
@@ -1638,15 +1534,8 @@
                 option.textContent = district;
                 filterDistrictSelect.appendChild(option);
             });
-
-             // Populate edit profile district dropdown based on province
-            // (Assuming an edit profile modal exists with these IDs)
-            // const editProvinceSelect = document.getElementById('edit-province');
-            // const editDistrictSelect = document.getElementById('edit-district');
-             // This will be populated dynamically when the province changes, like in registration
         }
 
-        // Initialize AI Chat with welcome message
         function initAIChat() {
             chatMessages.innerHTML = '';
             conversationHistory = [
@@ -1659,14 +1548,12 @@
             conversationHistory.push({ role: 'assistant', content: "Hello! I'm the EMA AI Assistant. How can I help you today?" });
         }
 
-        // Screen navigation
         function showScreen(screenName) {
             Object.values(screens).forEach(screen => screen.classList.remove('active'));
             if (screens[screenName]) {
                 screens[screenName].classList.add('active');
             }
             window.scrollTo(0, 0);
-             // Show/hide FAB based on screen
             if (screenName === 'home') {
                 quickReportBtn.style.display = 'flex';
             } else {
@@ -1674,7 +1561,6 @@
             }
         }
 
-        // Modal control
         function openModal(modalName) {
             if (modals[modalName]) {
                 modals[modalName].classList.add('active');
@@ -1687,28 +1573,19 @@
             }
         }
 
-        // --- Event Listeners ---
         function setupEventListeners() {
-            // --- Login Screen ---
             document.getElementById('access-app-btn').addEventListener('click', handleLogin);
-            document.getElementById('quick-login-btn').addEventListener('click', startQRScanner); // Add QR Scan listener
+            document.getElementById('quick-login-btn').addEventListener('click', startQRScanner);
             document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
             document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
-
-            // --- Registration Screen ---
             document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
             document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
             document.getElementById('profile-picture').addEventListener('change', handleProfilePictureSelect);
             cropBtn.addEventListener('click', performCrop);
-
-            // --- Province/District Logic for Registration ---
-            const provinceSelect = document.getElementById('province');
-            const districtSelect = document.getElementById('district');
-
-            provinceSelect.addEventListener('change', function () {
+            document.getElementById('province').addEventListener('change', function () {
                 const selectedProvince = this.value;
-                districtSelect.innerHTML = '<option value="">Select District</option>'; // Clear previous options
-
+                const districtSelect = document.getElementById('district');
+                districtSelect.innerHTML = '<option value="">Select District</option>';
                 if (selectedProvince && sriLankanProvincesAndDistricts[selectedProvince]) {
                     sriLankanProvincesAndDistricts[selectedProvince].forEach(district => {
                         const option = document.createElement('option');
@@ -1716,39 +1593,30 @@
                         option.textContent = district;
                         districtSelect.appendChild(option);
                     });
-                    districtSelect.disabled = false; // Enable district dropdown
+                    districtSelect.disabled = false;
                 } else {
-                    districtSelect.disabled = true; // Disable if no province selected
+                    districtSelect.disabled = true;
                 }
-
-                // Clear any previous district error
                 document.getElementById('district-error').classList.add('hidden');
             });
 
-            // --- Home Screen ---
             document.getElementById('open-user-btn').addEventListener('click', openUserPopup);
             document.getElementById('user-card').addEventListener('click', openUserPopup);
-            // Removed settings button listener
-            document.querySelectorAll('.action-card').forEach(card => { // Changed from feature-card to action-card
+            document.querySelectorAll('.action-card').forEach(card => {
                 card.addEventListener('click', function () {
-                    const action = this.getAttribute('data-action'); // Changed from data-feature to data-action
-                    handleActionClick(action); // Changed function name
+                    const action = this.getAttribute('data-action');
+                    handleActionClick(action);
                 });
             });
 
-            // --- Floating Action Button ---
-            quickReportBtn.addEventListener('click', () => {
-                handleActionClick('report'); // Reuse the report action
-            });
+            quickReportBtn.addEventListener('click', () => handleActionClick('report'));
 
-            // --- User Popup Modal ---
             document.getElementById('close-user-popup').addEventListener('click', () => closeModal('userPopup'));
-            document.getElementById('request-agent-mode-btn').addEventListener('click', openAgentRequestForm); // Add Agent Request listener
+            document.getElementById('request-agent-mode-btn').addEventListener('click', openAgentRequestForm);
             document.getElementById('edit-profile-btn').addEventListener('click', openEditProfileModal);
             document.getElementById('sign-out-btn').addEventListener('click', handleLogout);
             document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
 
-            // --- AI Assistant Modal ---
             document.getElementById('close-ai-modal').addEventListener('click', () => closeModal('ai'));
             document.getElementById('send-message-btn').addEventListener('click', sendUserMessageToAI);
             userMessageInput.addEventListener('keypress', (e) => {
@@ -1757,13 +1625,11 @@
                 }
             });
 
-            // --- Report Modal ---
             document.getElementById('close-report-modal').addEventListener('click', () => closeModal('report'));
             document.getElementById('get-location-btn').addEventListener('click', getLocation);
             document.getElementById('open-map-btn').addEventListener('click', openMapModal);
             document.getElementById('increase-elephants').addEventListener('click', () => {
                 const input = document.getElementById('num-elephants');
-                // Ensure it's a number and at least 1
                 let value = parseInt(input.value) || 1;
                 input.value = value + 1;
             });
@@ -1776,7 +1642,6 @@
             });
             document.getElementById('report-form').addEventListener('submit', submitReport);
 
-            // --- Alerts Modal ---
             document.getElementById('close-alerts-modal').addEventListener('click', () => closeModal('alerts'));
             document.getElementById('filter-all').addEventListener('click', () => loadAndDisplayAlerts('all'));
             document.getElementById('filter-my-district').addEventListener('click', () => {
@@ -1784,7 +1649,7 @@
                     loadAndDisplayAlerts(currentUser.district);
                 } else {
                     alert("Your district information is not available.");
-                    loadAndDisplayAlerts('all'); // Fallback to all
+                    loadAndDisplayAlerts('all');
                 }
             });
             document.getElementById('filter-by-district').addEventListener('change', function () {
@@ -1796,39 +1661,25 @@
                 }
             });
 
-            // --- Image Zoom Modal ---
             document.getElementById('close-image-zoom-modal').addEventListener('click', () => closeModal('imageZoom'));
-            document.getElementById('zoomed-image').addEventListener('click', () => closeModal('imageZoom')); // Close on image click too
+            document.getElementById('zoomed-image').addEventListener('click', () => closeModal('imageZoom'));
 
-            // --- Alert Map Modal ---
             document.getElementById('close-alert-map-modal').addEventListener('click', () => closeModal('alertMap'));
 
-            // --- Map Modal ---
             document.getElementById('close-map-modal').addEventListener('click', () => closeModal('map'));
             document.getElementById('confirm-location-btn').addEventListener('click', confirmLocation);
 
-            // --- QR Scanner Modal ---
             document.getElementById('close-scanner-btn').addEventListener('click', stopQRScanner);
 
-            // --- ID Card Download Modal ---
             document.getElementById('close-id-card-download-btn').addEventListener('click', () => closeModal('idCardDownload'));
             document.getElementById('print-id-card-btn').addEventListener('click', printIDCard);
             document.getElementById('download-id-card-btn').addEventListener('click', downloadIDCardFinal);
 
-             // --- Name Validation for Registration ---
             document.getElementById('full-name').addEventListener('blur', validateRegistrationName);
             document.getElementById('profile-picture').addEventListener('change', validateProfilePictureName);
-
-             // --- Name Validation for Edit Profile ---
-            // (Assuming an edit profile modal exists)
-            // document.getElementById('edit-full-name').addEventListener('blur', validateEditProfileName);
-            // document.getElementById('edit-profile-picture').addEventListener('change', validateEditProfilePictureName);
-
         }
 
-        // Handle action button clicks (renamed from feature)
-        function handleActionClick(action) { // Renamed function
-            console.log("Action clicked:", action);
+        function handleActionClick(action) {
             if (action === 'ai') {
                 openModal('ai');
                 setTimeout(() => {
@@ -1836,92 +1687,16 @@
                 }, 100);
             } else if (action === 'report') {
                 openModal('report');
-                // Reset form fields
                 document.getElementById('report-form').reset();
                 document.getElementById('location').value = "Click 'Get Location' or 'Pick on Map'";
                 document.getElementById('num-elephants').value = 1;
                 selectedLocation = null;
-                // Repopulate district dropdown in case it was changed elsewhere
-                // Note: report district dropdown is populated once on init, no need to repopulate here unless dynamic
             } else if (action === 'alerts') {
                 openModal('alerts');
-                // Load all alerts by default when opening
                 loadAndDisplayAlerts('all');
             }
-            // Add logic for other actions (map, radar) here
         }
 
-        // --- Name Validation Functions ---
-        function validateRegistrationName() {
-            const fullName = document.getElementById('full-name').value.trim();
-            const warningElement = document.getElementById('name-warning');
-            const errorElement = document.getElementById('name-error');
-
-            // Clear previous warnings/errors
-            warningElement.classList.add('hidden');
-            warningElement.textContent = '';
-            errorElement.classList.add('hidden');
-            errorElement.textContent = '';
-
-            if (!fullName) return; // Don't validate if empty
-
-            const parts = fullName.split(/\s+/); // Split by whitespace
-            const hasSymbolsOrNumbers = /[0-9!@#$%^&*(),.?":{}|<>[\]\\;'`~_+=/-]/.test(fullName);
-
-            if (parts.length < 2) {
-                // Show warning for single name part
-                warningElement.textContent = "Consider using your full name (e.g., 'John Doe'). Accounts with incomplete names may be reviewed.";
-                warningElement.classList.remove('hidden');
-            }
-
-            if (hasSymbolsOrNumbers) {
-                // Show warning for symbols/numbers
-                warningElement.textContent = "Names should generally not contain symbols or numbers. Accounts with unusual names may be reviewed.";
-                warningElement.classList.remove('hidden');
-            }
-        }
-
-        function validateProfilePictureName() {
-            const file = document.getElementById('profile-picture').files[0];
-            const fullName = document.getElementById('full-name').value.trim();
-            const warningElement = document.getElementById('profile-picture-warning');
-
-            warningElement.classList.add('hidden');
-            warningElement.textContent = '';
-
-            if (file && fullName) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        // Simple check: if name is incomplete, remind about image clarity.
-                        const parts = fullName.split(/\s+/);
-                        if (parts.length < 2) {
-                             warningElement.textContent = "If your name has multiple parts, please ensure your profile picture clearly shows your full name.";
-                             warningElement.classList.remove('hidden');
-                        }
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function validateEditProfileName() {
-            // Similar logic as validateRegistrationName, applied to edit profile fields
-            // (Assuming an edit profile modal exists)
-        }
-
-        function validateEditProfilePictureName() {
-            // Similar logic as validateProfilePictureName, applied to edit profile fields
-            // (Assuming an edit profile modal exists)
-        }
-        // --- End Name Validation Functions ---
-
-
-        // --- Authentication Logic ---
-
-        // Login handler
         async function handleLogin() {
             if (!userDb) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
@@ -1943,14 +1718,14 @@
             }
 
             try {
-                const userRef = window.userRef(userDb, `users/${userId}`);
-                const snapshot = await window.userGet(userRef);
+                const userRef = userDb.ref(`users/${userId}`);
+                const snapshot = await userRef.once('value');
 
                 if (snapshot.exists()) {
                     currentUser = { userId, ...snapshot.val() };
                     sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
                     showHomeScreen();
-                    listenForStatsUpdates(); // Start listening for stats
+                    listenForStatsUpdates();
                 } else {
                     showError(errorElement, 'Invalid ID. Please check and try again.');
                 }
@@ -1960,7 +1735,6 @@
             }
         }
 
-        // Guest login
         function handleGuestLogin() {
             currentUser = {
                 userId: 'GUEST',
@@ -1971,10 +1745,9 @@
             };
             sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
             showHomeScreen();
-            listenForStatsUpdates(); // Start listening for stats
+            listenForStatsUpdates();
         }
 
-        // Handle profile picture selection and preview
         function handleProfilePictureSelect(event) {
             const file = event.target.files[0];
             const errorElement = document.getElementById('profile-picture-error');
@@ -2027,13 +1800,12 @@
             return { width: srcWidth * ratio, height: srcHeight * ratio };
         }
 
-        // Perform cropping (simple center crop to square for base64)
         function performCrop() {
             if (!originalImage) return;
 
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const cropSize = 100; // Small size for storage
+            const cropSize = 100;
 
             canvas.width = cropSize;
             canvas.height = cropSize;
@@ -2058,12 +1830,11 @@
                 0, 0, cropSize, cropSize
             );
 
-            croppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7); // JPEG quality 70%
+            croppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7);
             alert("Image cropped successfully!");
             cropBtn.classList.add('hidden');
         }
 
-        // Registration handler
         async function handleRegistration() {
             if (!userDb) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
@@ -2074,7 +1845,7 @@
             const province = document.getElementById('province').value;
             const district = document.getElementById('district').value;
             const mobile = document.getElementById('mobile').value.trim();
-            const profilePictureBase64 = croppedImageDataUrl; // Can be null
+            const profilePictureBase64 = croppedImageDataUrl;
 
             const nameError = document.getElementById('name-error');
             const provinceError = document.getElementById('province-error');
@@ -2116,9 +1887,9 @@
             if (!isValid) return;
 
             try {
-                const usersRef = window.userRef(userDb, 'users');
-                const mobileQuery = window.userQuery(usersRef, window.userOrderByChild('mobile'), window.userEqualTo(mobile));
-                const snapshot = await window.userGet(mobileQuery);
+                const usersRef = userDb.ref('users');
+                const mobileQuery = usersRef.orderByChild('mobile').equalTo(mobile);
+                const snapshot = await mobileQuery.once('value');
 
                 if (snapshot.exists()) {
                     showError(mobileError, 'This mobile number is already registered');
@@ -2136,10 +1907,10 @@
                     profilePicture: profilePictureBase64
                 };
 
-                await window.userSet(window.userRef(userDb, `users/${userId}`), userData);
+                await userDb.ref(`users/${userId}`).set(userData);
 
                 currentUser = userData;
-                showIDCardDownload(userId); // Show ID card download modal instead of navigating to a separate screen
+                showIDCardDownload(userId);
             } catch (error) {
                 console.error("Registration error:", error);
                 if (error.code === 'PERMISSION_DENIED') {
@@ -2150,70 +1921,50 @@
             }
         }
 
-        // Show ID Card Download Modal with QR Code
         function showIDCardDownload(userId) {
              openModal('idCardDownload');
 
             const canvas = document.getElementById('id-card-canvas');
             const ctx = canvas.getContext('2d');
 
-            // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw background
-            ctx.fillStyle = '#ffffff'; // White background
+            ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw logo
             const logo = new Image();
             logo.crossOrigin = "Anonymous";
             logo.onload = function () {
-                // Center the logo
                 const logoWidth = 150;
                 const logoHeight = 150;
                 const logoX = (canvas.width - logoWidth) / 2;
-                const logoY = 50; // Position from top
+                const logoY = 50;
                 ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
 
-                // Draw title
-                ctx.fillStyle = '#4CAF50'; // Green color
+                ctx.fillStyle = '#4CAF50';
                 ctx.font = 'bold 36px Arial';
                 ctx.textAlign = 'center';
                 ctx.fillText('EMA ID Card', canvas.width / 2, logoY + logoHeight + 50);
 
-                // Draw ID
-                ctx.fillStyle = '#212121'; // Dark text
+                ctx.fillStyle = '#212121';
                 ctx.font = '28px Arial';
                 ctx.fillText(userId, canvas.width / 2, logoY + logoHeight + 100);
 
-                // Generate and draw QR Code
-                const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(userId)}&size=150`; // Larger QR for print
+                const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(userId)}&size=150`;
                 const qrCode = new Image();
                 qrCode.crossOrigin = "Anonymous";
                 qrCode.onload = function () {
-                    // Position QR code below the ID
                     const qrX = (canvas.width - 150) / 2;
-                    const qrY = logoY + logoHeight + 120; // Below the ID text
+                    const qrY = logoY + logoHeight + 120;
                     ctx.drawImage(qrCode, qrX, qrY, 150, 150);
 
-                     // Draw footer note
-                    ctx.fillStyle = '#9E9E9E'; // Light gray
+                    ctx.fillStyle = '#9E9E9E';
                     ctx.font = '16px Arial';
                     ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
-
-                     // Re-trigger the final draw to ensure QR is included
-                     // This is a simple way to ensure the QR is drawn before the modal becomes active
-                     // In a more complex scenario, you might use Promises or async/await
-                     setTimeout(() => {
-                          // The canvas is now fully drawn with the QR code
-                          // The modal is already open, so the user sees the final result
-                     }, 100); // Short delay to ensure image load and draw
 
                 };
                 qrCode.onerror = function() {
                      console.error("Failed to load QR code image for ID card.");
-                     // The rest of the card is still drawn, just without the QR
-                     // Draw footer note even if QR fails
                      ctx.fillStyle = '#9E9E9E';
                      ctx.font = '16px Arial';
                      ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
@@ -2222,14 +1973,11 @@
             };
             logo.onerror = function() {
                  console.error("Failed to load logo for ID card.");
-                 // Proceed with drawing the rest, perhaps with a placeholder or text
-                 // For simplicity, we'll just call the onload handler to continue drawing
                  logo.onload();
             };
             logo.src = 'https://i.ibb.co/jvN2hV16/logo.png';
         }
 
-        // Print ID Card
         function printIDCard() {
              const canvas = document.getElementById('id-card-canvas');
             const dataUrl = canvas.toDataURL('image/png');
@@ -2266,7 +2014,6 @@
                     <script>
                         window.onload = function() {
                             window.print();
-                            // window.close(); // Optional: close the window after printing
                         };
                     </script>
                 </body>
@@ -2275,7 +2022,6 @@
             printWindow.document.close();
         }
 
-        // Download ID Card
         function downloadIDCardFinal() {
             const canvas = document.getElementById('id-card-canvas');
             const dataUrl = canvas.toDataURL('image/png');
@@ -2285,7 +2031,6 @@
             link.click();
         }
 
-        // Show home screen
         function showHomeScreen() {
             if (!currentUser) {
                 const storedUser = sessionStorage.getItem('emaUser');
@@ -2298,7 +2043,6 @@
             }
 
             if (currentUser) {
-                // Set user info on home screen
                 document.getElementById('home-user-name').textContent = currentUser.fullName;
                 document.getElementById('home-user-id').textContent = currentUser.userId;
                 document.getElementById('top-user-initials').textContent = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -2307,7 +2051,6 @@
                 document.getElementById('home-user-initials').textContent = initials;
                 document.getElementById('top-user-initials').textContent = initials;
 
-                // Handle profile picture display
                 const profileImgElements = [
                     document.getElementById('home-user-avatar-img'),
                     document.getElementById('top-user-avatar'),
@@ -2331,50 +2074,31 @@
                 }
 
                 showScreen('home');
-                // Show FAB on home screen
-                quickReportBtn.style.display = 'flex';
-
-                // Configure UI based on user type (Guest vs Regular)
                 configureUIForUserType();
 
             } else {
                 showScreen('login');
-                 // Hide FAB if not on home
-                quickReportBtn.style.display = 'none';
             }
         }
 
-        // Configure UI based on user type (Guest vs Regular)
         function configureUIForUserType() {
             const isGuest = currentUser.userId === 'GUEST';
             const userPopupActions = document.getElementById('user-popup-actions');
 
             if (isGuest) {
-                // Hide edit profile, delete account, and request agent mode for guests
                 document.getElementById('edit-profile-btn').style.display = 'none';
                 document.getElementById('delete-account-btn').style.display = 'none';
-                document.getElementById('request-agent-mode-btn').style.display = 'none'; // Hide agent request for guests
-
-                // Optionally, you can customize the guest popup further
-                // For example, change the title or add a guest-specific message
+                document.getElementById('request-agent-mode-btn').style.display = 'none';
                 document.querySelector('#user-popup-modal .modal-header h2').textContent = "Guest User";
-
             } else {
-                // Ensure edit profile, delete account, and request agent mode are visible for regular users
                 document.getElementById('edit-profile-btn').style.display = 'block';
                 document.getElementById('delete-account-btn').style.display = 'block';
-                document.getElementById('request-agent-mode-btn').style.display = 'block'; // Show agent request for users
-
-                 // Reset title for regular users
+                document.getElementById('request-agent-mode-btn').style.display = 'block';
                 document.querySelector('#user-popup-modal .modal-header h2').textContent = "User Information";
             }
-
-            // Show sign out for both
             document.getElementById('sign-out-btn').style.display = 'block';
         }
 
-
-        // Open User Popup
         function openUserPopup() {
             if (!currentUser) return;
 
@@ -2401,31 +2125,23 @@
             openModal('userPopup');
         }
 
-        // Open Agent Request Form (Placeholder)
         function openAgentRequestForm() {
-            alert("Agent Mode request feature is being implemented. You will be able to request access soon.");
-            closeModal('userPopup'); // Close user popup
-             // TODO: Implement agent request form/modal
+            alert("Agent Mode request feature is being implemented.");
+            closeModal('userPopup');
         }
 
-        // Open Edit Profile Modal (Placeholder)
         function openEditProfileModal() {
             alert("Edit Profile feature is being implemented.");
-            closeModal('userPopup'); // Close user popup
-             // TODO: Implement edit profile modal/form
+            closeModal('userPopup');
         }
 
-        // Logout handler
         function handleLogout() {
             currentUser = null;
             sessionStorage.removeItem('emaUser');
             closeModal('userPopup');
             showScreen('login');
-            // Hide FAB on logout
-            quickReportBtn.style.display = 'none';
         }
 
-        // Delete Account handler
         async function handleDeleteAccount() {
             if (!currentUser || !currentUser.userId || !userDb) {
                 alert("Cannot delete account: User not found or database not initialized.");
@@ -2436,32 +2152,27 @@
             if (!confirmation) return;
 
             try {
-                const userRef = window.userRef(userDb, `users/${currentUser.userId}`);
-                await window.userRemove(userRef);
+                const userRef = userDb.ref(`users/${currentUser.userId}`);
+                await userRef.remove();
                 console.log("Account deleted successfully from database.");
             } catch (error) {
                 console.error("Error deleting account from database:", error);
                 alert("Failed to delete account from database. Please try again or contact support.");
-                return; // Don't proceed if DB delete failed
+                return;
             }
 
-            // If DB delete was successful, clear local session and redirect
             currentUser = null;
             sessionStorage.removeItem('emaUser');
             closeModal('userPopup');
             alert("Your account has been deleted.");
             showScreen('login');
-            // Hide FAB on delete
-            quickReportBtn.style.display = 'none';
         }
 
-        // Show error message
         function showError(element, message) {
             element.textContent = message;
             element.classList.remove('hidden');
         }
 
-        // --- AI Assistant functions ---
         async function sendUserMessageToAI() {
             const message = userMessageInput.value.trim();
             if (!message) return;
@@ -2525,11 +2236,7 @@
             chatMessages.appendChild(messageDiv);
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
         }
-        // --- End AI Assistant functions ---
 
-        // --- Report Form Logic ---
-
-        // Get user's current location
         function getLocation() {
             const locationInput = document.getElementById('location');
             locationInput.value = "Getting location...";
@@ -2556,12 +2263,9 @@
             );
         }
 
-        // Open map modal for location picking
         function openMapModal() {
             openModal('map');
-            // Initialize map only when modal is opened
             if (!map) {
-                // Use a default center (e.g., Sri Lanka) and zoom
                 map = L.map('map').setView([7.8731, 80.7718], 7);
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2578,7 +2282,6 @@
             }
         }
 
-        // Confirm location selected on map
         function confirmLocation() {
             if (marker) {
                 const latlng = marker.getLatLng();
@@ -2590,7 +2293,6 @@
             }
         }
 
-        // Submit report
         async function submitReport(event) {
             event.preventDefault();
 
@@ -2623,8 +2325,6 @@
 
             let imageBase64 = null;
             if (imageFile) {
-                // Convert image to Base64
-                // Add a check for file size if needed to prevent huge payloads
                 imageBase64 = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = (e) => resolve(e.target.result);
@@ -2632,45 +2332,32 @@
                 });
             }
 
-            // --- Enhanced Report Submission with Precise Timestamp and Reporter Info ---
-            const preciseTimestamp = new Date().toISOString(); // Capture precise timestamp
+            const preciseTimestamp = new Date().toISOString();
 
             const reportData = {
                 userId: currentUser.userId,
                 userName: currentUser.fullName,
-                userProfilePicture: currentUser.profilePicture || null, // Include profile picture for display
+                userProfilePicture: currentUser.profilePicture || null,
                 location: selectedLocation,
                 numElephants: numElephants,
                 elephantNames: elephantNames || null,
                 district: district,
                 description: description || null,
-                image: imageBase64, // Will be null if no image
-                timestamp: preciseTimestamp, // Use the precise timestamp
+                image: imageBase64,
+                timestamp: preciseTimestamp,
                 status: 'pending' // Add status for agent review
-                // Add other fields that might be useful for future features here
-                // e.g., deviceId, appVersion, etc. (would need to be captured)
             };
-            // --- End Enhanced Report Submission ---
 
             try {
-                // Push report to the separate database
-                await window.reportPush(window.reportRef(reportDb, 'reports'), reportData);
+                await reportDb.ref('reports').push(reportData);
                 alert("Report submitted successfully!");
                 closeModal('report');
-                // Reset form
-                document.getElementById('report-form').reset();
-                document.getElementById('location').value = "Click 'Get Location' or 'Pick on Map'";
-                document.getElementById('num-elephants').value = 1;
-                selectedLocation = null;
-                // The statistics should update automatically due to the real-time listener
             } catch (error) {
                 console.error("Error submitting report:", error);
                 alert("Failed to submit report. Please try again.");
             }
         }
-        // --- End Report Form Logic ---
 
-        // --- Alerts Modal Logic (Enhanced with Expandable Cards and Image Zoom) ---
         async function loadAndDisplayAlerts(filterType) {
             const alertsListElement = document.getElementById('alerts-list');
             alertsListElement.innerHTML = '<p class="text-center">Loading reports...</p>';
@@ -2681,8 +2368,8 @@
             }
 
             try {
-                const reportsRef = window.reportRef(reportDb, 'reports');
-                const snapshot = await window.userGet(reportsRef); // Use get for a one-time read for filtering
+                const reportsRef = reportDb.ref('reports');
+                const snapshot = await reportsRef.once('value'); // Use .once for filtering
                 const data = snapshot.val();
 
                 if (!data) {
@@ -2690,19 +2377,16 @@
                     return;
                 }
 
-                // Filter reports (only show 'accepted' reports in alerts)
                 let filteredReports = [];
-                const reportsArray = Object.keys(data).map(key => ({ id: key, ...data[key] })).filter(report => report.status === 'accepted');
+                const reportsArray = Object.keys(data).map(key => ({ id: key, ...data[key] })).filter(report => report.status === 'accepted'); // Only show accepted reports
 
                 if (filterType === 'all') {
                     filteredReports = reportsArray;
                 } else if (filterType === 'mydistrict' && currentUser && currentUser.district) {
                     filteredReports = reportsArray.filter(report => report.district === currentUser.district);
                 } else if (typeof filterType === 'string' && allSriLankanDistricts.includes(filterType)) {
-                    // Filter by specific district name
                     filteredReports = reportsArray.filter(report => report.district === filterType);
                 } else {
-                    // Default to all if filterType is unrecognized
                     filteredReports = reportsArray;
                 }
 
@@ -2711,33 +2395,31 @@
                     return;
                 }
 
-                // Sort by timestamp, newest first
                 filteredReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-                // Display reports as expandable cards
                 alertsListElement.innerHTML = '';
                 filteredReports.forEach(report => {
                     const reportCard = document.createElement('div');
                     reportCard.classList.add('alert-card');
-                    reportCard.dataset.reportId = report.id; // Store report ID
+                    reportCard.dataset.reportId = report.id;
 
                     const timestamp = new Date(report.timestamp);
                     const formattedDate = timestamp.toLocaleDateString();
                     const formattedTime = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                    // Determine reporter's avatar/initials
                     let reporterAvatarHtml = '';
                     const reporterInitials = report.userName ? report.userName.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
                     if (report.userProfilePicture) {
-                        reporterAvatarHtml = `<img src="${report.userProfilePicture}" alt="${report.userName}'s Avatar">`;
+                        reporterAvatarHtml = `<img src="${report.userProfilePicture}" alt="${report.userName}'s Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+                        reporterAvatarHtml += `<span style="display:none; align-items: center; justify-content: center; width: 100%; height: 100%;">${reporterInitials}</span>`;
                     } else {
-                        reporterAvatarHtml = `<span>${reporterInitials}</span>`;
+                        reporterAvatarHtml = `<span style="display:flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${reporterInitials}</span>`;
                     }
 
-                    // Determine image thumbnail HTML
                     let imageThumbnailHtml = '';
                     if (report.image) {
-                        imageThumbnailHtml = `<img src="${report.image}" alt="Report Image" class="alert-card-image-thumbnail" data-image-url="${report.image}">`;
+                         // Use onerror to handle broken image links
+                         imageThumbnailHtml = `<img src="${report.image}" alt="Report Image" class="alert-card-image-thumbnail" data-image-url="${report.image}" onerror="this.style.display='none';">`;
                     }
 
                     reportCard.innerHTML = `
@@ -2772,17 +2454,14 @@
                     `;
                     alertsListElement.appendChild(reportCard);
 
-                    // Add click listener to header for expand/collapse
                     const header = reportCard.querySelector('.alert-card-header');
                     header.addEventListener('click', function(e) {
-                        // Prevent collapse if clicking on the image thumbnail or View Map button (which have their own handlers)
                         if (e.target.classList.contains('alert-card-image-thumbnail') || e.target.closest('.view-map-btn')) {
                             return;
                         }
                         reportCard.classList.toggle('expanded');
                     });
 
-                    // Add click listener to image thumbnail for zooming
                     const imageThumbnailElement = reportCard.querySelector('.alert-card-image-thumbnail');
                     if (imageThumbnailElement) {
                         imageThumbnailElement.addEventListener('click', function() {
@@ -2792,7 +2471,6 @@
                         });
                     }
 
-                    // Add click listener to View Map button
                     const viewMapBtn = reportCard.querySelector('.view-map-btn');
                     viewMapBtn.addEventListener('click', function() {
                          const lat = parseFloat(this.getAttribute('data-lat'));
@@ -2808,25 +2486,20 @@
             }
         }
 
-        // Open Map Modal for a specific Alert
         function openAlertMap(lat, lng) {
             openModal('alertMap');
             alertMapCoordinatesElement.textContent = `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`;
 
-            // Initialize map only when modal is opened
             if (!alertMap) {
-                alertMap = L.map('alert-map-container').setView([lat, lng], 13); // Center on the report location, zoomed in
-
+                alertMap = L.map('alert-map-container').setView([lat, lng], 13);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(alertMap);
 
-                // Add marker for the report location
                 alertMarker = L.marker([lat, lng]).addTo(alertMap)
                     .bindPopup(`Report Location<br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`)
                     .openPopup();
             } else {
-                // If map already exists, update view and marker
                 alertMap.setView([lat, lng], 13);
                 if (alertMarker) {
                     alertMap.removeLayer(alertMarker);
@@ -2836,12 +2509,10 @@
                     .openPopup();
             }
         }
-        // --- End Alerts Modal Logic ---
 
-        // --- QR Code Scanning Logic ---
         function startQRScanner() {
-            modals.qrScanner.classList.add('active'); // Use the modals object
-            lastScannedResult = null; // Reset last scan
+            modals.qrScanner.classList.add('active');
+            lastScannedResult = null;
 
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 alert("Sorry, your browser does not support camera access for QR scanning.");
@@ -2849,15 +2520,14 @@
                 return;
             }
 
-            // Get access to the camera (prefer rear camera for mobile)
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                 .then(function (mediaStream) {
                     qrStream = mediaStream;
                     qrVideo.srcObject = mediaStream;
-                    qrVideo.setAttribute("playsinline", true); // Required for iOS Safari
+                    qrVideo.setAttribute("playsinline", true);
                     qrVideo.play();
                     qrScanning = true;
-                    requestAnimationFrame(qrTick); // Start the scanning loop
+                    requestAnimationFrame(qrTick);
                 })
                 .catch(function (err) {
                     console.error("Camera access error:", err);
@@ -2873,14 +2543,13 @@
             qrScanning = false;
             if (qrStream) {
                 const tracks = qrStream.getTracks();
-                tracks.forEach(track => track.stop()); // Stop all tracks
+                tracks.forEach(track => track.stop());
                 qrStream = null;
             }
             if (qrVideo.srcObject) {
                 qrVideo.srcObject = null;
             }
-            modals.qrScanner.classList.remove('active'); // Use the modals object
-            // Clear any previous result display
+            modals.qrScanner.classList.remove('active');
             document.getElementById('qr-result').textContent = '';
             document.getElementById('qr-result').classList.add('hidden');
         }
@@ -2896,28 +2565,21 @@
                 });
 
                 if (code) {
-                    // Check if the decoded data matches the EMA ID format and hasn't been scanned recently
                     const idRegex = /^EMA-\d{6}$/;
                     if (idRegex.test(code.data) && code.data !== lastScannedResult) {
                         console.log("QR Code found:", code.data);
-                        lastScannedResult = code.data; // Store to prevent re-scanning
-                        // Display result temporarily
+                        lastScannedResult = code.data;
                         const resultElement = document.getElementById('qr-result');
                         resultElement.textContent = `Scanned: ${code.data}`;
                         resultElement.classList.remove('hidden');
-                        // Stop the camera
                         stopQRScanner();
-                        // Simulate entering the ID and clicking login
                         document.getElementById('login-id').value = code.data;
-                        // Use a small delay to ensure the value is set before calling handleLogin
                         setTimeout(() => {
-                             // Call the existing login handler
                              handleLogin();
-                        }, 500); // Slightly longer delay to allow UI feedback
-                        return; // Exit the tick loop
-                    } else if(code.data !== lastScannedResult) {
+                        }, 500);
+                        return;
+                    } else if (code.data !== lastScannedResult) {
                         console.log("Scanned QR code does not match EMA ID format:", code.data);
-                        // Optionally, show a message to the user for a short time
                         const resultElement = document.getElementById('qr-result');
                         resultElement.textContent = "Not a valid EMA ID QR code.";
                         resultElement.classList.remove('hidden');
@@ -2925,18 +2587,66 @@
                             if (!resultElement.classList.contains('hidden')) {
                                  resultElement.classList.add('hidden');
                             }
-                        }, 2000); // Hide after 2 seconds
+                        }, 2000);
                     }
                 }
-                requestAnimationFrame(qrTick); // Continue scanning
+                requestAnimationFrame(qrTick);
             } else if (qrScanning) {
-                 requestAnimationFrame(qrTick); // Keep trying if not ready
+                 requestAnimationFrame(qrTick);
             }
         }
-        // --- End QR Code Scanning Logic ---
 
+        function validateRegistrationName() {
+            const fullName = document.getElementById('full-name').value.trim();
+            const warningElement = document.getElementById('name-warning');
+            const errorElement = document.getElementById('name-error');
 
-        // Initialize the app when the DOM is fully loaded
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
+            errorElement.classList.add('hidden');
+            errorElement.textContent = '';
+
+            if (!fullName) return;
+
+            const parts = fullName.split(/\s+/);
+            const hasSymbolsOrNumbers = /[0-9!@#$%^&*(),.?":{}|<>[\]\\;'`~_+=/-]/.test(fullName);
+
+            if (parts.length < 2) {
+                warningElement.textContent = "Consider using your full name (e.g., 'John Doe'). Accounts with incomplete names may be reviewed.";
+                warningElement.classList.remove('hidden');
+            }
+
+            if (hasSymbolsOrNumbers) {
+                warningElement.textContent = "Names should generally not contain symbols or numbers. Accounts with unusual names may be reviewed.";
+                warningElement.classList.remove('hidden');
+            }
+        }
+
+        function validateProfilePictureName() {
+            const file = document.getElementById('profile-picture').files[0];
+            const fullName = document.getElementById('full-name').value.trim();
+            const warningElement = document.getElementById('profile-picture-warning');
+
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
+
+            if (file && fullName) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                         const parts = fullName.split(/\s+/);
+                        if (parts.length < 2) {
+                             warningElement.textContent = "If your name has multiple parts, please ensure your profile picture clearly shows your full name.";
+                             warningElement.classList.remove('hidden');
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initApp();
         });
