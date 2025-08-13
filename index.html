@@ -2,34 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMA - Elephant Monitoring App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMA - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    <!-- Load Firebase SDKs directly for better reliability -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <style>
         :root {
-            --md-sys-color-primary: #4CAF50;
-            --md-sys-color-on-primary: #FFFFFF;
-            --md-sys-color-primary-container: #C8E6C9;
-            --md-sys-color-on-primary-container: #1B5E20;
-            --md-sys-color-secondary: #81C784;
-            --md-sys-color-on-secondary: #FFFFFF;
-            --md-sys-color-secondary-container: #E8F5E9;
-            --md-sys-color-on-secondary-container: #2E7D32;
-            --md-sys-color-surface: #F5F5F5;
-            --md-sys-color-on-surface: #212121;
-            --md-sys-color-outline: #BDBDBD;
-            --md-sys-color-error: #F44336;
-            --md-sys-color-on-error: #FFFFFF;
+            --md-sys-color-primary: #606c38;
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container: #e9f4c7;
+            --md-sys-color-on-primary-container: #1d2000;
+            --md-sys-color-secondary: #5f614d;
+            --md-sys-color-on-secondary: #ffffff;
+            --md-sys-color-secondary-container: #e4e5c1;
+            --md-sys-color-on-secondary-container: #1b1d0c;
+            --md-sys-color-surface: #fafdf6;
+            --md-sys-color-on-surface: #1b1c18;
+            --md-sys-color-outline: #75796c;
+            --md-sys-color-error: #ba1a1a;
+            --md-sys-color-on-error: #ffffff;
             --md-sys-color-shadow: #000000;
-            --md-sys-color-surface-variant: #E0E0E0;
-            --md-sys-color-on-surface-variant: #616161;
-            --md-sys-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
-            --md-sys-elevation-2: 0 1px 5px 0 rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+            --md-sys-color-surface-variant: #e1e4d5;
+            --md-sys-color-on-surface-variant: #44483d;
+            --md-sys-elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+            --md-sys-elevation-2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
             --md-sys-shape-corner-none: 0px;
             --md-sys-shape-corner-extra-small: 4px;
             --md-sys-shape-corner-small: 8px;
@@ -40,71 +35,50 @@
             --md-sys-state-focus-opacity: 0.12;
             --md-sys-state-pressed-opacity: 0.12;
             --md-sys-state-dragged-opacity: 0.16;
-            --theme-surface: var(--md-sys-color-surface);
-            --theme-on-surface: var(--md-sys-color-on-surface);
-            --theme-surface-variant: var(--md-sys-color-surface-variant);
-            --theme-on-surface-variant: var(--md-sys-color-on-surface-variant);
-            --theme-primary: var(--md-sys-color-primary);
-            --theme-on-primary: var(--md-sys-color-on-primary);
-            --theme-primary-container: var(--md-sys-color-primary-container);
-            --theme-on-primary-container: var(--md-sys-color-on-primary-container);
-            --theme-secondary-container: var(--md-sys-color-secondary-container);
-            --theme-on-secondary-container: var(--md-sys-color-on-secondary-container);
-            --theme-outline: var(--md-sys-color-outline);
-            --theme-error: var(--md-sys-color-error);
-            --theme-on-error: var(--md-sys-color-on-error);
         }
 
-        html, body {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
             font-family: 'Roboto', 'Segoe UI', sans-serif;
         }
 
         body {
-            background-color: var(--theme-surface);
-            color: var(--theme-on-surface);
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             padding: 16px;
-            position: relative;
-            overflow: auto;
         }
 
         .screen {
             width: 100%;
             max-width: 500px;
-            display: none;
+            display: flex; /* Show login screen by default */
             flex-direction: column;
             gap: 20px;
         }
 
-        .active {
-            display: flex;
-        }
-
         .card {
-            background-color: var(--theme-surface);
+            background-color: white;
             border-radius: var(--md-sys-shape-corner-large);
             box-shadow: var(--md-sys-elevation-1);
             padding: 20px;
             width: 100%;
             flex-shrink: 0;
-            border: 1px solid var(--theme-outline);
+            border: 1px solid var(--md-sys-color-outline);
         }
 
         .logo-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100vw;
             height: 100vh;
-            background-color: var(--theme-surface);
+            width: 100%;
+            background-color: white;
             position: fixed;
             top: 0;
             left: 0;
@@ -123,7 +97,7 @@
         }
 
         h1, h2 {
-            color: var(--theme-primary);
+            color: var(--md-sys-color-primary);
             margin-bottom: 16px;
         }
 
@@ -144,25 +118,25 @@
             display: block;
             margin-bottom: 6px;
             font-weight: 500;
-            color: var(--theme-on-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
             font-size: 0.9rem;
         }
 
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 12px 14px;
-            border: 1px solid var(--theme-outline);
+            border: 1px solid var(--md-sys-color-outline);
             border-radius: var(--md-sys-shape-corner-medium);
-            background-color: var(--theme-surface);
-            color: var(--theme-on-surface);
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
             font-size: 16px;
             transition: border-color 0.2s;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
-            border-color: var(--theme-primary);
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 2px rgba(96, 108, 56, 0.2);
         }
 
         .btn {
@@ -179,31 +153,33 @@
             text-decoration: none;
             gap: 8px;
             min-height: 48px;
+            width: 100%; /* Make buttons full width */
         }
 
         .btn-primary {
-            background-color: var(--theme-primary);
-            color: var(--theme-on-primary);
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
             box-shadow: var(--md-sys-elevation-1);
         }
 
         .btn-primary:hover {
-            background-color: #43A047;
+            background-color: #4a552a;
+            box-shadow: var(--md-sys-elevation-2);
         }
 
         .btn-secondary {
-            background-color: var(--theme-secondary-container);
-            color: var(--theme-on-secondary-container);
+            background-color: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
         }
 
         .btn-secondary:hover {
-            background-color: #A5D6A7;
+            background-color: #d7d9b0;
         }
 
         .btn-text {
             background: none;
             border: none;
-            color: var(--theme-primary);
+            color: var(--md-sys-color-primary);
             padding: 8px 4px;
             font-size: 15px;
             cursor: pointer;
@@ -237,670 +213,15 @@
         }
 
         .error {
-            color: var(--theme-error);
+            color: var(--md-sys-color-error);
             font-size: 14px;
             margin-top: 4px;
         }
 
         .success {
-            color: #4CAF50;
+            color: #2e7d32;
             font-size: 14px;
             margin-top: 4px;
-        }
-
-        .warning {
-             color: #FF9800;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        .home-header {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 0;
-        }
-
-        .user-btn {
-            background: none;
-            border: none;
-            color: var(--theme-on-surface);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .user-btn:hover {
-             background-color: rgba(76, 175, 80, 0.1);
-        }
-
-        .user-btn-avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            display: none;
-        }
-
-        .user-btn-initials {
-            font-weight: bold;
-        }
-
-        .user-card {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 0;
-            cursor: pointer;
-        }
-
-        .avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background-color: var(--theme-primary-container);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--theme-on-primary-container);
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
-        .user-info h3 {
-            margin: 0;
-            font-size: 17px;
-            word-break: break-word;
-        }
-
-        .user-info p {
-            margin: 3px 0 0;
-            color: var(--theme-on-surface-variant);
-            font-size: 13px;
-        }
-
-        .stats-grid, .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 14px;
-            margin-top: 14px;
-        }
-
-        .stat-card, .action-card {
-            background-color: var(--theme-surface-variant);
-            border-radius: var(--md-sys-shape-corner-medium);
-            padding: 14px;
-            text-align: center;
-            box-shadow: var(--md-sys-elevation-1);
-        }
-
-        .stat-card i, .action-card i {
-            font-size: 22px;
-            color: var(--theme-primary);
-            margin-bottom: 6px;
-        }
-
-        .stat-card .value {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 6px 0;
-        }
-
-        .stat-card .label, .action-card .label {
-            font-size: 13px;
-            color: var(--theme-on-surface-variant);
-        }
-
-        .actions-grid {
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        }
-
-        .action-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 14px;
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-
-        .action-card:hover {
-            background-color: #d5d8c9;
-            transform: translateY(-2px);
-        }
-
-        .id-display {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .user-id {
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--theme-primary);
-            word-break: break-all;
-            background-color: var(--theme-primary-container);
-            padding: 14px;
-            border-radius: var(--md-sys-shape-corner-medium);
-            margin: 14px 0;
-        }
-
-        .qr-code {
-            margin: 20px auto;
-            display: block;
-            max-width: 100%;
-            height: auto;
-            width: 180px;
-            height: 180px;
-        }
-
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background-color: var(--theme-primary);
-            color: var(--theme-on-primary);
-            border: none;
-            box-shadow: var(--md-sys-elevation-2);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            z-index: 100;
-            transition: background-color 0.2s, transform 0.2s;
-        }
-
-        .fab:hover {
-            background-color: #43A047;
-            transform: scale(1.05);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1001;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: var(--theme-surface);
-            border-radius: var(--md-sys-shape-corner-large);
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--md-sys-elevation-2);
-            border: 1px solid var(--theme-outline);
-        }
-
-        .modal-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--theme-outline);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-            flex-grow: 1;
-            text-align: center;
-            color: var(--theme-on-surface);
-        }
-
-        .close-modal-btn {
-            background: none;
-            border: none;
-            color: var(--theme-on-surface-variant);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background-color 0.2s;
-            margin-left: auto;
-        }
-
-        .close-modal-btn:hover {
-            background-color: var(--theme-surface-variant);
-            color: var(--theme-error);
-        }
-
-        .modal-body {
-            padding: 16px 20px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .chat-messages {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .message {
-            max-width: 85%;
-            padding: 14px 16px;
-            border-radius: var(--md-sys-shape-corner-medium);
-            position: relative;
-            animation: fadeIn 0.3s ease;
-            line-height: 1.5;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background-color: var(--theme-primary);
-            color: var(--theme-on-primary);
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-message {
-            align-self: flex-start;
-            background-color: var(--theme-surface-variant);
-            color: var(--theme-on-surface-variant);
-            border-bottom-left-radius: 4px;
-        }
-
-        .typing-indicator {
-            display: none;
-            align-self: flex-start;
-            background-color: var(--theme-surface-variant);
-            padding: 14px 16px;
-            border-radius: var(--md-sys-shape-corner-medium);
-            border-bottom-left-radius: 4px;
-        }
-
-        .typing-indicator span {
-            height: 8px;
-            width: 8px;
-            background-color: var(--theme-on-surface-variant);
-            border-radius: 50%;
-            display: inline-block;
-            margin: 0 2px;
-            animation: bounce 1.3s linear infinite;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.15s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        @keyframes bounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
-
-        .modal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--theme-outline);
-            display: flex;
-            gap: 10px;
-        }
-
-        .modal-footer input {
-            flex-grow: 1;
-            min-height: 46px;
-            padding: 0 14px;
-        }
-
-        .modal-footer .btn {
-            min-width: 46px;
-            min-height: 46px;
-            padding: 0;
-        }
-
-        .user-popup-content {
-             text-align: center;
-        }
-        .user-popup-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin: 0 auto 16px;
-            background-color: var(--theme-primary-container);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            font-weight: bold;
-            color: var(--theme-on-primary-container);
-            overflow: hidden;
-        }
-        .user-popup-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-        .user-popup-info h3 {
-            margin: 0 0 8px 0;
-            font-size: 20px;
-            color: var(--theme-on-surface);
-        }
-        .user-popup-info p {
-            margin: 4px 0;
-            color: var(--theme-on-surface-variant);
-        }
-        .user-popup-actions {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .elephant-counter {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .elephant-counter input {
-            text-align: center;
-            width: 60px;
-        }
-
-        .elephant-counter .btn {
-            min-width: 40px;
-            min-height: 40px;
-            padding: 0;
-        }
-
-        #map {
-            height: 300px;
-            width: 100%;
-            margin-bottom: 16px;
-            border-radius: var(--md-sys-shape-corner-medium);
-            border: 1px solid var(--theme-outline);
-        }
-
-        .alerts-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .alerts-filters {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .alerts-filters .btn {
-            padding: 8px 12px;
-            font-size: 14px;
-            min-height: auto;
-        }
-
-        .alert-card {
-            background-color: var(--theme-surface-variant);
-            border-radius: var(--md-sys-shape-corner-medium);
-            box-shadow: var(--md-sys-elevation-1);
-            margin-bottom: 16px;
-            overflow: hidden;
-            transition: box-shadow 0.2s;
-            border: 1px solid var(--theme-outline);
-        }
-
-        .alert-card:hover {
-            box-shadow: var(--md-sys-elevation-2);
-        }
-
-        .alert-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            cursor: pointer;
-            background-color: var(--theme-primary-container);
-        }
-
-        .alert-card-header:hover {
-            background-color: #bbdeb9;
-        }
-
-        .alert-card-user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .alert-card-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--theme-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--theme-on-primary);
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        .alert-card-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
-        .alert-card-user-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .alert-card-user-name {
-            font-weight: bold;
-            font-size: 16px;
-            color: var(--theme-on-primary-container);
-        }
-
-        .alert-card-user-id {
-            font-size: 12px;
-            color: var(--theme-on-primary-container);
-            opacity: 0.8;
-        }
-
-        .alert-card-meta {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            color: var(--theme-on-primary-container);
-        }
-
-        .alert-card-timestamp {
-            font-size: 12px;
-            margin-bottom: 4px;
-        }
-
-        .alert-card-district {
-            font-size: 12px;
-            background-color: var(--theme-primary);
-            padding: 2px 6px;
-            border-radius: var(--md-sys-shape-corner-extra-small);
-        }
-
-        .alert-card-body {
-            padding: 0 16px 16px 16px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-        }
-
-        .alert-card.expanded .alert-card-body {
-            padding: 16px;
-            max-height: 1000px;
-        }
-
-        .alert-card-details {
-            margin-bottom: 16px;
-        }
-
-        .alert-card-details p {
-            margin: 8px 0;
-            font-size: 14px;
-        }
-
-        .alert-card-image-thumbnail {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: var(--md-sys-shape-corner-medium);
-            cursor: pointer;
-            display: block;
-            margin: 10px 0;
-            box-shadow: var(--md-sys-elevation-1);
-            transition: transform 0.2s;
-            border: 1px solid var(--theme-outline);
-        }
-
-        .alert-card-image-thumbnail:hover {
-            transform: scale(1.05);
-        }
-
-        .chevron-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .alert-card.expanded .chevron-icon {
-            transform: rotate(180deg);
-        }
-
-        #image-zoom-modal .modal-content {
-            max-width: 90vw;
-            max-height: 90vh;
-            background-color: transparent;
-            border: none;
-            box-shadow: none;
-        }
-
-        #image-zoom-modal .modal-body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: var(--md-sys-shape-corner-large);
-        }
-
-        #zoomed-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: var(--md-sys-shape-corner-medium);
-        }
-
-        #image-zoom-modal .close-modal-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-        }
-
-        #image-zoom-modal .close-modal-btn:hover {
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-
-        #alert-map-modal .modal-content {
-            max-width: 95vw;
-            max-height: 95vh;
-        }
-
-        #alert-map-container {
-            height: 70vh;
-            width: 100%;
-            border-radius: var(--md-sys-shape-corner-medium);
-            border: 1px solid var(--theme-outline);
-        }
-
-        #id-card-download {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1002;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #id-card-download.active {
-            display: flex;
-        }
-
-        #id-card-canvas-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: var(--md-sys-shape-corner-large);
-            box-shadow: var(--md-sys-elevation-2);
-        }
-
-        #id-card-canvas {
-            display: block;
-            max-width: 100%;
-            height: auto;
-        }
-
-        #id-card-download-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        #id-card-download-buttons .btn {
-            min-width: 120px;
         }
 
         .hidden {
@@ -927,10 +248,12 @@
     </style>
 </head>
 <body>
+    <!-- Startup Screen -->
     <div id="startup-screen" class="logo-container">
         <img src="https://i.ibb.co/jvN2hV16/logo.png" alt="EMA Logo" class="logo">
     </div>
 
+    <!-- Login Screen -->
     <div id="login-screen" class="screen">
         <div class="card">
             <h1>Welcome to EMA</h1>
@@ -942,9 +265,6 @@
             <button id="access-app-btn" class="btn btn-primary btn-full">
                 <i class="fas fa-sign-in-alt"></i> Access App
             </button>
-            <button id="quick-login-btn" class="btn btn-secondary btn-full mt-16">
-                <i class="fas fa-qrcode"></i> Quick Login (Scan ID)
-            </button>
             <button id="register-btn" class="btn btn-secondary btn-full mt-16">
                 <i class="fas fa-user-plus"></i> New User? Register
             </button>
@@ -954,13 +274,13 @@
         </div>
     </div>
 
-    <div id="register-screen" class="screen">
+    <!-- Registration Screen -->
+    <div id="register-screen" class="screen hidden">
         <div class="card">
             <h1>Register</h1>
             <div class="input-group">
                 <label for="full-name">Full Name</label>
                 <input type="text" id="full-name" placeholder="Enter your full name">
-                <div id="name-warning" class="warning hidden"></div>
                 <div id="name-error" class="error hidden"></div>
             </div>
             <div class="input-group">
@@ -991,14 +311,6 @@
                 <input type="tel" id="mobile" placeholder="0771234567">
                 <div id="mobile-error" class="error hidden"></div>
             </div>
-             <div class="input-group">
-                <label for="profile-picture">Profile Picture</label>
-                <input type="file" accept="image/*" id="profile-picture" />
-                <div id="profile-picture-warning" class="warning hidden"></div>
-                <div id="profile-picture-error" class="error hidden"></div>
-                 <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
-                 <button id="crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
-            </div>
             <button id="generate-id-btn" class="btn btn-primary btn-full">
                 <i class="fas fa-id-card"></i> Generate My ID
             </button>
@@ -1008,308 +320,7 @@
         </div>
     </div>
 
-    <div id="home-screen" class="screen">
-        <div class="card">
-            <div class="home-header">
-                <button class="user-btn" id="open-user-btn" title="User Profile">
-                    <span class="user-btn-initials" id="top-user-initials">U</span>
-                    <img class="user-btn-avatar" id="top-user-avatar" src="" alt="Profile">
-                </button>
-            </div>
-             <div class="user-card" id="user-card">
-                <div class="avatar" id="home-user-avatar">
-                    <img id="home-user-avatar-img" src="" alt="Profile">
-                    <span id="home-user-initials">U</span>
-                </div>
-                <div class="user-info">
-                    <h3 id="home-user-name">User Name</h3>
-                    <p id="home-user-id">EMA-XXXXXX</p>
-                </div>
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-file-alt"></i>
-                    <div class="value" id="total-reports">0</div>
-                    <div class="label">Reports</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-elephant"></i>
-                    <div class="value" id="total-elephants">0</div>
-                    <div class="label">Elephants</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div class="value" id="unique-locations">0</div>
-                    <div class="label">Locations</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-bell"></i>
-                    <div class="value" id="recent-alerts">0</div>
-                    <div class="label">Alerts</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Actions</h2>
-            <div class="actions-grid">
-                <div class="action-card" data-action="report">
-                    <i class="fas fa-bullhorn"></i>
-                    <div class="label">Report Elephant</div>
-                </div>
-                <div class="action-card" data-action="map">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <div class="label">View Map</div>
-                </div>
-                <div class="action-card" data-action="radar">
-                     <i class="fas fa-radar"></i>
-                    <div class="label">Radar</div>
-                </div>
-                <div class="action-card" data-action="ai">
-                    <i class="fas fa-robot"></i>
-                    <div class="label">AI Chatbot</div>
-                </div>
-                 <div class="action-card" data-action="alerts">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div class="label">Alerts</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <button class="fab" id="quick-report-btn" title="Quick Report">
-        <i class="fas fa-plus"></i>
-    </button>
-
-    <div id="report-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Report Elephant</h2>
-                <button id="close-report-modal" class="close-modal-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="report-form">
-                    <div class="input-group">
-                        <label for="location">Location</label>
-                        <input type="text" id="location" placeholder="Click 'Get Location' or 'Pick on Map'" readonly>
-                        <div class="mt-8" style="display: flex; gap: 8px;">
-                            <button type="button" id="get-location-btn" class="btn btn-secondary" style="flex: 1;">
-                                <i class="fas fa-location-arrow"></i> Get Location
-                            </button>
-                            <button type="button" id="open-map-btn" class="btn btn-secondary" style="flex: 1;">
-                                <i class="fas fa-map-marker-alt"></i> Pick on Map
-                            </button>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="num-elephants">Number of Elephants</label>
-                        <div class="elephant-counter">
-                            <button type="button" id="decrease-elephants" class="btn btn-secondary"><i class="fas fa-minus"></i></button>
-                            <input type="number" id="num-elephants" value="1" min="1">
-                            <button type="button" id="increase-elephants" class="btn btn-secondary"><i class="fas fa-plus"></i></button>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="elephant-names">Names of Elephants (Optional)</label>
-                        <input type="text" id="elephant-names" placeholder="Enter names separated by commas">
-                    </div>
-                    <div class="input-group">
-                        <label for="report-district">District</label>
-                        <select id="report-district">
-                            <option value="">Select District</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" rows="3" placeholder="Brief description"></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label for="image-upload">Image (Optional)</label>
-                        <input type="file" accept="image/*" id="image-upload">
-                    </div>
-                    <button type="submit" id="submit-report-btn" class="btn btn-primary btn-full">
-                        <i class="fas fa-paper-plane"></i> Submit Report
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div id="user-popup-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>User Information</h2>
-                <button class="close-modal-btn" id="close-user-popup">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="user-popup-content">
-                    <div class="user-popup-avatar" id="popup-user-avatar">
-                        <img id="popup-user-image" src="" alt="Profile Picture">
-                        <span id="popup-user-initials">U</span>
-                    </div>
-                    <div class="user-popup-info">
-                        <h3 id="popup-user-fullname">User Name</h3>
-                        <p><strong>ID:</strong> <span id="popup-user-id">EMA-XXXXXX</span></p>
-                        <p><strong>Province:</strong> <span id="popup-user-province">Province</span></p>
-                        <p><strong>District:</strong> <span id="popup-user-district">District</span></p>
-                        <p><strong>Mobile:</strong> <span id="popup-user-mobile">077XXXXXXX</span></p>
-                    </div>
-                    <div class="user-popup-actions" id="user-popup-actions">
-                        <button id="request-agent-mode-btn" class="btn btn-secondary btn-full">
-                            <i class="fas fa-user-shield"></i> Request Agent Mode
-                        </button>
-                        <button id="edit-profile-btn" class="btn btn-secondary btn-full">
-                            <i class="fas fa-edit"></i> Edit Profile
-                        </button>
-                        <button id="delete-account-btn" class="btn btn-secondary btn-full">
-                            <i class="fas fa-trash-alt"></i> Delete Account
-                        </button>
-                        <button id="sign-out-btn" class="btn btn-primary btn-full">
-                            <i class="fas fa-sign-out-alt"></i> Sign Out
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="ai-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>EMA AI Assistant</h2>
-                <button id="close-ai-modal" class="close-modal-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="chat-messages" id="chat-messages">
-                </div>
-                <div class="typing-indicator" id="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <input type="text" id="user-message" placeholder="Type your message...">
-                <button id="send-message-btn" class="btn btn-primary">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="alerts-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Alerts & Reports</h2>
-                <button id="close-alerts-modal" class="close-modal-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="alerts-header">
-                    <div class="alerts-filters">
-                        <button id="filter-all" class="btn btn-secondary">All Districts</button>
-                        <button id="filter-my-district" class="btn btn-secondary">My District</button>
-                        <select id="filter-by-district" class="btn btn-secondary">
-                            <option value="">Filter by District</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="alerts-list" id="alerts-list">
-                    <p class="text-center">Loading reports...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="image-zoom-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-body">
-                <img id="zoomed-image" src="" alt="Zoomed Report Image">
-            </div>
-            <button id="close-image-zoom-modal" class="close-modal-btn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
-
-    <div id="alert-map-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Report Location</h2>
-                <button id="close-alert-map-modal" class="close-modal-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="alert-map-container"></div>
-                 <p id="alert-map-coordinates" class="text-center mt-16">Latitude: --, Longitude: --</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="map-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Select Location</h2>
-                <button id="close-map-modal" class="close-modal-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="map"></div>
-                <p id="map-coordinates" class="text-center mb-16">Click on the map to select a location.</p>
-                <button id="confirm-location-btn" class="btn btn-primary btn-full">
-                    <i class="fas fa-check"></i> Confirm Location
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="qr-scanner-modal" class="modal">
-        <div class="scanner-container">
-            <button id="close-scanner-btn" class="close-scanner-btn">
-                <i class="fas fa-times"></i>
-            </button>
-            <video id="qr-video" playsinline></video>
-            <div class="scanner-instructions">
-                <p>Point your camera at your EMA ID QR code</p>
-                <p><i class="fas fa-qrcode fa-2x"></i></p>
-            </div>
-            <div id="qr-result" class="qr-result hidden"></div>
-        </div>
-    </div>
-
-    <div id="id-card-download" class="modal">
-        <div id="id-card-canvas-container">
-            <canvas id="id-card-canvas" width="800" height="500"></canvas>
-            <div id="id-card-download-buttons">
-                <button id="print-id-card-btn" class="btn btn-primary">
-                    <i class="fas fa-print"></i> Print
-                </button>
-                <button id="download-id-card-btn" class="btn btn-secondary">
-                    <i class="fas fa-download"></i> Download
-                </button>
-                <button id="close-id-card-download-btn" class="btn btn-text">
-                    <i class="fas fa-times"></i> Close
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
+    <script type="module">
         // --- Firebase Configurations ---
         const userFirebaseConfig = {
             apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
@@ -1322,51 +333,28 @@
             measurementId: "G-ZZ04XCWXVQ"
         };
 
-        const reportFirebaseConfig = {
-            apiKey: "AIzaSyAib835ipwr_zCw5vMJiy6YgYauGgn2yYg",
-            authDomain: "reports-ema.firebaseapp.com",
-            databaseURL: "https://reports-ema-default-rtdb.firebaseio.com",
-            projectId: "reports-ema",
-            storageBucket: "reports-ema.firebasestorage.app",
-            messagingSenderId: "843340696456",
-            appId: "1:843340696456:web:cbbceec058fb3d53e5883d",
-            measurementId: "G-YWEBKKFK6Y"
-        };
+        // --- DOM Elements ---
+        const startupScreen = document.getElementById('startup-screen');
+        const loginScreen = document.getElementById('login-screen');
+        const registerScreen = document.getElementById('register-screen');
+        const loginIdInput = document.getElementById('login-id');
+        const loginError = document.getElementById('login-error');
+        const accessAppBtn = document.getElementById('access-app-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const guestBtn = document.getElementById('guest-btn');
+        const fullNameInput = document.getElementById('full-name');
+        const provinceSelect = document.getElementById('province');
+        const districtSelect = document.getElementById('district');
+        const mobileInput = document.getElementById('mobile');
+        const nameError = document.getElementById('name-error');
+        const provinceError = document.getElementById('province-error');
+        const districtError = document.getElementById('district-error');
+        const mobileError = document.getElementById('mobile-error');
+        const generateIdBtn = document.getElementById('generate-id-btn');
+        const backToLoginBtn = document.getElementById('back-to-login-btn');
 
-        const OPENROUTER_API_KEY = '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';
-
-        const screens = {
-            startup: document.getElementById('startup-screen'),
-            login: document.getElementById('login-screen'),
-            register: document.getElementById('register-screen'),
-            home: document.getElementById('home-screen')
-        };
-
-        const modals = {
-            report: document.getElementById('report-modal'),
-            userPopup: document.getElementById('user-popup-modal'),
-            ai: document.getElementById('ai-modal'),
-            alerts: document.getElementById('alerts-modal'),
-            imageZoom: document.getElementById('image-zoom-modal'),
-            alertMap: document.getElementById('alert-map-modal'),
-            map: document.getElementById('map-modal'),
-            qrScanner: document.getElementById('qr-scanner-modal'),
-            idCardDownload: document.getElementById('id-card-download')
-        };
-
-        const chatMessages = document.getElementById('chat-messages');
-        const typingIndicator = document.getElementById('typing-indicator');
-        const userMessageInput = document.getElementById('user-message');
-        const previewCanvas = document.getElementById('preview-canvas');
-        const cropBtn = document.getElementById('crop-btn');
-        const mapElement = document.getElementById('map');
-        const mapCoordinatesElement = document.getElementById('map-coordinates');
-        const alertMapContainer = document.getElementById('alert-map-container');
-        const alertMapCoordinatesElement = document.getElementById('alert-map-coordinates');
-
-        const quickReportBtn = document.getElementById('quick-report-btn');
-
-        const sriLankanProvincesAndDistricts = {
+        // District data
+        const districts = {
             "Western": ["Colombo", "Gampaha", "Kalutara"],
             "Central": ["Kandy", "Matale", "Nuwara Eliya"],
             "Southern": ["Galle", "Matara", "Hambantota"],
@@ -1378,216 +366,62 @@
             "Sabaragamuwa": ["Ratnapura", "Kegalle"]
         };
 
-        const allSriLankanDistricts = [
-            "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
-            "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
-            "Vavuniya", "Mullaitivu", "Batticaloa", "Ampara", "Trincomalee",
-            "Kurunegala", "Puttalam", "Anuradhapura", "Polonnaruwa", "Badulla",
-            "Monaragala", "Ratnapura", "Kegalle"
-        ];
-
-        let currentUser = null;
-        let conversationHistory = [
-            {
-                role: 'system',
-                content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant action buttons.'
-            }
-        ];
-
-        let originalImage = null;
-        let croppedImageDataUrl = null;
-        let editOriginalImage = null;
-        let editCroppedImageDataUrl = null;
-
-        let map = null;
-        let marker = null;
-        let selectedLocation = null;
-        let alertMap = null;
-        let alertMarker = null;
-
+        // Firebase references (will be initialized after SDK loads)
         let userDb = null;
-        let reportDb = null;
-
-        const qrVideo = document.getElementById('qr-video');
-        const qrCanvasElement = document.createElement('canvas');
-        const qrCanvas = qrCanvasElement.getContext('2d');
-        let qrScanning = false;
-        let qrStream = null;
-        let lastScannedResult = null;
 
         // --- Initialize App ---
         async function initApp() {
-            try {
-                // Firebase SDKs are now loaded via <script> tags
+             try {
+                // Dynamically import Firebase SDKs
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+                const { getDatabase, ref, get, set, query, orderByChild, equalTo } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
 
-                // Initialize Firebase Apps
-                const userApp = firebase.initializeApp(userFirebaseConfig, 'userApp');
-                const reportApp = firebase.initializeApp(reportFirebaseConfig, 'reportApp');
+                // Initialize Firebase
+                const app = initializeApp(userFirebaseConfig, 'userApp');
+                userDb = getDatabase(app);
 
-                // Get Database instances
-                userDb = firebase.database(userApp);
-                reportDb = firebase.database(reportApp);
+                // Make Firebase functions globally available for use in handlers
+                window.userRef = ref;
+                window.userGet = get;
+                window.userSet = set;
+                window.userQuery = query;
+                window.userOrderByChild = orderByChild;
+                window.userEqualTo = equalTo;
 
-                console.log("EMA App: Firebase initialized successfully.");
+                console.log("Login App: Firebase initialized.");
 
                 // Show startup screen
                 setTimeout(() => {
-                    screens.startup.classList.add('fade-out');
+                    startupScreen.classList.add('fade-out');
                     setTimeout(() => {
-                        screens.startup.style.display = 'none';
-                        showScreen('login');
+                        startupScreen.style.display = 'none';
+                        loginScreen.classList.remove('hidden'); // Show login screen
                     }, 1000);
                 }, 2000);
 
                 // Set up event listeners
                 setupEventListeners();
 
-                // Populate district dropdowns
+                // Populate districts
                 populateDistrictDropdowns();
 
-                // Initialize AI chat
-                initAIChat();
-
-                // Check for existing session
-                checkExistingSession();
-
             } catch (error) {
-                console.error("EMA App: Critical Error during initialization:", error);
-                alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again. Error: " + error.message);
-                screens.startup.style.display = 'none';
-                showScreen('login');
+                console.error("Login App: Failed to initialize Firebase:", error);
+                alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
+                startupScreen.style.display = 'none';
+                loginScreen.classList.remove('hidden');
                 setupEventListeners();
-                initAIChat();
             }
         }
 
-        function checkExistingSession() {
-            const storedUser = sessionStorage.getItem('emaUser');
-            if (storedUser) {
-                currentUser = JSON.parse(storedUser);
-                showHomeScreen();
-                listenForStatsUpdates();
-            }
-        }
-
-        function listenForStatsUpdates() {
-            if (!reportDb) return;
-
-            const reportsRef = reportDb.ref('reports');
-            reportsRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    updateStatistics(data);
-                } else {
-                    updateStatistics({});
-                }
-            });
-        }
-
-        function updateStatistics(reportsData) {
-            let totalReports = 0;
-            let totalElephants = 0;
-            const locations = new Set();
-            let recentAlerts = 0;
-
-            const now = new Date();
-            const oneDayAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
-
-            for (const key in reportsData) {
-                if (reportsData.hasOwnProperty(key)) {
-                    const report = reportsData[key];
-                    totalReports++;
-                    totalElephants += report.numElephants || 0;
-
-                    if (report.location && report.location.lat !== undefined && report.location.lng !== undefined) {
-                        locations.add(`${report.location.lat.toFixed(4)},${report.location.lng.toFixed(4)}`);
-                    }
-
-                    const reportTimestamp = new Date(report.timestamp);
-                    if (reportTimestamp > oneDayAgo) {
-                        recentAlerts++;
-                    }
-                }
-            }
-
-            document.getElementById('total-reports').textContent = totalReports;
-            document.getElementById('total-elephants').textContent = totalElephants;
-            document.getElementById('unique-locations').textContent = locations.size;
-            document.getElementById('recent-alerts').textContent = recentAlerts;
-        }
-
+        // Populate district dropdowns
         function populateDistrictDropdowns() {
-            const reportDistrictSelect = document.getElementById('report-district');
-            reportDistrictSelect.innerHTML = '<option value="">Select District</option>';
-            allSriLankanDistricts.forEach(district => {
-                const option = document.createElement('option');
-                option.value = district;
-                option.textContent = district;
-                reportDistrictSelect.appendChild(option);
-            });
-
-            const filterDistrictSelect = document.getElementById('filter-by-district');
-            filterDistrictSelect.innerHTML = '<option value="">Filter by District</option>';
-            allSriLankanDistricts.forEach(district => {
-                const option = document.createElement('option');
-                option.value = district;
-                option.textContent = district;
-                filterDistrictSelect.appendChild(option);
-            });
-        }
-
-        function initAIChat() {
-            chatMessages.innerHTML = '';
-            conversationHistory = [
-                {
-                    role: 'system',
-                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant action buttons.'
-                }
-            ];
-            addMessageToChat("Hello! I'm the EMA AI Assistant. How can I help you today?", 'ai');
-            conversationHistory.push({ role: 'assistant', content: "Hello! I'm the EMA AI Assistant. How can I help you today?" });
-        }
-
-        function showScreen(screenName) {
-            Object.values(screens).forEach(screen => screen.classList.remove('active'));
-            if (screens[screenName]) {
-                screens[screenName].classList.add('active');
-            }
-            window.scrollTo(0, 0);
-            if (screenName === 'home') {
-                quickReportBtn.style.display = 'flex';
-            } else {
-                quickReportBtn.style.display = 'none';
-            }
-        }
-
-        function openModal(modalName) {
-            if (modals[modalName]) {
-                modals[modalName].classList.add('active');
-            }
-        }
-
-        function closeModal(modalName) {
-            if (modals[modalName]) {
-                modals[modalName].classList.remove('active');
-            }
-        }
-
-        function setupEventListeners() {
-            document.getElementById('access-app-btn').addEventListener('click', handleLogin);
-            document.getElementById('quick-login-btn').addEventListener('click', startQRScanner);
-            document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
-            document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
-            document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
-            document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
-            document.getElementById('profile-picture').addEventListener('change', handleProfilePictureSelect);
-            cropBtn.addEventListener('click', performCrop);
-            document.getElementById('province').addEventListener('change', function () {
+            provinceSelect.addEventListener('change', function() {
                 const selectedProvince = this.value;
-                const districtSelect = document.getElementById('district');
                 districtSelect.innerHTML = '<option value="">Select District</option>';
-                if (selectedProvince && sriLankanProvincesAndDistricts[selectedProvince]) {
-                    sriLankanProvincesAndDistricts[selectedProvince].forEach(district => {
+
+                if (selectedProvince && districts[selectedProvince]) {
+                    districts[selectedProvince].forEach(district => {
                         const option = document.createElement('option');
                         option.value = district;
                         option.textContent = district;
@@ -1597,263 +431,91 @@
                 } else {
                     districtSelect.disabled = true;
                 }
-                document.getElementById('district-error').classList.add('hidden');
             });
-
-            document.getElementById('open-user-btn').addEventListener('click', openUserPopup);
-            document.getElementById('user-card').addEventListener('click', openUserPopup);
-            document.querySelectorAll('.action-card').forEach(card => {
-                card.addEventListener('click', function () {
-                    const action = this.getAttribute('data-action');
-                    handleActionClick(action);
-                });
-            });
-
-            quickReportBtn.addEventListener('click', () => handleActionClick('report'));
-
-            document.getElementById('close-user-popup').addEventListener('click', () => closeModal('userPopup'));
-            document.getElementById('request-agent-mode-btn').addEventListener('click', openAgentRequestForm);
-            document.getElementById('edit-profile-btn').addEventListener('click', openEditProfileModal);
-            document.getElementById('sign-out-btn').addEventListener('click', handleLogout);
-            document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
-
-            document.getElementById('close-ai-modal').addEventListener('click', () => closeModal('ai'));
-            document.getElementById('send-message-btn').addEventListener('click', sendUserMessageToAI);
-            userMessageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendUserMessageToAI();
-                }
-            });
-
-            document.getElementById('close-report-modal').addEventListener('click', () => closeModal('report'));
-            document.getElementById('get-location-btn').addEventListener('click', getLocation);
-            document.getElementById('open-map-btn').addEventListener('click', openMapModal);
-            document.getElementById('increase-elephants').addEventListener('click', () => {
-                const input = document.getElementById('num-elephants');
-                let value = parseInt(input.value) || 1;
-                input.value = value + 1;
-            });
-            document.getElementById('decrease-elephants').addEventListener('click', () => {
-                const input = document.getElementById('num-elephants');
-                let value = parseInt(input.value) || 1;
-                if (value > 1) {
-                    input.value = value - 1;
-                }
-            });
-            document.getElementById('report-form').addEventListener('submit', submitReport);
-
-            document.getElementById('close-alerts-modal').addEventListener('click', () => closeModal('alerts'));
-            document.getElementById('filter-all').addEventListener('click', () => loadAndDisplayAlerts('all'));
-            document.getElementById('filter-my-district').addEventListener('click', () => {
-                if (currentUser && currentUser.district) {
-                    loadAndDisplayAlerts(currentUser.district);
-                } else {
-                    alert("Your district information is not available.");
-                    loadAndDisplayAlerts('all');
-                }
-            });
-            document.getElementById('filter-by-district').addEventListener('change', function () {
-                const selectedDistrict = this.value;
-                if (selectedDistrict) {
-                    loadAndDisplayAlerts(selectedDistrict);
-                } else {
-                    loadAndDisplayAlerts('all');
-                }
-            });
-
-            document.getElementById('close-image-zoom-modal').addEventListener('click', () => closeModal('imageZoom'));
-            document.getElementById('zoomed-image').addEventListener('click', () => closeModal('imageZoom'));
-
-            document.getElementById('close-alert-map-modal').addEventListener('click', () => closeModal('alertMap'));
-
-            document.getElementById('close-map-modal').addEventListener('click', () => closeModal('map'));
-            document.getElementById('confirm-location-btn').addEventListener('click', confirmLocation);
-
-            document.getElementById('close-scanner-btn').addEventListener('click', stopQRScanner);
-
-            document.getElementById('close-id-card-download-btn').addEventListener('click', () => closeModal('idCardDownload'));
-            document.getElementById('print-id-card-btn').addEventListener('click', printIDCard);
-            document.getElementById('download-id-card-btn').addEventListener('click', downloadIDCardFinal);
-
-            document.getElementById('full-name').addEventListener('blur', validateRegistrationName);
-            document.getElementById('profile-picture').addEventListener('change', validateProfilePictureName);
         }
 
-        function handleActionClick(action) {
-            if (action === 'ai') {
-                openModal('ai');
-                setTimeout(() => {
-                    chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
-                }, 100);
-            } else if (action === 'report') {
-                openModal('report');
-                document.getElementById('report-form').reset();
-                document.getElementById('location').value = "Click 'Get Location' or 'Pick on Map'";
-                document.getElementById('num-elephants').value = 1;
-                selectedLocation = null;
-            } else if (action === 'alerts') {
-                openModal('alerts');
-                loadAndDisplayAlerts('all');
-            }
+        // Set up event listeners
+        function setupEventListeners() {
+            accessAppBtn.addEventListener('click', handleLogin);
+            registerBtn.addEventListener('click', () => {
+                loginScreen.classList.add('hidden');
+                registerScreen.classList.remove('hidden');
+            });
+            guestBtn.addEventListener('click', handleGuestLogin);
+            generateIdBtn.addEventListener('click', handleRegistration);
+            backToLoginBtn.addEventListener('click', () => {
+                registerScreen.classList.add('hidden');
+                loginScreen.classList.remove('hidden');
+            });
         }
 
+        // --- Authentication Logic ---
+
+        // Login handler
         async function handleLogin() {
-            if (!userDb) {
+             if (!userDb) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
                 return;
             }
 
-            const userId = document.getElementById('login-id').value.trim();
-            const errorElement = document.getElementById('login-error');
+            const userId = loginIdInput.value.trim();
+            loginError.classList.add('hidden');
+            loginError.textContent = '';
 
             if (!userId) {
-                showError(errorElement, 'Please enter your ID');
+                showError(loginError, 'Please enter your ID');
                 return;
             }
 
             const idRegex = /^EMA-\d{6}$/;
             if (!idRegex.test(userId)) {
-                showError(errorElement, 'Please enter a valid EMA ID (e.g., EMA-123456)');
+                showError(loginError, 'Please enter a valid EMA ID (e.g., EMA-123456)');
                 return;
             }
 
             try {
-                const userRef = userDb.ref(`users/${userId}`);
-                const snapshot = await userRef.once('value');
+                const userRef = window.userRef(userDb, `users/${userId}`);
+                const snapshot = await window.userGet(userRef);
 
                 if (snapshot.exists()) {
-                    currentUser = { userId, ...snapshot.val() };
-                    sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
-                    showHomeScreen();
-                    listenForStatsUpdates();
+                    const userData = { userId, ...snapshot.val() };
+                    sessionStorage.setItem('emaUser', JSON.stringify(userData));
+                    window.location.href = 'home.html'; // Redirect to home
                 } else {
-                    showError(errorElement, 'Invalid ID. Please check and try again.');
+                    showError(loginError, 'Invalid ID. Please check and try again.');
                 }
             } catch (error) {
                 console.error("Login error:", error);
-                showError(errorElement, 'An error occurred. Please try again.');
+                showError(loginError, 'An error occurred. Please try again.');
             }
         }
 
+        // Guest login
         function handleGuestLogin() {
-            currentUser = {
+            const guestUser = {
                 userId: 'GUEST',
                 fullName: 'Guest User',
                 province: 'N/A',
                 district: 'N/A',
                 mobile: 'N/A'
             };
-            sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
-            showHomeScreen();
-            listenForStatsUpdates();
+            sessionStorage.setItem('emaUser', JSON.stringify(guestUser));
+            window.location.href = 'home.html'; // Redirect to home
         }
 
-        function handleProfilePictureSelect(event) {
-            const file = event.target.files[0];
-            const errorElement = document.getElementById('profile-picture-error');
-            errorElement.classList.add('hidden');
-            errorElement.textContent = '';
-
-            if (file) {
-                if (!file.type.startsWith('image/')) {
-                    showError(errorElement, 'Please select a valid image file.');
-                    event.target.value = '';
-                    previewCanvas.style.display = 'none';
-                    cropBtn.classList.add('hidden');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        originalImage = img;
-                        const maxWidth = 200;
-                        const maxHeight = 200;
-                        let { width, height } = calculateAspectRatioFit(img.width, img.height, maxWidth, maxHeight);
-
-                        previewCanvas.width = width;
-                        previewCanvas.height = height;
-                        const ctx = previewCanvas.getContext('2d');
-                        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        previewCanvas.style.display = 'block';
-                        cropBtn.classList.remove('hidden');
-                    };
-                    img.src = e.target.result;
-                };
-                reader.onerror = () => {
-                    showError(errorElement, 'Error reading the image file.');
-                    previewCanvas.style.display = 'none';
-                    cropBtn.classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                previewCanvas.style.display = 'none';
-                cropBtn.classList.add('hidden');
-            }
-        }
-
-        function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
-            const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
-            return { width: srcWidth * ratio, height: srcHeight * ratio };
-        }
-
-        function performCrop() {
-            if (!originalImage) return;
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const cropSize = 100;
-
-            canvas.width = cropSize;
-            canvas.height = cropSize;
-
-            const sourceWidth = originalImage.width;
-            const sourceHeight = originalImage.height;
-            let sourceX, sourceY, sourceSize;
-
-            if (sourceWidth > sourceHeight) {
-                sourceSize = sourceHeight;
-                sourceX = (sourceWidth - sourceHeight) / 2;
-                sourceY = 0;
-            } else {
-                sourceSize = sourceWidth;
-                sourceX = 0;
-                sourceY = (sourceHeight - sourceWidth) / 2;
-            }
-
-            ctx.drawImage(
-                originalImage,
-                sourceX, sourceY, sourceSize, sourceSize,
-                0, 0, cropSize, cropSize
-            );
-
-            croppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-            alert("Image cropped successfully!");
-            cropBtn.classList.add('hidden');
-        }
-
+        // Registration handler
         async function handleRegistration() {
             if (!userDb) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
                 return;
             }
 
-            const fullName = document.getElementById('full-name').value.trim();
-            const province = document.getElementById('province').value;
-            const district = document.getElementById('district').value;
-            const mobile = document.getElementById('mobile').value.trim();
-            const profilePictureBase64 = croppedImageDataUrl;
+            const fullName = fullNameInput.value.trim();
+            const province = provinceSelect.value;
+            const district = districtSelect.value;
+            const mobile = mobileInput.value.trim();
 
-            const nameError = document.getElementById('name-error');
-            const provinceError = document.getElementById('province-error');
-            const districtError = document.getElementById('district-error');
-            const mobileError = document.getElementById('mobile-error');
-            const profilePictureError = document.getElementById('profile-picture-error');
-
-            [nameError, provinceError, districtError, mobileError, profilePictureError].forEach(el => {
+            [nameError, provinceError, districtError, mobileError].forEach(el => {
                 el.classList.add('hidden');
                 el.textContent = '';
             });
@@ -1887,9 +549,9 @@
             if (!isValid) return;
 
             try {
-                const usersRef = userDb.ref('users');
-                const mobileQuery = usersRef.orderByChild('mobile').equalTo(mobile);
-                const snapshot = await mobileQuery.once('value');
+                const usersRef = window.userRef(userDb, 'users');
+                const mobileQuery = window.userQuery(usersRef, window.userOrderByChild('mobile'), window.userEqualTo(mobile));
+                const snapshot = await window.userGet(mobileQuery);
 
                 if (snapshot.exists()) {
                     showError(mobileError, 'This mobile number is already registered');
@@ -1897,20 +559,21 @@
                 }
 
                 const userId = `EMA-${Math.floor(100000 + Math.random() * 900000)}`;
+
                 const userData = {
                     userId,
                     fullName,
                     province,
                     district,
                     mobile,
-                    registeredAt: new Date().toISOString(),
-                    profilePicture: profilePictureBase64
+                    registeredAt: new Date().toISOString()
                 };
 
-                await userDb.ref(`users/${userId}`).set(userData);
+                await window.userSet(window.userRef(userDb, `users/${userId}`), userData);
 
-                currentUser = userData;
-                showIDCardDownload(userId);
+                sessionStorage.setItem('emaUser', JSON.stringify({ userId, ...userData }));
+                window.location.href = 'home.html'; // Redirect to home after registration
+
             } catch (error) {
                 console.error("Registration error:", error);
                 if (error.code === 'PERMISSION_DENIED') {
@@ -1921,732 +584,13 @@
             }
         }
 
-        function showIDCardDownload(userId) {
-             openModal('idCardDownload');
-
-            const canvas = document.getElementById('id-card-canvas');
-            const ctx = canvas.getContext('2d');
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const logo = new Image();
-            logo.crossOrigin = "Anonymous";
-            logo.onload = function () {
-                const logoWidth = 150;
-                const logoHeight = 150;
-                const logoX = (canvas.width - logoWidth) / 2;
-                const logoY = 50;
-                ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
-
-                ctx.fillStyle = '#4CAF50';
-                ctx.font = 'bold 36px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('EMA ID Card', canvas.width / 2, logoY + logoHeight + 50);
-
-                ctx.fillStyle = '#212121';
-                ctx.font = '28px Arial';
-                ctx.fillText(userId, canvas.width / 2, logoY + logoHeight + 100);
-
-                const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(userId)}&size=150`;
-                const qrCode = new Image();
-                qrCode.crossOrigin = "Anonymous";
-                qrCode.onload = function () {
-                    const qrX = (canvas.width - 150) / 2;
-                    const qrY = logoY + logoHeight + 120;
-                    ctx.drawImage(qrCode, qrX, qrY, 150, 150);
-
-                    ctx.fillStyle = '#9E9E9E';
-                    ctx.font = '16px Arial';
-                    ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
-
-                };
-                qrCode.onerror = function() {
-                     console.error("Failed to load QR code image for ID card.");
-                     ctx.fillStyle = '#9E9E9E';
-                     ctx.font = '16px Arial';
-                     ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
-                };
-                qrCode.src = qrCodeUrl;
-            };
-            logo.onerror = function() {
-                 console.error("Failed to load logo for ID card.");
-                 logo.onload();
-            };
-            logo.src = 'https://i.ibb.co/jvN2hV16/logo.png';
-        }
-
-        function printIDCard() {
-             const canvas = document.getElementById('id-card-canvas');
-            const dataUrl = canvas.toDataURL('image/png');
-
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Print EMA ID Card</title>
-                    <style>
-                        body {
-                            margin: 0;
-                            padding: 20px;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            min-height: 100vh;
-                            background-color: #f0f0f0;
-                        }
-                        img {
-                            max-width: 100%;
-                            height: auto;
-                            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-                        }
-                        @media print {
-                            body {
-                                background-color: white;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <img src="${dataUrl}" alt="EMA ID Card" />
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                        };
-                    </script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        }
-
-        function downloadIDCardFinal() {
-            const canvas = document.getElementById('id-card-canvas');
-            const dataUrl = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = `EMA_ID_${currentUser.userId}_Card.png`;
-            link.href = dataUrl;
-            link.click();
-        }
-
-        function showHomeScreen() {
-            if (!currentUser) {
-                const storedUser = sessionStorage.getItem('emaUser');
-                if (storedUser) {
-                    currentUser = JSON.parse(storedUser);
-                } else {
-                    showScreen('login');
-                    return;
-                }
-            }
-
-            if (currentUser) {
-                document.getElementById('home-user-name').textContent = currentUser.fullName;
-                document.getElementById('home-user-id').textContent = currentUser.userId;
-                document.getElementById('top-user-initials').textContent = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-
-                const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-                document.getElementById('home-user-initials').textContent = initials;
-                document.getElementById('top-user-initials').textContent = initials;
-
-                const profileImgElements = [
-                    document.getElementById('home-user-avatar-img'),
-                    document.getElementById('top-user-avatar'),
-                    document.getElementById('popup-user-image')
-                ];
-                const initialsElements = [
-                    document.getElementById('home-user-initials'),
-                    document.getElementById('top-user-initials'),
-                    document.getElementById('popup-user-initials')
-                ];
-
-                if (currentUser.profilePicture) {
-                    profileImgElements.forEach(img => {
-                        img.src = currentUser.profilePicture;
-                        img.style.display = 'block';
-                    });
-                    initialsElements.forEach(span => span.style.display = 'none');
-                } else {
-                    profileImgElements.forEach(img => img.style.display = 'none';
-                    initialsElements.forEach(span => span.style.display = 'block';
-                }
-
-                showScreen('home');
-                configureUIForUserType();
-
-            } else {
-                showScreen('login');
-            }
-        }
-
-        function configureUIForUserType() {
-            const isGuest = currentUser.userId === 'GUEST';
-            const userPopupActions = document.getElementById('user-popup-actions');
-
-            if (isGuest) {
-                document.getElementById('edit-profile-btn').style.display = 'none';
-                document.getElementById('delete-account-btn').style.display = 'none';
-                document.getElementById('request-agent-mode-btn').style.display = 'none';
-                document.querySelector('#user-popup-modal .modal-header h2').textContent = "Guest User";
-            } else {
-                document.getElementById('edit-profile-btn').style.display = 'block';
-                document.getElementById('delete-account-btn').style.display = 'block';
-                document.getElementById('request-agent-mode-btn').style.display = 'block';
-                document.querySelector('#user-popup-modal .modal-header h2').textContent = "User Information";
-            }
-            document.getElementById('sign-out-btn').style.display = 'block';
-        }
-
-        function openUserPopup() {
-            if (!currentUser) return;
-
-            document.getElementById('popup-user-fullname').textContent = currentUser.fullName;
-            document.getElementById('popup-user-id').textContent = currentUser.userId;
-            document.getElementById('popup-user-province').textContent = currentUser.province || 'N/A';
-            document.getElementById('popup-user-district').textContent = currentUser.district || 'N/A';
-            document.getElementById('popup-user-mobile').textContent = currentUser.mobile || 'N/A';
-
-            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-            document.getElementById('popup-user-initials').textContent = initials;
-
-            const profileImgElement = document.getElementById('popup-user-image');
-            const initialsElement = document.getElementById('popup-user-initials');
-            if (currentUser.profilePicture) {
-                profileImgElement.src = currentUser.profilePicture;
-                profileImgElement.style.display = 'block';
-                initialsElement.style.display = 'none';
-            } else {
-                profileImgElement.style.display = 'none';
-                initialsElement.style.display = 'block';
-            }
-
-            openModal('userPopup');
-        }
-
-        function openAgentRequestForm() {
-            alert("Agent Mode request feature is being implemented.");
-            closeModal('userPopup');
-        }
-
-        function openEditProfileModal() {
-            alert("Edit Profile feature is being implemented.");
-            closeModal('userPopup');
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            sessionStorage.removeItem('emaUser');
-            closeModal('userPopup');
-            showScreen('login');
-        }
-
-        async function handleDeleteAccount() {
-            if (!currentUser || !currentUser.userId || !userDb) {
-                alert("Cannot delete account: User not found or database not initialized.");
-                return;
-            }
-
-            const confirmation = confirm(`Are you sure you want to delete your account (${currentUser.userId})? This action cannot be undone.`);
-            if (!confirmation) return;
-
-            try {
-                const userRef = userDb.ref(`users/${currentUser.userId}`);
-                await userRef.remove();
-                console.log("Account deleted successfully from database.");
-            } catch (error) {
-                console.error("Error deleting account from database:", error);
-                alert("Failed to delete account from database. Please try again or contact support.");
-                return;
-            }
-
-            currentUser = null;
-            sessionStorage.removeItem('emaUser');
-            closeModal('userPopup');
-            alert("Your account has been deleted.");
-            showScreen('login');
-        }
-
+        // Show error message
         function showError(element, message) {
             element.textContent = message;
             element.classList.remove('hidden');
         }
 
-        async function sendUserMessageToAI() {
-            const message = userMessageInput.value.trim();
-            if (!message) return;
-
-            addMessageToChat(message, 'user');
-            conversationHistory.push({ role: 'user', content: message });
-            userMessageInput.value = '';
-
-            typingIndicator.style.display = 'flex';
-            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
-
-            try {
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'google/gemma-7b-it:free',
-                        messages: conversationHistory,
-                        temperature: 0.7,
-                        max_tokens: 500
-                    })
-                });
-
-                if (!response.ok) {
-                    let errorMsg = `API request failed with status ${response.status}`;
-                    try {
-                        const errorData = await response.json();
-                        errorMsg += ` - ${errorData.message || JSON.stringify(errorData)}`;
-                    } catch (e) {
-                        errorMsg += ` - ${response.statusText}`;
-                    }
-                    throw new Error(errorMsg);
-                }
-
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
-
-                typingIndicator.style.display = 'none';
-                addMessageToChat(aiResponse, 'ai');
-                conversationHistory.push({ role: 'assistant', content: aiResponse });
-
-            } catch (error) {
-                console.error('AI Assistant error:', error);
-                typingIndicator.style.display = 'none';
-                const userErrorMsg = error.message.includes('401') ?
-                    'Authentication failed. Please check the API key.' :
-                    'Sorry, I encountered an error. Please try again.';
-                addMessageToChat(userErrorMsg, 'ai');
-                conversationHistory.push({ role: 'assistant', content: userErrorMsg });
-            }
-        }
-
-        function addMessageToChat(content, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-            messageDiv.textContent = content;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
-        }
-
-        function getLocation() {
-            const locationInput = document.getElementById('location');
-            locationInput.value = "Getting location...";
-
-            if (!navigator.geolocation) {
-                locationInput.value = "Geolocation is not supported by your browser.";
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    selectedLocation = { lat, lng };
-                    locationInput.value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
-                },
-                (error) => {
-                    console.error("Geolocation error:", error);
-                    const errorMessage = error.message.includes("denied") ?
-                        "Location access denied. Please enable location services and try again." :
-                        "Unable to retrieve your location. Please try picking on the map.";
-                    locationInput.value = errorMessage;
-                }
-            );
-        }
-
-        function openMapModal() {
-            openModal('map');
-            if (!map) {
-                map = L.map('map').setView([7.8731, 80.7718], 7);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-
-                map.on('click', function (e) {
-                    if (marker) {
-                        map.removeLayer(marker);
-                    }
-                    marker = L.marker(e.latlng).addTo(map);
-                    mapCoordinatesElement.textContent = `Selected: Lat ${e.latlng.lat.toFixed(6)}, Lng ${e.latlng.lng.toFixed(6)}`;
-                });
-            }
-        }
-
-        function confirmLocation() {
-            if (marker) {
-                const latlng = marker.getLatLng();
-                selectedLocation = { lat: latlng.lat, lng: latlng.lng };
-                document.getElementById('location').value = `Lat: ${latlng.lat.toFixed(6)}, Lng: ${latlng.lng.toFixed(6)}`;
-                closeModal('map');
-            } else {
-                alert("Please click on the map to select a location first.");
-            }
-        }
-
-        async function submitReport(event) {
-            event.preventDefault();
-
-            if (!reportDb || !currentUser) {
-                alert("Application not ready or user not logged in. Please try again.");
-                return;
-            }
-
-            const locationInput = document.getElementById('location').value;
-            const numElephants = parseInt(document.getElementById('num-elephants').value) || 0;
-            const elephantNames = document.getElementById('elephant-names').value;
-            const district = document.getElementById('report-district').value;
-            const description = document.getElementById('description').value;
-            const imageFile = document.getElementById('image-upload').files[0];
-
-            if (!selectedLocation) {
-                alert("Please select a location using 'Get Location' or 'Pick on Map'.");
-                return;
-            }
-
-            if (numElephants <= 0) {
-                alert("Please enter a valid number of elephants (greater than 0).");
-                return;
-            }
-
-            if (!district) {
-                alert("Please select a district.");
-                return;
-            }
-
-            let imageBase64 = null;
-            if (imageFile) {
-                imageBase64 = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.readAsDataURL(imageFile);
-                });
-            }
-
-            const preciseTimestamp = new Date().toISOString();
-
-            const reportData = {
-                userId: currentUser.userId,
-                userName: currentUser.fullName,
-                userProfilePicture: currentUser.profilePicture || null,
-                location: selectedLocation,
-                numElephants: numElephants,
-                elephantNames: elephantNames || null,
-                district: district,
-                description: description || null,
-                image: imageBase64,
-                timestamp: preciseTimestamp,
-                status: 'pending' // Add status for agent review
-            };
-
-            try {
-                await reportDb.ref('reports').push(reportData);
-                alert("Report submitted successfully!");
-                closeModal('report');
-            } catch (error) {
-                console.error("Error submitting report:", error);
-                alert("Failed to submit report. Please try again.");
-            }
-        }
-
-        async function loadAndDisplayAlerts(filterType) {
-            const alertsListElement = document.getElementById('alerts-list');
-            alertsListElement.innerHTML = '<p class="text-center">Loading reports...</p>';
-
-            if (!reportDb) {
-                alertsListElement.innerHTML = '<p class="text-center error">Database not initialized.</p>';
-                return;
-            }
-
-            try {
-                const reportsRef = reportDb.ref('reports');
-                const snapshot = await reportsRef.once('value'); // Use .once for filtering
-                const data = snapshot.val();
-
-                if (!data) {
-                    alertsListElement.innerHTML = '<p class="text-center">No reports found.</p>';
-                    return;
-                }
-
-                let filteredReports = [];
-                const reportsArray = Object.keys(data).map(key => ({ id: key, ...data[key] })).filter(report => report.status === 'accepted'); // Only show accepted reports
-
-                if (filterType === 'all') {
-                    filteredReports = reportsArray;
-                } else if (filterType === 'mydistrict' && currentUser && currentUser.district) {
-                    filteredReports = reportsArray.filter(report => report.district === currentUser.district);
-                } else if (typeof filterType === 'string' && allSriLankanDistricts.includes(filterType)) {
-                    filteredReports = reportsArray.filter(report => report.district === filterType);
-                } else {
-                    filteredReports = reportsArray;
-                }
-
-                if (filteredReports.length === 0) {
-                    alertsListElement.innerHTML = '<p class="text-center">No reports found for the selected filter.</p>';
-                    return;
-                }
-
-                filteredReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-                alertsListElement.innerHTML = '';
-                filteredReports.forEach(report => {
-                    const reportCard = document.createElement('div');
-                    reportCard.classList.add('alert-card');
-                    reportCard.dataset.reportId = report.id;
-
-                    const timestamp = new Date(report.timestamp);
-                    const formattedDate = timestamp.toLocaleDateString();
-                    const formattedTime = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    let reporterAvatarHtml = '';
-                    const reporterInitials = report.userName ? report.userName.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
-                    if (report.userProfilePicture) {
-                        reporterAvatarHtml = `<img src="${report.userProfilePicture}" alt="${report.userName}'s Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
-                        reporterAvatarHtml += `<span style="display:none; align-items: center; justify-content: center; width: 100%; height: 100%;">${reporterInitials}</span>`;
-                    } else {
-                        reporterAvatarHtml = `<span style="display:flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${reporterInitials}</span>`;
-                    }
-
-                    let imageThumbnailHtml = '';
-                    if (report.image) {
-                         // Use onerror to handle broken image links
-                         imageThumbnailHtml = `<img src="${report.image}" alt="Report Image" class="alert-card-image-thumbnail" data-image-url="${report.image}" onerror="this.style.display='none';">`;
-                    }
-
-                    reportCard.innerHTML = `
-                        <div class="alert-card-header">
-                            <div class="alert-card-user-info">
-                                <div class="alert-card-avatar">
-                                    ${reporterAvatarHtml}
-                                </div>
-                                <div class="alert-card-user-details">
-                                    <span class="alert-card-user-name">${report.userName || 'Unknown User'}</span>
-                                    <span class="alert-card-user-id">${report.userId || 'N/A'}</span>
-                                </div>
-                            </div>
-                            <div class="alert-card-meta">
-                                <span class="alert-card-timestamp">${formattedDate} ${formattedTime}</span>
-                                <span class="alert-card-district">${report.district}</span>
-                            </div>
-                            <i class="fas fa-chevron-down chevron-icon"></i>
-                        </div>
-                        <div class="alert-card-body">
-                            <div class="alert-card-details">
-                                <p><strong>Location:</strong> Lat: ${report.location.lat.toFixed(6)}, Lng: ${report.location.lng.toFixed(6)}</p>
-                                <p><strong>Elephants:</strong> ${report.numElephants}</p>
-                                ${report.elephantNames ? `<p><strong>Names:</strong> ${report.elephantNames}</p>` : ''}
-                                ${report.description ? `<p><strong>Description:</strong> ${report.description}</p>` : ''}
-                                ${imageThumbnailHtml}
-                                <button class="btn btn-secondary btn-full mt-8 view-map-btn" data-lat="${report.location.lat}" data-lng="${report.location.lng}">
-                                    <i class="fas fa-map-marker-alt"></i> View on Map
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    alertsListElement.appendChild(reportCard);
-
-                    const header = reportCard.querySelector('.alert-card-header');
-                    header.addEventListener('click', function(e) {
-                        if (e.target.classList.contains('alert-card-image-thumbnail') || e.target.closest('.view-map-btn')) {
-                            return;
-                        }
-                        reportCard.classList.toggle('expanded');
-                    });
-
-                    const imageThumbnailElement = reportCard.querySelector('.alert-card-image-thumbnail');
-                    if (imageThumbnailElement) {
-                        imageThumbnailElement.addEventListener('click', function() {
-                            const imageUrl = this.getAttribute('data-image-url');
-                            document.getElementById('zoomed-image').src = imageUrl;
-                            openModal('imageZoom');
-                        });
-                    }
-
-                    const viewMapBtn = reportCard.querySelector('.view-map-btn');
-                    viewMapBtn.addEventListener('click', function() {
-                         const lat = parseFloat(this.getAttribute('data-lat'));
-                         const lng = parseFloat(this.getAttribute('data-lng'));
-                         openAlertMap(lat, lng);
-                    });
-
-                });
-
-            } catch (error) {
-                console.error("Error loading reports:", error);
-                alertsListElement.innerHTML = '<p class="text-center error">Failed to load reports. Please try again.</p>';
-            }
-        }
-
-        function openAlertMap(lat, lng) {
-            openModal('alertMap');
-            alertMapCoordinatesElement.textContent = `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`;
-
-            if (!alertMap) {
-                alertMap = L.map('alert-map-container').setView([lat, lng], 13);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(alertMap);
-
-                alertMarker = L.marker([lat, lng]).addTo(alertMap)
-                    .bindPopup(`Report Location<br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`)
-                    .openPopup();
-            } else {
-                alertMap.setView([lat, lng], 13);
-                if (alertMarker) {
-                    alertMap.removeLayer(alertMarker);
-                }
-                alertMarker = L.marker([lat, lng]).addTo(alertMap)
-                    .bindPopup(`Report Location<br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`)
-                    .openPopup();
-            }
-        }
-
-        function startQRScanner() {
-            modals.qrScanner.classList.add('active');
-            lastScannedResult = null;
-
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert("Sorry, your browser does not support camera access for QR scanning.");
-                stopQRScanner();
-                return;
-            }
-
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(function (mediaStream) {
-                    qrStream = mediaStream;
-                    qrVideo.srcObject = mediaStream;
-                    qrVideo.setAttribute("playsinline", true);
-                    qrVideo.play();
-                    qrScanning = true;
-                    requestAnimationFrame(qrTick);
-                })
-                .catch(function (err) {
-                    console.error("Camera access error:", err);
-                    const errorMessage = err.name === 'NotAllowedError' ?
-                        "Camera access denied. Please allow camera permission and try again." :
-                        "Could not access the camera. Please ensure you have granted permission.";
-                    alert(errorMessage);
-                    stopQRScanner();
-                });
-        }
-
-        function stopQRScanner() {
-            qrScanning = false;
-            if (qrStream) {
-                const tracks = qrStream.getTracks();
-                tracks.forEach(track => track.stop());
-                qrStream = null;
-            }
-            if (qrVideo.srcObject) {
-                qrVideo.srcObject = null;
-            }
-            modals.qrScanner.classList.remove('active');
-            document.getElementById('qr-result').textContent = '';
-            document.getElementById('qr-result').classList.add('hidden');
-        }
-
-        function qrTick() {
-            if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA && qrScanning) {
-                qrCanvasElement.height = qrVideo.videoHeight;
-                qrCanvasElement.width = qrVideo.videoWidth;
-                qrCanvas.drawImage(qrVideo, 0, 0, qrCanvasElement.width, qrCanvasElement.height);
-                const imageData = qrCanvas.getImageData(0, 0, qrCanvasElement.width, qrCanvasElement.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: "dontInvert",
-                });
-
-                if (code) {
-                    const idRegex = /^EMA-\d{6}$/;
-                    if (idRegex.test(code.data) && code.data !== lastScannedResult) {
-                        console.log("QR Code found:", code.data);
-                        lastScannedResult = code.data;
-                        const resultElement = document.getElementById('qr-result');
-                        resultElement.textContent = `Scanned: ${code.data}`;
-                        resultElement.classList.remove('hidden');
-                        stopQRScanner();
-                        document.getElementById('login-id').value = code.data;
-                        setTimeout(() => {
-                             handleLogin();
-                        }, 500);
-                        return;
-                    } else if (code.data !== lastScannedResult) {
-                        console.log("Scanned QR code does not match EMA ID format:", code.data);
-                        const resultElement = document.getElementById('qr-result');
-                        resultElement.textContent = "Not a valid EMA ID QR code.";
-                        resultElement.classList.remove('hidden');
-                        setTimeout(() => {
-                            if (!resultElement.classList.contains('hidden')) {
-                                 resultElement.classList.add('hidden');
-                            }
-                        }, 2000);
-                    }
-                }
-                requestAnimationFrame(qrTick);
-            } else if (qrScanning) {
-                 requestAnimationFrame(qrTick);
-            }
-        }
-
-        function validateRegistrationName() {
-            const fullName = document.getElementById('full-name').value.trim();
-            const warningElement = document.getElementById('name-warning');
-            const errorElement = document.getElementById('name-error');
-
-            warningElement.classList.add('hidden');
-            warningElement.textContent = '';
-            errorElement.classList.add('hidden');
-            errorElement.textContent = '';
-
-            if (!fullName) return;
-
-            const parts = fullName.split(/\s+/);
-            const hasSymbolsOrNumbers = /[0-9!@#$%^&*(),.?":{}|<>[\]\\;'`~_+=/-]/.test(fullName);
-
-            if (parts.length < 2) {
-                warningElement.textContent = "Consider using your full name (e.g., 'John Doe'). Accounts with incomplete names may be reviewed.";
-                warningElement.classList.remove('hidden');
-            }
-
-            if (hasSymbolsOrNumbers) {
-                warningElement.textContent = "Names should generally not contain symbols or numbers. Accounts with unusual names may be reviewed.";
-                warningElement.classList.remove('hidden');
-            }
-        }
-
-        function validateProfilePictureName() {
-            const file = document.getElementById('profile-picture').files[0];
-            const fullName = document.getElementById('full-name').value.trim();
-            const warningElement = document.getElementById('profile-picture-warning');
-
-            warningElement.classList.add('hidden');
-            warningElement.textContent = '';
-
-            if (file && fullName) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                         const parts = fullName.split(/\s+/);
-                        if (parts.length < 2) {
-                             warningElement.textContent = "If your name has multiple parts, please ensure your profile picture clearly shows your full name.";
-                             warningElement.classList.remove('hidden');
-                        }
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
+        // Initialize the app when the DOM is fully loaded
         window.addEventListener('DOMContentLoaded', () => {
             initApp();
         });
