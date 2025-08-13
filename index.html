@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- jsQR Library for QR Code scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
         :root {
             --md-sys-color-primary: #606c38;
@@ -87,6 +89,7 @@
             justify-content: center;
             align-items: center;
             padding: 16px;
+            position: relative; /* For FAB positioning */
         }
 
         .screen {
@@ -264,12 +267,12 @@
         /* --- Home Screen Specific Styles --- */
         .home-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* Align user button to the right */
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .settings-btn, .user-btn {
+        .user-btn {
             background: none;
             border: none;
             color: var(--theme-on-surface);
@@ -279,7 +282,7 @@
             border-radius: 50%;
         }
 
-        .settings-btn:hover, .user-btn:hover {
+        .user-btn:hover {
              background-color: rgba(96, 108, 56, 0.1); /* Subtle hover */
         }
 
@@ -347,14 +350,14 @@
             font-size: 13px;
         }
 
-        .stats-grid, .features-grid {
+        .stats-grid, .actions-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
             gap: 14px;
             margin-top: 14px;
         }
 
-        .stat-card, .feature-card {
+        .stat-card, .action-card {
             background-color: var(--theme-surface-variant);
             border-radius: var(--md-sys-shape-corner-medium);
             padding: 14px;
@@ -362,7 +365,7 @@
             box-shadow: var(--md-sys-elevation-1);
         }
 
-        .stat-card i, .feature-card i {
+        .stat-card i, .action-card i {
             font-size: 22px;
             color: var(--theme-primary);
             margin-bottom: 6px;
@@ -374,16 +377,16 @@
             margin: 6px 0;
         }
 
-        .stat-card .label, .feature-card .label {
+        .stat-card .label, .action-card .label {
             font-size: 13px;
             color: var(--theme-on-surface-variant);
         }
 
-        .features-grid {
+        .actions-grid {
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         }
 
-        .feature-card {
+        .action-card {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -393,7 +396,7 @@
             transition: transform 0.2s, background-color 0.2s;
         }
 
-        .feature-card:hover {
+        .action-card:hover {
             background-color: #d5d8c9; /* Lighten surface-variant for hover */
             transform: translateY(-2px);
         }
@@ -423,6 +426,33 @@
             height: 180px;
         }
 
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--theme-primary);
+            color: var(--theme-on-primary);
+            border: none;
+            box-shadow: var(--md-sys-elevation-2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 100;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .fab:hover {
+            background-color: #4a552a; /* Darken primary for hover */
+            transform: scale(1.05);
+        }
+
+        /* --- Modals --- */
         .modal {
             display: none;
             position: fixed;
@@ -649,21 +679,194 @@
         }
         /* --- End Report Form Styles --- */
 
-        /* --- Settings Modal --- */
-        .settings-content {
+        /* --- Alerts Modal --- */
+        .alerts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 10px;
+        }
+
+        .alerts-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+
+        .alerts-filters .btn {
+            padding: 8px 12px; /* Smaller padding for filter buttons */
+            font-size: 14px;
+            min-height: auto; /* Override default min-height */
+        }
+
+        .alerts-list {
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
-        .setting-item {
+
+        .alert-item {
+            background-color: var(--theme-surface-variant);
+            border-radius: var(--md-sys-shape-corner-medium);
+            padding: 16px;
+            box-shadow: var(--md-sys-elevation-1);
+        }
+
+        .alert-item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--theme-outline);
+            padding-bottom: 8px;
         }
-        .setting-item label {
-            margin: 0;
+
+        .alert-item-user {
+            font-weight: bold;
+            color: var(--theme-primary);
         }
-        /* --- End Settings Modal --- */
+
+        .alert-item-timestamp {
+            font-size: 0.8rem;
+            color: var(--theme-on-surface-variant);
+        }
+
+        .alert-item-details p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .alert-item-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--md-sys-shape-corner-medium);
+            margin-top: 10px;
+            display: block;
+        }
+        /* --- End Alerts Modal --- */
+
+        /* --- Edit Profile Modal --- */
+        .edit-profile-form .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            background-color: var(--theme-primary-container);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: var(--theme-on-primary-container);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .edit-profile-form .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .edit-profile-form .avatar-preview .initials {
+            /* Inherits styles from above */
+        }
+
+        .edit-profile-form .avatar-preview input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        /* --- End Edit Profile Modal --- */
+
+
+        /* --- QR Scanner Modal Styles --- */
+        #qr-scanner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9); /* Darker background */
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        #qr-scanner-modal.active {
+            display: flex;
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: transparent; /* Transparent background for container */
+            border-radius: var(--md-sys-shape-corner-large);
+            overflow: hidden;
+            box-shadow: none;
+            position: relative; /* For positioning the close button */
+        }
+
+        #qr-video {
+            width: 100%;
+            display: block;
+            max-height: 70vh; /* Limit video height */
+            background-color: #000; /* Black background for video */
+        }
+
+        .scanner-instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: var(--md-sys-shape-corner-medium);
+            width: 80%;
+            pointer-events: none; /* Allow clicks to pass through to video */
+        }
+
+        .close-scanner-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10; /* Above video */
+        }
+
+        .close-scanner-btn:hover {
+             background: rgba(0, 0, 0, 0.7);
+        }
+
+        .qr-result {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: var(--md-sys-shape-corner-medium);
+            margin: 0 20px;
+        }
 
         .hidden {
             display: none !important;
@@ -679,7 +882,7 @@
             .btn {
                 padding: 10px 16px;
             }
-            .stat-card, .feature-card {
+            .stat-card, .action-card {
                 padding: 12px;
             }
             .modal-content {
@@ -705,6 +908,10 @@
             </div>
             <button id="access-app-btn" class="btn btn-primary btn-full">
                 <i class="fas fa-sign-in-alt"></i> Access App
+            </button>
+             <!-- Quick Login Button -->
+            <button id="quick-login-btn" class="btn btn-secondary btn-full mt-16">
+                <i class="fas fa-qrcode"></i> Quick Login (Scan ID)
             </button>
             <button id="register-btn" class="btn btn-secondary btn-full mt-16">
                 <i class="fas fa-user-plus"></i> New User? Register
@@ -788,9 +995,6 @@
     <div id="home-screen" class="screen">
         <div class="card">
             <div class="home-header">
-                <button class="settings-btn" id="open-settings-btn" title="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
                 <button class="user-btn" id="open-user-btn" title="User Profile">
                     <span class="user-btn-initials" id="top-user-initials">U</span>
                     <img class="user-btn-avatar" id="top-user-avatar" src="" alt="Profile">
@@ -815,49 +1019,58 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fas fa-file-alt"></i>
-                    <div class="value">12</div>
+                    <div class="value" id="total-reports">0</div>
                     <div class="label">Reports</div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-elephant"></i>
-                    <div class="value">8</div>
+                    <div class="value" id="total-elephants">0</div>
                     <div class="label">Elephants</div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-map-marker-alt"></i>
-                    <div class="value">5</div>
+                    <div class="value" id="unique-locations">0</div>
                     <div class="label">Locations</div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-bell"></i>
-                    <div class="value">3</div>
+                    <div class="value" id="recent-alerts">0</div>
                     <div class="label">Alerts</div>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <h2>Features</h2>
-            <div class="features-grid">
-                <div class="feature-card" data-feature="report">
+            <h2>Actions</h2> <!-- Changed from Features to Actions -->
+            <div class="actions-grid">
+                <div class="action-card" data-action="report">
                     <i class="fas fa-bullhorn"></i>
                     <div class="label">Report Elephant</div>
                 </div>
-                <div class="feature-card" data-feature="map">
+                <div class="action-card" data-action="map">
                     <i class="fas fa-map-marked-alt"></i>
                     <div class="label">View Map</div>
                 </div>
-                <div class="feature-card" data-feature="radar">
+                <div class="action-card" data-action="radar">
                      <i class="fas fa-radar"></i> <!-- Radar icon -->
                     <div class="label">Radar</div>
                 </div>
-                <div class="feature-card" data-feature="ai">
+                <div class="action-card" data-action="ai">
                     <i class="fas fa-robot"></i>
                     <div class="label">AI Chatbot</div>
+                </div>
+                 <div class="action-card" data-action="alerts">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="label">Alerts</div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="quick-report-btn" title="Quick Report">
+        <i class="fas fa-plus"></i>
+    </button>
 
     <!-- Report Modal -->
     <div id="report-modal" class="modal">
@@ -940,6 +1153,9 @@
                         <p><strong>Mobile:</strong> <span id="popup-user-mobile">077XXXXXXX</span></p>
                     </div>
                     <div class="user-popup-actions">
+                        <button id="edit-profile-btn" class="btn btn-secondary btn-full">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
                         <button id="delete-account-btn" class="btn btn-secondary btn-full">
                             <i class="fas fa-trash-alt"></i> Delete Account
                         </button>
@@ -980,33 +1196,85 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal">
+    <!-- Alerts Modal -->
+    <div id="alerts-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Settings</h2>
-                <button id="close-settings-modal" class="close-modal-btn">
+                <h2>Alerts & Reports</h2>
+                <button id="close-alerts-modal" class="close-modal-btn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="settings-content">
-                    <div class="setting-item">
-                        <label for="theme-toggle">Dark Mode</label>
-                        <label class="switch">
-                            <input type="checkbox" id="theme-toggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label for="language-select">Language</label>
-                        <select id="language-select">
-                            <option value="en">English</option>
-                            <option value="si">Sinhala</option>
-                            <option value="ta">Tamil</option>
+                <div class="alerts-header">
+                    <div class="alerts-filters">
+                        <button id="filter-all" class="btn btn-secondary">All Districts</button>
+                        <button id="filter-my-district" class="btn btn-secondary">My District</button>
+                        <!-- District filter dropdown will be populated dynamically -->
+                        <select id="filter-by-district" class="btn btn-secondary">
+                            <option value="">Filter by District</option>
                         </select>
                     </div>
                 </div>
+                <div class="alerts-list" id="alerts-list">
+                    <!-- Alerts will be populated here dynamically -->
+                    <p class="text-center">Loading reports...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <button id="close-edit-profile-modal" class="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-profile-form" class="edit-profile-form">
+                    <div class="avatar-preview" id="edit-avatar-preview">
+                        <img id="edit-profile-image-preview" src="" alt="Profile Picture">
+                        <span id="edit-profile-initials-preview">U</span>
+                        <input type="file" accept="image/*" id="edit-profile-picture">
+                    </div>
+                     <div class="input-group">
+                        <label for="edit-full-name">Full Name</label>
+                        <input type="text" id="edit-full-name" placeholder="Enter your full name">
+                    </div>
+                    <div class="input-group">
+                        <label for="edit-province">Province</label>
+                        <select id="edit-province">
+                            <option value="">Select Province</option>
+                            <option value="Western">Western</option>
+                            <option value="Central">Central</option>
+                            <option value="Southern">Southern</option>
+                            <option value="Northern">Northern</option>
+                            <option value="Eastern">Eastern</option>
+                            <option value="North Western">North Western</option>
+                            <option value="North Central">North Central</option>
+                            <option value="Uva">Uva</option>
+                            <option value="Sabaragamuwa">Sabaragamuwa</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="edit-district">District</label>
+                        <select id="edit-district" disabled>
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="edit-mobile">Mobile Number</label>
+                        <input type="tel" id="edit-mobile" placeholder="0771234567">
+                    </div>
+                     <canvas id="edit-preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
+                     <button id="edit-crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
+                    <button type="submit" id="save-profile-btn" class="btn btn-primary btn-full mt-16">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -1027,6 +1295,21 @@
                     <i class="fas fa-check"></i> Confirm Location
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qr-scanner-modal" class="modal">
+        <div class="scanner-container">
+            <button id="close-scanner-btn" class="close-scanner-btn">
+                <i class="fas fa-times"></i>
+            </button>
+            <video id="qr-video" playsinline></video>
+            <div class="scanner-instructions">
+                <p>Point your camera at your EMA ID QR code</p>
+                <p><i class="fas fa-qrcode fa-2x"></i></p>
+            </div>
+            <div id="qr-result" class="qr-result hidden"></div>
         </div>
     </div>
 
@@ -1074,8 +1357,10 @@
             report: document.getElementById('report-modal'),
             userPopup: document.getElementById('user-popup-modal'),
             ai: document.getElementById('ai-modal'),
-            settings: document.getElementById('settings-modal'),
-            map: document.getElementById('map-modal')
+            alerts: document.getElementById('alerts-modal'),
+            editProfile: document.getElementById('edit-profile-modal'),
+            map: document.getElementById('map-modal'),
+            qrScanner: document.getElementById('qr-scanner-modal') // Add QR Scanner Modal
         };
 
         const chatMessages = document.getElementById('chat-messages');
@@ -1085,6 +1370,9 @@
         const cropBtn = document.getElementById('crop-btn');
         const mapElement = document.getElementById('map');
         const mapCoordinatesElement = document.getElementById('map-coordinates');
+
+        // Floating Action Button
+        const quickReportBtn = document.getElementById('quick-report-btn');
 
         // District data (Sri Lankan districts grouped by province)
         const sriLankanProvincesAndDistricts = {
@@ -1099,7 +1387,7 @@
             "Sabaragamuwa": ["Ratnapura", "Kegalle"]
         };
 
-        // All Sri Lankan districts for report form
+        // All Sri Lankan districts for report form and filters
         const allSriLankanDistricts = [
             "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
             "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
@@ -1113,13 +1401,17 @@
         let conversationHistory = [
             {
                 role: 'system',
-                content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant feature buttons.'
+                content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant action buttons.'
             }
         ];
 
         // Image cropping variables
         let originalImage = null;
         let croppedImageDataUrl = null;
+
+        // Edit Profile Image Cropping variables
+        let editOriginalImage = null;
+        let editCroppedImageDataUrl = null; // Will hold the new cropped image if changed
 
         // Map variables
         let map = null;
@@ -1130,16 +1422,24 @@
         let userDb = null;
         let reportDb = null;
 
+        // --- QR Scanner Variables ---
+        const qrVideo = document.getElementById('qr-video');
+        const qrCanvasElement = document.createElement('canvas');
+        const qrCanvas = qrCanvasElement.getContext('2d');
+        let qrScanning = false;
+        let qrStream = null;
+        let lastScannedResult = null; // To prevent duplicate scans
+
         // --- Initialize App ---
         async function initApp() {
             try {
                 // Dynamically import Firebase SDKs for User DB
                 const { initializeApp: initializeUserApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-                const { getDatabase: getUserDatabase, ref: userRef, get: userGet, set: userSet, remove: userRemove, query: userQuery, orderByChild: userOrderByChild, equalTo: userEqualTo } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                const { getDatabase: getUserDatabase, ref: userRef, get: userGet, set: userSet, update: userUpdate, remove: userRemove, query: userQuery, orderByChild: userOrderByChild, equalTo: userEqualTo, onValue: userOnValue } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
 
                 // Dynamically import Firebase SDKs for Report DB
                 const { initializeApp: initializeReportApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-                const { getDatabase: getReportDatabase, ref: reportRef, push: reportPush } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                const { getDatabase: getReportDatabase, ref: reportRef, push: reportPush, onValue: reportOnValue } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
 
                 // Initialize Firebase Apps
                 const userApp = initializeUserApp(userFirebaseConfig, 'userApp');
@@ -1153,13 +1453,16 @@
                 window.userRef = userRef;
                 window.userGet = userGet;
                 window.userSet = userSet;
+                window.userUpdate = userUpdate; // Add update function
                 window.userRemove = userRemove;
                 window.userQuery = userQuery;
                 window.userOrderByChild = userOrderByChild;
                 window.userEqualTo = userEqualTo;
+                window.userOnValue = userOnValue; // Add onValue for real-time listeners
 
                 window.reportRef = reportRef;
                 window.reportPush = reportPush;
+                window.reportOnValue = reportOnValue; // Add onValue for real-time listeners
 
                 // Show startup screen
                 setTimeout(() => {
@@ -1182,12 +1485,6 @@
                 // Check for existing session
                 checkExistingSession();
 
-                // Apply saved theme
-                applySavedTheme();
-
-                // Apply saved language
-                applySavedLanguage();
-
             } catch (error) {
                 console.error("Failed to load Firebase SDK or initialize app:", error);
                 alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
@@ -1206,95 +1503,69 @@
             if (storedUser) {
                 currentUser = JSON.parse(storedUser);
                 showHomeScreen();
+                // Start listening for real-time stats updates
+                listenForStatsUpdates();
             }
         }
 
-        // Apply saved theme from Firebase or localStorage
-        async function applySavedTheme() {
-            if (!currentUser || !userDb) {
-                // Fallback to localStorage if not logged in or DB not ready
-                const savedTheme = localStorage.getItem('emaTheme');
-                if (savedTheme === 'dark') {
-                    document.body.classList.add('theme-dark');
-                    document.getElementById('theme-toggle').checked = true;
-                }
-                return;
-            }
+        // Listen for real-time updates to statistics
+        function listenForStatsUpdates() {
+            if (!reportDb) return;
 
-            try {
-                const userSettingsRef = window.userRef(userDb, `users/${currentUser.userId}/settings`);
-                const snapshot = await window.userGet(userSettingsRef);
-                if (snapshot.exists()) {
-                    const settings = snapshot.val();
-                    if (settings.theme === 'dark') {
-                        document.body.classList.add('theme-dark');
-                        document.getElementById('theme-toggle').checked = true;
-                    } else {
-                        document.body.classList.remove('theme-dark');
-                        document.getElementById('theme-toggle').checked = false;
-                    }
-                    // Save to localStorage as well for immediate access on reload
-                    localStorage.setItem('emaTheme', settings.theme || 'light');
+            const reportsRef = window.reportRef(reportDb, 'reports');
+            window.reportOnValue(reportsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    updateStatistics(data);
                 } else {
-                    // Default to light if no settings found
-                    document.body.classList.remove('theme-dark');
-                    document.getElementById('theme-toggle').checked = false;
-                    localStorage.setItem('emaTheme', 'light');
+                    // Handle case where there are no reports
+                    updateStatistics({});
                 }
-            } catch (error) {
-                console.error("Error fetching theme:", error);
-                // Fallback to localStorage
-                const savedTheme = localStorage.getItem('emaTheme');
-                if (savedTheme === 'dark') {
-                    document.body.classList.add('theme-dark');
-                    document.getElementById('theme-toggle').checked = true;
-                }
-            }
+            });
         }
 
-        // Apply saved language from Firebase or localStorage
-        async function applySavedLanguage() {
-             // Note: Google Translate widget integration is complex in a single HTML file.
-             // This function will save/load the language preference to/from Firebase/localStorage.
-             // Actual translation would require embedding the widget script and managing it,
-             // which is outside the scope of a simple file. This part focuses on persistence.
-            if (!currentUser || !userDb) {
-                const savedLang = localStorage.getItem('emaLanguage');
-                if (savedLang) {
-                    document.getElementById('language-select').value = savedLang;
-                }
-                return;
-            }
+        // Update statistics on the home screen
+        function updateStatistics(reportsData) {
+            let totalReports = 0;
+            let totalElephants = 0;
+            const locations = new Set();
+            let recentAlerts = 0;
 
-            try {
-                const userSettingsRef = window.userRef(userDb, `users/${currentUser.userId}/settings`);
-                const snapshot = await window.userGet(userSettingsRef);
-                if (snapshot.exists()) {
-                    const settings = snapshot.val();
-                    if (settings.language) {
-                        document.getElementById('language-select').value = settings.language;
-                        localStorage.setItem('emaLanguage', settings.language);
+            const now = new Date();
+            const oneDayAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000)); // 24 hours ago
+
+            for (const key in reportsData) {
+                if (reportsData.hasOwnProperty(key)) {
+                    const report = reportsData[key];
+                    totalReports++;
+                    totalElephants += report.numElephants || 0;
+
+                    // Assuming location is stored as {lat, lng}
+                    if (report.location && report.location.lat !== undefined && report.location.lng !== undefined) {
+                        locations.add(`${report.location.lat.toFixed(4)},${report.location.lng.toFixed(4)}`); // Round for uniqueness
                     }
-                } else {
-                     // Default to English if no settings found
-                     document.getElementById('language-select').value = 'en';
-                     localStorage.setItem('emaLanguage', 'en');
-                }
-            } catch (error) {
-                console.error("Error fetching language:", error);
-                const savedLang = localStorage.getItem('emaLanguage');
-                if (savedLang) {
-                    document.getElementById('language-select').value = savedLang;
+
+                    // Count recent alerts (reports from last 24 hours)
+                    const reportTimestamp = new Date(report.timestamp);
+                    if (reportTimestamp > oneDayAgo) {
+                        recentAlerts++;
+                    }
                 }
             }
+
+            document.getElementById('total-reports').textContent = totalReports;
+            document.getElementById('total-elephants').textContent = totalElephants;
+            document.getElementById('unique-locations').textContent = locations.size;
+            document.getElementById('recent-alerts').textContent = recentAlerts;
         }
+
 
         // Populate district dropdowns
         function populateDistrictDropdowns() {
             // Populate registration district dropdown based on province
             const provinceSelect = document.getElementById('province');
             const districtSelect = document.getElementById('district');
-            
+
             // Populate report district dropdown with all districts
             const reportDistrictSelect = document.getElementById('report-district');
             reportDistrictSelect.innerHTML = '<option value="">Select District</option>';
@@ -1304,6 +1575,22 @@
                 option.textContent = district;
                 reportDistrictSelect.appendChild(option);
             });
+
+            // Populate filter-by-district dropdown in Alerts modal
+            const filterDistrictSelect = document.getElementById('filter-by-district');
+            // Clear existing options except the first one
+            filterDistrictSelect.innerHTML = '<option value="">Filter by District</option>';
+            allSriLankanDistricts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                filterDistrictSelect.appendChild(option);
+            });
+
+             // Populate edit profile district dropdown based on province
+            const editProvinceSelect = document.getElementById('edit-province');
+            const editDistrictSelect = document.getElementById('edit-district');
+             // This will be populated dynamically when the province changes, like in registration
         }
 
         // Initialize AI Chat with welcome message
@@ -1312,7 +1599,7 @@
             conversationHistory = [
                 {
                     role: 'system',
-                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant feature buttons.'
+                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant action buttons.'
                 }
             ];
             addMessageToChat("Hello! I'm the EMA AI Assistant. How can I help you today?", 'ai');
@@ -1345,6 +1632,7 @@
         function setupEventListeners() {
             // --- Login Screen ---
             document.getElementById('access-app-btn').addEventListener('click', handleLogin);
+            document.getElementById('quick-login-btn').addEventListener('click', startQRScanner); // Add QR Scan listener
             document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
             document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
 
@@ -1353,15 +1641,15 @@
             document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
             document.getElementById('profile-picture').addEventListener('change', handleProfilePictureSelect);
             cropBtn.addEventListener('click', performCrop);
-            
-            // --- Province/District Logic ---
+
+            // --- Province/District Logic for Registration ---
             const provinceSelect = document.getElementById('province');
             const districtSelect = document.getElementById('district');
-            
-            provinceSelect.addEventListener('change', function() {
+
+            provinceSelect.addEventListener('change', function () {
                 const selectedProvince = this.value;
                 districtSelect.innerHTML = '<option value="">Select District</option>'; // Clear previous options
-                
+
                 if (selectedProvince && sriLankanProvincesAndDistricts[selectedProvince]) {
                     sriLankanProvincesAndDistricts[selectedProvince].forEach(district => {
                         const option = document.createElement('option');
@@ -1373,9 +1661,30 @@
                 } else {
                     districtSelect.disabled = true; // Disable if no province selected
                 }
-                
+
                 // Clear any previous district error
                 document.getElementById('district-error').classList.add('hidden');
+            });
+
+            // --- Province/District Logic for Edit Profile ---
+            const editProvinceSelect = document.getElementById('edit-province');
+            const editDistrictSelect = document.getElementById('edit-district');
+
+            editProvinceSelect.addEventListener('change', function () {
+                const selectedProvince = this.value;
+                editDistrictSelect.innerHTML = '<option value="">Select District</option>'; // Clear previous options
+
+                if (selectedProvince && sriLankanProvincesAndDistricts[selectedProvince]) {
+                    sriLankanProvincesAndDistricts[selectedProvince].forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        editDistrictSelect.appendChild(option);
+                    });
+                    editDistrictSelect.disabled = false; // Enable district dropdown
+                } else {
+                    editDistrictSelect.disabled = true; // Disable if no province selected
+                }
             });
 
             // --- ID Display Screen ---
@@ -1383,6 +1692,7 @@
             document.getElementById('use-id-btn').addEventListener('click', () => {
                 if (currentUser) {
                     showHomeScreen();
+                    listenForStatsUpdates(); // Start listening for stats when user logs in via ID screen
                 } else {
                     showScreen('login');
                 }
@@ -1391,16 +1701,22 @@
             // --- Home Screen ---
             document.getElementById('open-user-btn').addEventListener('click', openUserPopup);
             document.getElementById('user-card').addEventListener('click', openUserPopup);
-            document.getElementById('open-settings-btn').addEventListener('click', () => openModal('settings'));
-            document.querySelectorAll('.feature-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const feature = this.getAttribute('data-feature');
-                    handleFeatureClick(feature);
+            // Removed settings button listener
+            document.querySelectorAll('.action-card').forEach(card => { // Changed from feature-card to action-card
+                card.addEventListener('click', function () {
+                    const action = this.getAttribute('data-action'); // Changed from data-feature to data-action
+                    handleActionClick(action); // Changed function name
                 });
+            });
+
+            // --- Floating Action Button ---
+            quickReportBtn.addEventListener('click', () => {
+                handleActionClick('report'); // Reuse the report action
             });
 
             // --- User Popup Modal ---
             document.getElementById('close-user-popup').addEventListener('click', () => closeModal('userPopup'));
+            document.getElementById('edit-profile-btn').addEventListener('click', openEditProfileModal);
             document.getElementById('sign-out-btn').addEventListener('click', handleLogout);
             document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
 
@@ -1419,35 +1735,62 @@
             document.getElementById('open-map-btn').addEventListener('click', openMapModal);
             document.getElementById('increase-elephants').addEventListener('click', () => {
                 const input = document.getElementById('num-elephants');
-                input.value = parseInt(input.value) + 1;
+                // Ensure it's a number and at least 1
+                let value = parseInt(input.value) || 1;
+                input.value = value + 1;
             });
             document.getElementById('decrease-elephants').addEventListener('click', () => {
                 const input = document.getElementById('num-elephants');
-                if (parseInt(input.value) > 1) {
-                    input.value = parseInt(input.value) - 1;
+                let value = parseInt(input.value) || 1;
+                if (value > 1) {
+                    input.value = value - 1;
                 }
             });
             document.getElementById('report-form').addEventListener('submit', submitReport);
 
-            // --- Settings Modal ---
-            document.getElementById('close-settings-modal').addEventListener('click', () => closeModal('settings'));
-            document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
-            document.getElementById('language-select').addEventListener('change', changeLanguage);
+            // --- Alerts Modal ---
+            document.getElementById('close-alerts-modal').addEventListener('click', () => closeModal('alerts'));
+            document.getElementById('filter-all').addEventListener('click', () => loadAndDisplayAlerts('all'));
+            document.getElementById('filter-my-district').addEventListener('click', () => {
+                if (currentUser && currentUser.district) {
+                    loadAndDisplayAlerts(currentUser.district);
+                } else {
+                    alert("Your district information is not available.");
+                    loadAndDisplayAlerts('all'); // Fallback to all
+                }
+            });
+            document.getElementById('filter-by-district').addEventListener('change', function () {
+                const selectedDistrict = this.value;
+                if (selectedDistrict) {
+                    loadAndDisplayAlerts(selectedDistrict);
+                } else {
+                    loadAndDisplayAlerts('all');
+                }
+            });
+
+            // --- Edit Profile Modal ---
+            document.getElementById('close-edit-profile-modal').addEventListener('click', () => closeModal('editProfile'));
+            document.getElementById('edit-profile-picture').addEventListener('change', handleEditProfilePictureSelect);
+            document.getElementById('edit-crop-btn').addEventListener('click', performEditCrop);
+            document.getElementById('edit-profile-form').addEventListener('submit', saveProfileChanges);
 
             // --- Map Modal ---
             document.getElementById('close-map-modal').addEventListener('click', () => closeModal('map'));
             document.getElementById('confirm-location-btn').addEventListener('click', confirmLocation);
+
+            // --- QR Scanner Modal ---
+            document.getElementById('close-scanner-btn').addEventListener('click', stopQRScanner);
         }
 
-        // Handle feature button clicks
-        function handleFeatureClick(feature) {
-            console.log("Feature clicked:", feature);
-            if (feature === 'ai') {
+        // Handle action button clicks (renamed from feature)
+        function handleActionClick(action) { // Renamed function
+            console.log("Action clicked:", action);
+            if (action === 'ai') {
                 openModal('ai');
                 setTimeout(() => {
                     chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
                 }, 100);
-            } else if (feature === 'report') {
+            } else if (action === 'report') {
                 openModal('report');
                 // Reset form fields
                 document.getElementById('report-form').reset();
@@ -1455,9 +1798,13 @@
                 document.getElementById('num-elephants').value = 1;
                 selectedLocation = null;
                 // Repopulate district dropdown in case it was changed elsewhere
-                populateDistrictDropdowns();
+                // Note: report district dropdown is populated once on init, no need to repopulate here unless dynamic
+            } else if (action === 'alerts') {
+                openModal('alerts');
+                // Load all alerts by default when opening
+                loadAndDisplayAlerts('all');
             }
-            // Add logic for other features (map, radar) here
+            // Add logic for other actions (map, radar) here
         }
 
         // --- Authentication Logic ---
@@ -1491,6 +1838,7 @@
                     currentUser = { userId, ...snapshot.val() };
                     sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
                     showHomeScreen();
+                    listenForStatsUpdates(); // Start listening for stats
                 } else {
                     showError(errorElement, 'Invalid ID. Please check and try again.');
                 }
@@ -1511,6 +1859,7 @@
             };
             sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
             showHomeScreen();
+            listenForStatsUpdates(); // Start listening for stats
         }
 
         // Handle profile picture selection and preview
@@ -1780,14 +2129,13 @@
                 }
 
                 showScreen('home');
+                // Show FAB on home screen
+                quickReportBtn.style.display = 'flex';
 
-                // Apply theme and language after home screen is shown
-                setTimeout(() => {
-                    applySavedTheme();
-                    applySavedLanguage();
-                }, 100);
             } else {
                 showScreen('login');
+                 // Hide FAB if not on home
+                quickReportBtn.style.display = 'none';
             }
         }
 
@@ -1818,12 +2166,280 @@
             openModal('userPopup');
         }
 
+        // Open Edit Profile Modal
+        function openEditProfileModal() {
+            if (!currentUser) return;
+            closeModal('userPopup'); // Close user popup first
+
+            // Pre-fill the form with current user data
+            document.getElementById('edit-full-name').value = currentUser.fullName || '';
+            document.getElementById('edit-province').value = currentUser.province || '';
+            document.getElementById('edit-mobile').value = currentUser.mobile || '';
+
+            // Handle district dropdown population based on selected province
+            const editProvinceSelect = document.getElementById('edit-province');
+            const editDistrictSelect = document.getElementById('edit-district');
+            const selectedProvince = currentUser.province;
+
+            editDistrictSelect.innerHTML = '<option value="">Select District</option>';
+            if (selectedProvince && sriLankanProvincesAndDistricts[selectedProvince]) {
+                sriLankanProvincesAndDistricts[selectedProvince].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    if (district === currentUser.district) {
+                        option.selected = true; // Select the current district
+                    }
+                    editDistrictSelect.appendChild(option);
+                });
+                editDistrictSelect.disabled = false;
+            } else {
+                editDistrictSelect.disabled = true;
+            }
+
+            // Handle profile picture preview
+            const profileImgPreview = document.getElementById('edit-profile-image-preview');
+            const initialsPreview = document.getElementById('edit-profile-initials-preview');
+            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+
+            if (currentUser.profilePicture) {
+                profileImgPreview.src = currentUser.profilePicture;
+                profileImgPreview.style.display = 'block';
+                initialsPreview.style.display = 'none';
+            } else {
+                profileImgPreview.style.display = 'none';
+                initialsPreview.textContent = initials;
+                initialsPreview.style.display = 'block';
+            }
+
+            // Reset cropping variables for edit
+            editOriginalImage = null;
+            editCroppedImageDataUrl = null;
+            document.getElementById('edit-preview-canvas').style.display = 'none';
+            document.getElementById('edit-crop-btn').classList.add('hidden');
+
+            openModal('editProfile');
+        }
+
+        // Handle edit profile picture selection and preview
+        function handleEditProfilePictureSelect(event) {
+            const file = event.target.files[0];
+            // Use the edit modal's specific elements
+            const previewCanvasEdit = document.getElementById('edit-preview-canvas');
+            const cropBtnEdit = document.getElementById('edit-crop-btn');
+
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select a valid image file.');
+                    event.target.value = '';
+                    previewCanvasEdit.style.display = 'none';
+                    cropBtnEdit.classList.add('hidden');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        editOriginalImage = img;
+                        const maxWidth = 200;
+                        const maxHeight = 200;
+                        let { width, height } = calculateAspectRatioFit(img.width, img.height, maxWidth, maxHeight);
+
+                        previewCanvasEdit.width = width;
+                        previewCanvasEdit.height = height;
+                        const ctx = previewCanvasEdit.getContext('2d');
+                        ctx.clearRect(0, 0, previewCanvasEdit.width, previewCanvasEdit.height);
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        previewCanvasEdit.style.display = 'block';
+                        cropBtnEdit.classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => {
+                    alert('Error reading the image file.');
+                    previewCanvasEdit.style.display = 'none';
+                    cropBtnEdit.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewCanvasEdit.style.display = 'none';
+                cropBtnEdit.classList.add('hidden');
+            }
+        }
+
+        // Perform cropping for edit profile picture
+        function performEditCrop() {
+            if (!editOriginalImage) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const cropSize = 100;
+
+            canvas.width = cropSize;
+            canvas.height = cropSize;
+
+            const sourceWidth = editOriginalImage.width;
+            const sourceHeight = editOriginalImage.height;
+            let sourceX, sourceY, sourceSize;
+
+            if (sourceWidth > sourceHeight) {
+                sourceSize = sourceHeight;
+                sourceX = (sourceWidth - sourceHeight) / 2;
+                sourceY = 0;
+            } else {
+                sourceSize = sourceWidth;
+                sourceX = 0;
+                sourceY = (sourceHeight - sourceWidth) / 2;
+            }
+
+            ctx.drawImage(
+                editOriginalImage,
+                sourceX, sourceY, sourceSize, sourceSize,
+                0, 0, cropSize, cropSize
+            );
+
+            editCroppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            alert("Profile picture cropped successfully!");
+            document.getElementById('edit-crop-btn').classList.add('hidden');
+
+            // Update the preview in the modal immediately
+            const profileImgPreview = document.getElementById('edit-profile-image-preview');
+            const initialsPreview = document.getElementById('edit-profile-initials-preview');
+            profileImgPreview.src = editCroppedImageDataUrl;
+            profileImgPreview.style.display = 'block';
+            initialsPreview.style.display = 'none';
+        }
+
+        // Save profile changes
+        async function saveProfileChanges(event) {
+            event.preventDefault();
+
+            if (!userDb || !currentUser) {
+                alert("Application not ready or user not logged in.");
+                return;
+            }
+
+            const updatedFullName = document.getElementById('edit-full-name').value.trim();
+            const updatedProvince = document.getElementById('edit-province').value;
+            const updatedDistrict = document.getElementById('edit-district').value;
+            const updatedMobile = document.getElementById('edit-mobile').value.trim();
+
+            // Validation (basic)
+            if (!updatedFullName) {
+                alert("Full name is required.");
+                return;
+            }
+            if (!updatedProvince) {
+                alert("Please select a province.");
+                return;
+            }
+            if (!updatedDistrict) {
+                alert("Please select a district.");
+                return;
+            }
+            const mobileRegex = /^0[0-9]{9}$/;
+            if (!updatedMobile) {
+                alert("Mobile number is required.");
+                return;
+            } else if (!mobileRegex.test(updatedMobile)) {
+                alert("Please enter a valid Sri Lankan mobile number (0XXXXXXXXX)");
+                return;
+            }
+
+            // Check if mobile number is unique (excluding current user)
+            try {
+                const usersRef = window.userRef(userDb, 'users');
+                const mobileQuery = window.userQuery(usersRef, window.userOrderByChild('mobile'), window.userEqualTo(updatedMobile));
+                const snapshot = await window.userGet(mobileQuery);
+
+                if (snapshot.exists()) {
+                    // Check if the mobile belongs to a different user
+                    const users = snapshot.val();
+                    const otherUserKey = Object.keys(users).find(key => key !== currentUser.userId);
+                    if (otherUserKey) {
+                        alert("This mobile number is already registered to another user.");
+                        return;
+                    }
+                    // If the key is the same as currentUser.userId, it's the same user, so it's okay.
+                }
+
+                // Prepare data to update
+                let updateData = {
+                    fullName: updatedFullName,
+                    province: updatedProvince,
+                    district: updatedDistrict,
+                    mobile: updatedMobile
+                };
+
+                // If a new picture was cropped, include it
+                if (editCroppedImageDataUrl !== null) {
+                    updateData.profilePicture = editCroppedImageDataUrl;
+                }
+                // If the picture input was cleared (editCroppedImageDataUrl is null and no original picture), explicitly set to null
+                // This handles the case of removing a picture, though UI for that isn't strictly implemented here.
+                // else if (!currentUser.profilePicture && !editOriginalImage) {
+                //     updateData.profilePicture = null;
+                // }
+
+                // Update user data in Firebase
+                const userRef = window.userRef(userDb, `users/${currentUser.userId}`);
+                await window.userUpdate(userRef, updateData); // Use update instead of set to only change provided fields
+
+                // Update local currentUser object
+                Object.assign(currentUser, updateData);
+                // Update session storage
+                sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
+
+                // Update UI elements that display user info
+                document.getElementById('home-user-name').textContent = currentUser.fullName;
+                document.getElementById('popup-user-fullname').textContent = currentUser.fullName;
+                document.getElementById('popup-user-province').textContent = currentUser.province || 'N/A';
+                document.getElementById('popup-user-district').textContent = currentUser.district || 'N/A';
+                document.getElementById('popup-user-mobile').textContent = currentUser.mobile || 'N/A';
+
+                const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('home-user-initials').textContent = initials;
+                document.getElementById('top-user-initials').textContent = initials;
+                document.getElementById('popup-user-initials').textContent = initials;
+
+                // Update profile picture display if it was changed
+                if (editCroppedImageDataUrl !== null) {
+                    const profileImgElements = [
+                        document.getElementById('home-user-avatar-img'),
+                        document.getElementById('top-user-avatar'),
+                        document.getElementById('popup-user-image'),
+                        document.getElementById('edit-profile-image-preview') // Also update preview in case modal is reopened quickly
+                    ];
+                    profileImgElements.forEach(img => {
+                        img.src = currentUser.profilePicture;
+                        img.style.display = 'block';
+                    });
+                    // Hide initials if picture is set
+                    document.getElementById('home-user-initials').style.display = 'none';
+                    document.getElementById('top-user-initials').style.display = 'none';
+                    document.getElementById('popup-user-initials').style.display = 'none';
+                    document.getElementById('edit-profile-initials-preview').style.display = 'none'; // Hide in edit preview too
+                }
+
+                alert("Profile updated successfully!");
+                closeModal('editProfile');
+
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                alert("Failed to update profile. Please try again.");
+            }
+        }
+
         // Logout handler
         function handleLogout() {
             currentUser = null;
             sessionStorage.removeItem('emaUser');
             closeModal('userPopup');
             showScreen('login');
+            // Hide FAB on logout
+            quickReportBtn.style.display = 'none';
         }
 
         // Delete Account handler
@@ -1851,6 +2467,8 @@
             closeModal('userPopup');
             alert("Your account has been deleted.");
             showScreen('login');
+            // Hide FAB on delete
+            quickReportBtn.style.display = 'none';
         }
 
         // Show error message
@@ -1942,12 +2560,14 @@
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
                     selectedLocation = { lat, lng };
-                    // Simple reverse geocode placeholder - in a real app, you'd call an API
                     locationInput.value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
                 },
                 (error) => {
                     console.error("Geolocation error:", error);
-                    locationInput.value = "Unable to retrieve your location. Please try picking on the map.";
+                    const errorMessage = error.message.includes("denied") ?
+                        "Location access denied. Please enable location services and try again." :
+                        "Unable to retrieve your location. Please try picking on the map.";
+                    locationInput.value = errorMessage;
                 }
             );
         }
@@ -1996,7 +2616,7 @@
             }
 
             const locationInput = document.getElementById('location').value;
-            const numElephants = document.getElementById('num-elephants').value;
+            const numElephants = parseInt(document.getElementById('num-elephants').value) || 0;
             const elephantNames = document.getElementById('elephant-names').value;
             const district = document.getElementById('report-district').value;
             const description = document.getElementById('description').value;
@@ -2004,6 +2624,11 @@
 
             if (!selectedLocation) {
                 alert("Please select a location using 'Get Location' or 'Pick on Map'.");
+                return;
+            }
+
+            if (numElephants <= 0) {
+                alert("Please enter a valid number of elephants (greater than 0).");
                 return;
             }
 
@@ -2015,6 +2640,7 @@
             let imageBase64 = null;
             if (imageFile) {
                 // Convert image to Base64
+                // Add a check for file size if needed to prevent huge payloads
                 imageBase64 = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = (e) => resolve(e.target.result);
@@ -2026,7 +2652,7 @@
                 userId: currentUser.userId,
                 userName: currentUser.fullName,
                 location: selectedLocation,
-                numElephants: parseInt(numElephants),
+                numElephants: numElephants,
                 elephantNames: elephantNames || null,
                 district: district,
                 description: description || null,
@@ -2039,6 +2665,12 @@
                 await window.reportPush(window.reportRef(reportDb, 'reports'), reportData);
                 alert("Report submitted successfully!");
                 closeModal('report');
+                // Reset form
+                document.getElementById('report-form').reset();
+                document.getElementById('location').value = "Click 'Get Location' or 'Pick on Map'";
+                document.getElementById('num-elephants').value = 1;
+                selectedLocation = null;
+                // The statistics should update automatically due to the real-time listener
             } catch (error) {
                 console.error("Error submitting report:", error);
                 alert("Failed to submit report. Please try again.");
@@ -2046,55 +2678,186 @@
         }
         // --- End Report Form Logic ---
 
-        // --- Settings Logic ---
+        // --- Alerts Modal Logic ---
+        async function loadAndDisplayAlerts(filterType) {
+            const alertsListElement = document.getElementById('alerts-list');
+            alertsListElement.innerHTML = '<p class="text-center">Loading reports...</p>';
 
-        // Toggle theme
-        async function toggleTheme() {
-            const isDarkMode = document.getElementById('theme-toggle').checked;
-            if (isDarkMode) {
-                document.body.classList.add('theme-dark');
-            } else {
-                document.body.classList.remove('theme-dark');
+            if (!reportDb) {
+                alertsListElement.innerHTML = '<p class="text-center error">Database not initialized.</p>';
+                return;
             }
 
-            // Save preference locally
-            const themeValue = isDarkMode ? 'dark' : 'light';
-            localStorage.setItem('emaTheme', themeValue);
+            try {
+                const reportsRef = window.reportRef(reportDb, 'reports');
+                const snapshot = await window.userGet(reportsRef); // Use get for a one-time read
+                const data = snapshot.val();
 
-            // Save preference to Firebase if user is logged in
-            if (currentUser && userDb) {
-                try {
-                    const userSettingsRef = window.userRef(userDb, `users/${currentUser.userId}/settings`);
-                    await window.userSet(userSettingsRef, { theme: themeValue });
-                } catch (error) {
-                    console.error("Error saving theme to Firebase:", error);
-                    // It's okay if this fails, localStorage fallback exists
+                if (!data) {
+                    alertsListElement.innerHTML = '<p class="text-center">No reports found.</p>';
+                    return;
                 }
+
+                // Filter reports
+                let filteredReports = [];
+                const reportsArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+
+                if (filterType === 'all') {
+                    filteredReports = reportsArray;
+                } else if (filterType === 'mydistrict' && currentUser && currentUser.district) {
+                    filteredReports = reportsArray.filter(report => report.district === currentUser.district);
+                } else if (typeof filterType === 'string' && allSriLankanDistricts.includes(filterType)) {
+                    // Filter by specific district name
+                    filteredReports = reportsArray.filter(report => report.district === filterType);
+                } else {
+                    // Default to all if filterType is unrecognized
+                    filteredReports = reportsArray;
+                }
+
+                if (filteredReports.length === 0) {
+                    alertsListElement.innerHTML = '<p class="text-center">No reports found for the selected filter.</p>';
+                    return;
+                }
+
+                // Sort by timestamp, newest first
+                filteredReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                // Display reports
+                alertsListElement.innerHTML = '';
+                filteredReports.forEach(report => {
+                    const reportElement = document.createElement('div');
+                    reportElement.classList.add('alert-item');
+
+                    const timestamp = new Date(report.timestamp);
+                    const formattedDate = timestamp.toLocaleDateString();
+                    const formattedTime = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    let imageHtml = '';
+                    if (report.image) {
+                        imageHtml = `<img src="${report.image}" alt="Report Image" class="alert-item-image">`;
+                    }
+
+                    reportElement.innerHTML = `
+                        <div class="alert-item-header">
+                            <span class="alert-item-user">${report.userName || 'Unknown User'}</span>
+                            <span class="alert-item-timestamp">${formattedDate} ${formattedTime}</span>
+                        </div>
+                        <div class="alert-item-details">
+                            <p><strong>Location:</strong> Lat: ${report.location.lat.toFixed(6)}, Lng: ${report.location.lng.toFixed(6)}</p>
+                            <p><strong>Elephants:</strong> ${report.numElephants}</p>
+                            ${report.elephantNames ? `<p><strong>Names:</strong> ${report.elephantNames}</p>` : ''}
+                            <p><strong>District:</strong> ${report.district}</p>
+                            ${report.description ? `<p><strong>Description:</strong> ${report.description}</p>` : ''}
+                            ${imageHtml}
+                        </div>
+                    `;
+                    alertsListElement.appendChild(reportElement);
+                });
+
+            } catch (error) {
+                console.error("Error loading reports:", error);
+                alertsListElement.innerHTML = '<p class="text-center error">Failed to load reports. Please try again.</p>';
             }
         }
+        // --- End Alerts Modal Logic ---
 
-        // Change language
-        async function changeLanguage() {
-            const selectedLanguage = document.getElementById('language-select').value;
-            // Save preference locally
-            localStorage.setItem('emaLanguage', selectedLanguage);
+        // --- QR Code Scanning Logic ---
+        function startQRScanner() {
+            modals.qrScanner.classList.add('active'); // Use the modals object
+            lastScannedResult = null; // Reset last scan
 
-            // Save preference to Firebase if user is logged in
-            if (currentUser && userDb) {
-                try {
-                    const userSettingsRef = window.userRef(userDb, `users/${currentUser.userId}/settings`);
-                    await window.userSet(userSettingsRef, { language: selectedLanguage });
-                } catch (error) {
-                    console.error("Error saving language to Firebase:", error);
-                }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Sorry, your browser does not support camera access for QR scanning.");
+                stopQRScanner();
+                return;
             }
 
-            // Note: Actual page translation using Google Translate widget
-            // would be implemented here if it were embedded.
-            // This is a placeholder for the persistence logic.
-            alert(`Language preference set to ${selectedLanguage}. (Actual translation requires widget integration)`);
+            // Get access to the camera (prefer rear camera for mobile)
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function (mediaStream) {
+                    qrStream = mediaStream;
+                    qrVideo.srcObject = qrStream;
+                    qrVideo.setAttribute("playsinline", true); // Required for iOS Safari
+                    qrVideo.play();
+                    qrScanning = true;
+                    requestAnimationFrame(qrTick); // Start the scanning loop
+                })
+                .catch(function (err) {
+                    console.error("Camera access error:", err);
+                    const errorMessage = err.name === 'NotAllowedError' ?
+                        "Camera access denied. Please allow camera permission and try again." :
+                        "Could not access the camera. Please ensure you have granted permission.";
+                    alert(errorMessage);
+                    stopQRScanner();
+                });
         }
-        // --- End Settings Logic ---
+
+        function stopQRScanner() {
+            qrScanning = false;
+            if (qrStream) {
+                const tracks = qrStream.getTracks();
+                tracks.forEach(track => track.stop()); // Stop all tracks
+                qrStream = null;
+            }
+            if (qrVideo.srcObject) {
+                qrVideo.srcObject = null;
+            }
+            modals.qrScanner.classList.remove('active'); // Use the modals object
+            // Clear any previous result display
+            document.getElementById('qr-result').textContent = '';
+            document.getElementById('qr-result').classList.add('hidden');
+        }
+
+        function qrTick() {
+            if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA && qrScanning) {
+                qrCanvasElement.height = qrVideo.videoHeight;
+                qrCanvasElement.width = qrVideo.videoWidth;
+                qrCanvas.drawImage(qrVideo, 0, 0, qrCanvasElement.width, qrCanvasElement.height);
+                const imageData = qrCanvas.getImageData(0, 0, qrCanvasElement.width, qrCanvasElement.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    // Check if the decoded data matches the EMA ID format and hasn't been scanned recently
+                    const idRegex = /^EMA-\d{6}$/;
+                    if (idRegex.test(code.data) && code.data !== lastScannedResult) {
+                        console.log("QR Code found:", code.data);
+                        lastScannedResult = code.data; // Store to prevent re-scanning
+                        // Display result temporarily
+                        const resultElement = document.getElementById('qr-result');
+                        resultElement.textContent = `Scanned: ${code.data}`;
+                        resultElement.classList.remove('hidden');
+                        // Stop the camera
+                        // stopQRScanner(); // Stop immediately
+                        // Simulate entering the ID and clicking login
+                        document.getElementById('login-id').value = code.data;
+                        // Use a small delay to ensure the value is set and user sees feedback before calling handleLogin
+                        setTimeout(() => {
+                            stopQRScanner(); // Stop after delay
+                            handleLogin(); // Call the existing login handler
+                        }, 500); // 500ms delay
+                        return; // Exit the tick loop
+                    } else if (code.data !== lastScannedResult) {
+                        console.log("Scanned QR code does not match EMA ID format:", code.data);
+                        // Optionally, show a message to the user for a short time
+                        const resultElement = document.getElementById('qr-result');
+                        resultElement.textContent = "Not a valid EMA ID QR code.";
+                        resultElement.classList.remove('hidden');
+                        setTimeout(() => {
+                            if (!resultElement.classList.contains('hidden')) {
+                                resultElement.classList.add('hidden');
+                            }
+                        }, 2000); // Hide after 2 seconds
+                    }
+                }
+                requestAnimationFrame(qrTick); // Continue scanning
+            } else if (qrScanning) {
+                requestAnimationFrame(qrTick); // Keep trying if not ready
+            }
+        }
+        // --- End QR Code Scanning Logic ---
+
 
         // Initialize the app when the DOM is fully loaded
         window.addEventListener('DOMContentLoaded', () => {
