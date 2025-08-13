@@ -58,9 +58,13 @@
             --theme-on-error: var(--md-sys-color-on-error);
         }
 
-        /* Dark Theme Override (if needed later) */
-        .theme-dark {
-            /* Define dark theme colors if necessary */
+        /* Ensure no scrollbars on body during load */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrollbars initially */
+            height: 100%;
+            width: 100%;
         }
 
         * {
@@ -79,6 +83,7 @@
             align-items: center;
             padding: 16px;
             position: relative; /* For FAB positioning */
+            overflow: auto; /* Allow scrolling once content loads */
         }
 
         .screen {
@@ -108,7 +113,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            width: 100%;
+            width: 100vw; /* Full viewport width/height */
             background-color: var(--theme-surface);
             position: fixed;
             top: 0;
@@ -243,12 +248,6 @@
 
         .error {
             color: var(--theme-error);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        .warning {
-            color: #FF9800; /* Orange warning color */
             font-size: 14px;
             margin-top: 4px;
         }
@@ -671,7 +670,7 @@
         }
         /* --- End Report Form Styles --- */
 
-        /* --- Alerts Modal --- */
+        /* --- Alerts Modal Enhancements --- */
         .alerts-header {
             display: flex;
             justify-content: space-between;
@@ -693,215 +692,180 @@
             min-height: auto; /* Override default min-height */
         }
 
-        .alerts-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .alert-item {
+        .alert-card {
             background-color: var(--theme-surface-variant);
             border-radius: var(--md-sys-shape-corner-medium);
-            padding: 16px;
             box-shadow: var(--md-sys-elevation-1);
+            margin-bottom: 16px;
+            overflow: hidden; /* Contain expanded content */
+            transition: box-shadow 0.2s;
         }
 
-        .alert-item-header {
+        .alert-card:hover {
+            box-shadow: var(--md-sys-elevation-2);
+        }
+
+        .alert-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--theme-outline);
-            padding-bottom: 8px;
-        }
-
-        .alert-item-user {
-            font-weight: bold;
-            color: var(--theme-primary);
-        }
-
-        .alert-item-timestamp {
-            font-size: 0.8rem;
-            color: var(--theme-on-surface-variant);
-        }
-
-        .alert-item-details p {
-            margin: 5px 0;
-            font-size: 0.9rem;
-        }
-
-        .alert-item-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: var(--md-sys-shape-corner-medium);
-            margin-top: 10px;
-            display: block;
-        }
-        /* --- End Alerts Modal --- */
-
-        /* --- Edit Profile Modal --- */
-        .edit-profile-form .avatar-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin: 0 auto 16px;
+            padding: 16px;
+            cursor: pointer;
             background-color: var(--theme-primary-container);
+        }
+
+        .alert-card-header:hover {
+            background-color: #bbdeb9; /* Lighten header on hover */
+        }
+
+        .alert-card-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-card-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--theme-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 16px;
             font-weight: bold;
-            color: var(--theme-on-primary-container);
+            color: var(--theme-on-primary);
+            flex-shrink: 0;
             overflow: hidden;
-            position: relative;
         }
 
-        .edit-profile-form .avatar-preview img {
+        .alert-card-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: none;
         }
 
-        .edit-profile-form .avatar-preview .initials {
-            /* Inherits styles from above */
+        .alert-card-user-details {
+            display: flex;
+            flex-direction: column;
         }
 
-        .edit-profile-form .avatar-preview input[type="file"] {
-            position: absolute;
+        .alert-card-user-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--theme-on-primary-container);
+        }
+
+        .alert-card-user-id {
+            font-size: 12px;
+            color: var(--theme-on-primary-container);
+            opacity: 0.8;
+        }
+
+        .alert-card-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            color: var(--theme-on-primary-container);
+        }
+
+        .alert-card-timestamp {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .alert-card-district {
+            font-size: 12px;
+            background-color: var(--theme-primary);
+            padding: 2px 6px;
+            border-radius: var(--md-sys-shape-corner-extra-small);
+        }
+
+        .alert-card-body {
+            padding: 0 16px 16px 16px; /* Closed state: no padding */
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .alert-card.expanded .alert-card-body {
+            padding: 16px; /* Open state: full padding */
+            max-height: 1000px; /* Large enough value */
+        }
+
+        .alert-card-details {
+            margin-bottom: 16px;
+        }
+
+        .alert-card-details p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .alert-card-image {
             width: 100%;
-            height: 100%;
-            opacity: 0;
+            max-width: 300px; /* Limit image width */
+            height: auto;
+            border-radius: var(--md-sys-shape-corner-medium);
             cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            box-shadow: var(--md-sys-elevation-1);
+            transition: transform 0.2s;
         }
-        /* --- End Edit Profile Modal --- */
 
+        .alert-card-image:hover {
+            transform: scale(1.02);
+        }
 
-        /* --- QR Scanner Modal Styles --- */
-        #qr-scanner-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9); /* Darker background */
-            z-index: 1001;
+        .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .alert-card.expanded .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        /* --- Image Zoom Modal --- */
+        #image-zoom-modal .modal-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        #image-zoom-modal .modal-body {
+            display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
-        }
-
-        #qr-scanner-modal.active {
-            display: flex;
-        }
-
-        .scanner-container {
-            width: 100%;
-            max-width: 500px;
-            background-color: transparent; /* Transparent background for container */
+            padding: 0;
+            background-color: rgba(0, 0, 0, 0.8);
             border-radius: var(--md-sys-shape-corner-large);
-            overflow: hidden;
-            box-shadow: none;
-            position: relative; /* For positioning the close button */
         }
 
-        #qr-video {
-            width: 100%;
-            display: block;
-            max-height: 70vh; /* Limit video height */
-            background-color: #000; /* Black background for video */
-        }
-
-        .scanner-instructions {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 18px;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 20px;
+        #zoomed-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             border-radius: var(--md-sys-shape-corner-medium);
-            width: 80%;
-            pointer-events: none; /* Allow clicks to pass through to video */
         }
 
-        .close-scanner-btn {
+        #image-zoom-modal .close-modal-btn {
             position: absolute;
             top: 15px;
             right: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 10; /* Above video */
-        }
-
-        .close-scanner-btn:hover {
-             background: rgba(0, 0, 0, 0.7);
-        }
-
-        .qr-result {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            color: white;
-            padding: 10px;
             background-color: rgba(0, 0, 0, 0.5);
-            border-radius: var(--md-sys-shape-corner-medium);
-            margin: 0 20px;
+            color: white;
         }
 
-        /* --- ID Card Download Styles --- */
-        #id-card-download {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1002;
-            justify-content: center;
-            align-items: center;
+        #image-zoom-modal .close-modal-btn:hover {
+            background-color: rgba(0, 0, 0, 0.7);
         }
+        /* --- End Image Zoom Modal --- */
+        /* --- End Alerts Modal Enhancements --- */
 
-        #id-card-download.active {
-            display: flex;
-        }
-
-        #id-card-canvas-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: var(--md-sys-shape-corner-large);
-            box-shadow: var(--md-sys-elevation-2);
-        }
-
-        #id-card-canvas {
-            display: block;
-            max-width: 100%;
-            height: auto;
-        }
-
-        #id-card-download-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        #id-card-download-buttons .btn {
-            min-width: 120px;
-        }
-        /* --- End ID Card Download Styles --- */
 
         .hidden {
             display: none !important;
@@ -964,7 +928,7 @@
             <div class="input-group">
                 <label for="full-name">Full Name</label>
                 <input type="text" id="full-name" placeholder="Enter your full name">
-                <div id="name-warning" class="warning hidden"></div> <!-- Warning for name format -->
+                <div id="name-warning" class="error hidden"></div> <!-- Warning for name format -->
                 <div id="name-error" class="error hidden"></div>
             </div>
             <div class="input-group">
@@ -998,7 +962,7 @@
              <div class="input-group">
                 <label for="profile-picture">Profile Picture</label>
                 <input type="file" accept="image/*" id="profile-picture" />
-                <div id="profile-picture-warning" class="warning hidden"></div> <!-- Warning for profile picture -->
+                <div id="profile-picture-warning" class="error hidden"></div> <!-- Warning for profile picture -->
                 <div id="profile-picture-error" class="error hidden"></div>
                  <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
                  <button id="crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
@@ -1239,70 +1203,22 @@
                     </div>
                 </div>
                 <div class="alerts-list" id="alerts-list">
-                    <!-- Alerts will be populated here dynamically -->
+                    <!-- Alerts will be populated here dynamically as expandable cards -->
                     <p class="text-center">Loading reports...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Profile Modal -->
-    <div id="edit-profile-modal" class="modal">
+    <!-- Image Zoom Modal -->
+    <div id="image-zoom-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Edit Profile</h2>
-                <button id="close-edit-profile-modal" class="close-modal-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
             <div class="modal-body">
-                <form id="edit-profile-form" class="edit-profile-form">
-                    <div class="avatar-preview" id="edit-avatar-preview">
-                        <img id="edit-profile-image-preview" src="" alt="Profile Picture">
-                        <span id="edit-profile-initials-preview">U</span>
-                        <input type="file" accept="image/*" id="edit-profile-picture">
-                    </div>
-                     <div class="input-group">
-                        <label for="edit-full-name">Full Name</label>
-                        <input type="text" id="edit-full-name" placeholder="Enter your full name">
-                         <div id="edit-name-warning" class="warning hidden"></div> <!-- Warning for name format -->
-                        <div id="edit-name-error" class="error hidden"></div>
-                    </div>
-                    <div class="input-group">
-                        <label for="edit-province">Province</label>
-                        <select id="edit-province">
-                            <option value="">Select Province</option>
-                            <option value="Western">Western</option>
-                            <option value="Central">Central</option>
-                            <option value="Southern">Southern</option>
-                            <option value="Northern">Northern</option>
-                            <option value="Eastern">Eastern</option>
-                            <option value="North Western">North Western</option>
-                            <option value="North Central">North Central</option>
-                            <option value="Uva">Uva</option>
-                            <option value="Sabaragamuwa">Sabaragamuwa</option>
-                        </select>
-                        <div id="edit-province-error" class="error hidden"></div>
-                    </div>
-                    <div class="input-group">
-                        <label for="edit-district">District</label>
-                        <select id="edit-district" disabled>
-                            <option value="">Select District</option>
-                        </select>
-                        <div id="edit-district-error" class="error hidden"></div>
-                    </div>
-                    <div class="input-group">
-                        <label for="edit-mobile">Mobile Number</label>
-                        <input type="tel" id="edit-mobile" placeholder="0771234567">
-                        <div id="edit-mobile-error" class="error hidden"></div>
-                    </div>
-                     <canvas id="edit-preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
-                     <button id="edit-crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
-                    <button type="submit" id="save-profile-btn" class="btn btn-primary btn-full mt-16">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                </form>
+                <img id="zoomed-image" src="" alt="Zoomed Report Image">
             </div>
+            <button id="close-image-zoom-modal" class="close-modal-btn">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
     </div>
 
@@ -1320,39 +1236,6 @@
                 <p id="map-coordinates" class="text-center mb-16">Click on the map to select a location.</p>
                 <button id="confirm-location-btn" class="btn btn-primary btn-full">
                     <i class="fas fa-check"></i> Confirm Location
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- QR Scanner Modal -->
-    <div id="qr-scanner-modal" class="modal">
-        <div class="scanner-container">
-            <button id="close-scanner-btn" class="close-scanner-btn">
-                <i class="fas fa-times"></i>
-            </button>
-            <video id="qr-video" playsinline></video>
-            <div class="scanner-instructions">
-                <p>Point your camera at your EMA ID QR code</p>
-                <p><i class="fas fa-qrcode fa-2x"></i></p>
-            </div>
-            <div id="qr-result" class="qr-result hidden"></div>
-        </div>
-    </div>
-
-    <!-- ID Card Download Modal -->
-    <div id="id-card-download" class="modal">
-        <div id="id-card-canvas-container">
-            <canvas id="id-card-canvas" width="800" height="500"></canvas> <!-- Landscape format -->
-            <div id="id-card-download-buttons">
-                <button id="print-id-card-btn" class="btn btn-primary">
-                    <i class="fas fa-print"></i> Print
-                </button>
-                <button id="download-id-card-btn" class="btn btn-secondary">
-                    <i class="fas fa-download"></i> Download
-                </button>
-                <button id="close-id-card-download-btn" class="btn btn-text">
-                    <i class="fas fa-times"></i> Close
                 </button>
             </div>
         </div>
@@ -1402,10 +1285,9 @@
             userPopup: document.getElementById('user-popup-modal'),
             ai: document.getElementById('ai-modal'),
             alerts: document.getElementById('alerts-modal'),
-            editProfile: document.getElementById('edit-profile-modal'),
+            imageZoom: document.getElementById('image-zoom-modal'), // Add Image Zoom Modal
             map: document.getElementById('map-modal'),
-            qrScanner: document.getElementById('qr-scanner-modal'),
-            idCardDownload: document.getElementById('id-card-download') // Add ID Card Download Modal
+            qrScanner: document.getElementById('qr-scanner-modal') // If QR scanner modal exists
         };
 
         const chatMessages = document.getElementById('chat-messages');
@@ -1454,22 +1336,10 @@
         let originalImage = null;
         let croppedImageDataUrl = null;
 
-        // Edit Profile Image Cropping variables
-        let editOriginalImage = null;
-        let editCroppedImageDataUrl = null; // Will hold the new cropped image if changed
-
         // Map variables
         let map = null;
         let marker = null;
         let selectedLocation = null;
-
-        // --- QR Scanner Variables ---
-        const qrVideo = document.getElementById('qr-video');
-        const qrCanvasElement = document.createElement('canvas');
-        const qrCanvas = qrCanvasElement.getContext('2d');
-        let qrScanning = false;
-        let qrStream = null;
-        let lastScannedResult = null; // To prevent duplicate scans
 
         // Firebase references (will be initialized after SDK loads)
         let userDb = null;
@@ -1633,8 +1503,9 @@
             });
 
              // Populate edit profile district dropdown based on province
-            const editProvinceSelect = document.getElementById('edit-province');
-            const editDistrictSelect = document.getElementById('edit-district');
+            // (Assuming an edit profile modal exists with these IDs)
+            // const editProvinceSelect = document.getElementById('edit-province');
+            // const editDistrictSelect = document.getElementById('edit-district');
              // This will be populated dynamically when the province changes, like in registration
         }
 
@@ -1683,9 +1554,10 @@
         function setupEventListeners() {
             // --- Login Screen ---
             document.getElementById('access-app-btn').addEventListener('click', handleLogin);
-            document.getElementById('quick-login-btn').addEventListener('click', startQRScanner); // Add QR Scan listener
             document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
             document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
+            // Add QR Scan listener if applicable
+            // document.getElementById('quick-login-btn').addEventListener('click', startQRScanner);
 
             // --- Registration Screen ---
             document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
@@ -1717,27 +1589,6 @@
                 document.getElementById('district-error').classList.add('hidden');
             });
 
-            // --- Province/District Logic for Edit Profile ---
-            const editProvinceSelect = document.getElementById('edit-province');
-            const editDistrictSelect = document.getElementById('edit-district');
-
-            editProvinceSelect.addEventListener('change', function () {
-                const selectedProvince = this.value;
-                editDistrictSelect.innerHTML = '<option value="">Select District</option>'; // Clear previous options
-
-                if (selectedProvince && sriLankanProvincesAndDistricts[selectedProvince]) {
-                    sriLankanProvincesAndDistricts[selectedProvince].forEach(district => {
-                        const option = document.createElement('option');
-                        option.value = district;
-                        option.textContent = district;
-                        editDistrictSelect.appendChild(option);
-                    });
-                    editDistrictSelect.disabled = false; // Enable district dropdown
-                } else {
-                    editDistrictSelect.disabled = true; // Disable if no province selected
-                }
-            });
-
             // --- Home Screen ---
             document.getElementById('open-user-btn').addEventListener('click', openUserPopup);
             document.getElementById('user-card').addEventListener('click', openUserPopup);
@@ -1756,9 +1607,10 @@
 
             // --- User Popup Modal ---
             document.getElementById('close-user-popup').addEventListener('click', () => closeModal('userPopup'));
-            document.getElementById('edit-profile-btn').addEventListener('click', openEditProfileModal);
+            // Add listeners for edit profile, sign out, delete account if modals/functions exist
+            // document.getElementById('edit-profile-btn').addEventListener('click', openEditProfileModal);
             document.getElementById('sign-out-btn').addEventListener('click', handleLogout);
-            document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
+            // document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
 
             // --- AI Assistant Modal ---
             document.getElementById('close-ai-modal').addEventListener('click', () => closeModal('ai'));
@@ -1808,31 +1660,17 @@
                 }
             });
 
-            // --- Edit Profile Modal ---
-            document.getElementById('close-edit-profile-modal').addEventListener('click', () => closeModal('editProfile'));
-            document.getElementById('edit-profile-picture').addEventListener('change', handleEditProfilePictureSelect);
-            document.getElementById('edit-crop-btn').addEventListener('click', performEditCrop);
-            document.getElementById('edit-profile-form').addEventListener('submit', saveProfileChanges);
+            // --- Image Zoom Modal ---
+            document.getElementById('close-image-zoom-modal').addEventListener('click', () => closeModal('imageZoom'));
+            document.getElementById('zoomed-image').addEventListener('click', () => closeModal('imageZoom')); // Close on image click too
 
             // --- Map Modal ---
             document.getElementById('close-map-modal').addEventListener('click', () => closeModal('map'));
             document.getElementById('confirm-location-btn').addEventListener('click', confirmLocation);
 
-            // --- QR Scanner Modal ---
-            document.getElementById('close-scanner-btn').addEventListener('click', stopQRScanner);
-
-            // --- ID Card Download Modal ---
-            document.getElementById('close-id-card-download-btn').addEventListener('click', () => closeModal('idCardDownload'));
-            document.getElementById('print-id-card-btn').addEventListener('click', printIDCard);
-            document.getElementById('download-id-card-btn').addEventListener('click', downloadIDCardFinal);
-
-             // --- Name Validation for Registration ---
-            document.getElementById('full-name').addEventListener('blur', validateRegistrationName);
-            document.getElementById('profile-picture').addEventListener('change', validateProfilePictureName);
-
-             // --- Name Validation for Edit Profile ---
-            document.getElementById('edit-full-name').addEventListener('blur', validateEditProfileName);
-            document.getElementById('edit-profile-picture').addEventListener('change', validateEditProfilePictureName);
+             // --- Name Validation for Registration (if applicable) ---
+            // document.getElementById('full-name').addEventListener('blur', validateRegistrationName);
+            // document.getElementById('profile-picture').addEventListener('change', validateProfilePictureName);
 
         }
 
@@ -1860,121 +1698,6 @@
             }
             // Add logic for other actions (map, radar) here
         }
-
-        // --- Name Validation Functions ---
-        function validateRegistrationName() {
-            const fullName = document.getElementById('full-name').value.trim();
-            const warningElement = document.getElementById('name-warning');
-            const errorElement = document.getElementById('name-error');
-
-            // Clear previous warnings/errors
-            warningElement.classList.add('hidden');
-            warningElement.textContent = '';
-            errorElement.classList.add('hidden');
-            errorElement.textContent = '';
-
-            if (!fullName) return; // Don't validate if empty
-
-            const parts = fullName.split(/\s+/); // Split by whitespace
-            const hasSymbolsOrNumbers = /[0-9!@#$%^&*(),.?":{}|<>[\]\\;'`~_+=/-]/.test(fullName);
-
-            if (parts.length < 2) {
-                // Show warning for single name part
-                warningElement.textContent = "Consider using your full name (e.g., 'John Doe'). Accounts with incomplete names may be reviewed.";
-                warningElement.classList.remove('hidden');
-            }
-
-            if (hasSymbolsOrNumbers) {
-                // Show warning for symbols/numbers
-                warningElement.textContent = "Names should generally not contain symbols or numbers. Accounts with unusual names may be reviewed.";
-                warningElement.classList.remove('hidden');
-            }
-        }
-
-        function validateProfilePictureName() {
-            const file = document.getElementById('profile-picture').files[0];
-            const fullName = document.getElementById('full-name').value.trim();
-            const warningElement = document.getElementById('profile-picture-warning');
-
-            warningElement.classList.add('hidden');
-            warningElement.textContent = '';
-
-            if (file && fullName) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        // Basic idea: Create a temporary canvas to potentially analyze pixel data
-                        // However, OCR is complex client-side. Instead, we'll just warn based on filename/content type if needed.
-                        // For now, we'll just rely on the name field validation and this simple reminder.
-                        // A more robust solution would involve server-side OCR.
-
-                        // Simple check: if name is incomplete, remind about image clarity.
-                        const parts = fullName.split(/\s+/);
-                        if (parts.length < 2) {
-                             warningElement.textContent = "If your name has multiple parts, please ensure your profile picture clearly shows your full name.";
-                             warningElement.classList.remove('hidden');
-                        }
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function validateEditProfileName() {
-            const fullName = document.getElementById('edit-full-name').value.trim();
-            const warningElement = document.getElementById('edit-name-warning');
-            const errorElement = document.getElementById('edit-name-error');
-
-            // Clear previous warnings/errors
-            warningElement.classList.add('hidden');
-            warningElement.textContent = '';
-            errorElement.classList.add('hidden');
-            errorElement.textContent = '';
-
-            if (!fullName) return; // Don't validate if empty
-
-            const parts = fullName.split(/\s+/);
-            const hasSymbolsOrNumbers = /[0-9!@#$%^&*(),.?":{}|<>[\]\\;'`~_+=/-]/.test(fullName);
-
-            if (parts.length < 2) {
-                warningElement.textContent = "Consider using your full name (e.g., 'John Doe'). Accounts with incomplete names may be reviewed.";
-                warningElement.classList.remove('hidden');
-            }
-
-            if (hasSymbolsOrNumbers) {
-                warningElement.textContent = "Names should generally not contain symbols or numbers. Accounts with unusual names may be reviewed.";
-                warningElement.classList.remove('hidden');
-            }
-        }
-
-        function validateEditProfilePictureName() {
-            const file = document.getElementById('edit-profile-picture').files[0];
-            const fullName = document.getElementById('edit-full-name').value.trim();
-            const warningElement = document.getElementById('edit-profile-picture-warning');
-
-            warningElement.classList.add('hidden');
-            warningElement.textContent = '';
-
-            if (file && fullName) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                         const parts = fullName.split(/\s+/);
-                        if (parts.length < 2) {
-                             warningElement.textContent = "If your name has multiple parts, please ensure your profile picture clearly shows your full name.";
-                             warningElement.classList.remove('hidden');
-                        }
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-        // --- End Name Validation Functions ---
-
 
         // --- Authentication Logic ---
 
@@ -2196,7 +1919,8 @@
                 await window.userSet(window.userRef(userDb, `users/${userId}`), userData);
 
                 currentUser = userData;
-                showIDCardDownload(userId); // Show ID card download modal instead of navigating to a separate screen
+                showHomeScreen(); // Go directly to home after registration
+                listenForStatsUpdates(); // Start listening for stats
             } catch (error) {
                 console.error("Registration error:", error);
                 if (error.code === 'PERMISSION_DENIED') {
@@ -2205,142 +1929,6 @@
                     showError(mobileError, 'Registration failed. Try again later.');
                 }
             }
-        }
-
-        // Show ID Card Download Modal
-        function showIDCardDownload(userId) {
-             openModal('idCardDownload');
-
-            const canvas = document.getElementById('id-card-canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw background
-            ctx.fillStyle = '#ffffff'; // White background
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw logo
-            const logo = new Image();
-            logo.crossOrigin = "Anonymous";
-            logo.onload = function () {
-                // Center the logo
-                const logoWidth = 150;
-                const logoHeight = 150;
-                const logoX = (canvas.width - logoWidth) / 2;
-                const logoY = 50; // Position from top
-                ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
-
-                // Draw title
-                ctx.fillStyle = '#4CAF50'; // Green color
-                ctx.font = 'bold 36px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('EMA ID Card', canvas.width / 2, logoY + logoHeight + 50);
-
-                // Draw ID
-                ctx.fillStyle = '#212121'; // Dark text
-                ctx.font = '28px Arial';
-                ctx.fillText(userId, canvas.width / 2, logoY + logoHeight + 100);
-
-                // Draw QR Code Placeholder Text (will be replaced by actual QR)
-                ctx.fillStyle = '#616161'; // Gray text
-                ctx.font = 'italic 20px Arial';
-                ctx.fillText('QR Code will be generated here', canvas.width / 2, logoY + logoHeight + 150);
-
-                // Draw footer note
-                ctx.fillStyle = '#9E9E9E'; // Light gray
-                ctx.font = '16px Arial';
-                ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
-
-                // Generate and draw QR Code
-                const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(userId)}&size=150`; // Larger QR for print
-                const qrCode = new Image();
-                qrCode.crossOrigin = "Anonymous";
-                qrCode.onload = function () {
-                    // Position QR code below the ID
-                    const qrX = (canvas.width - 150) / 2;
-                    const qrY = logoY + logoHeight + 170; // Below the ID text and placeholder
-                    ctx.drawImage(qrCode, qrX, qrY, 150, 150);
-
-                     // Re-trigger the final draw to ensure QR is included
-                     // This is a simple way to ensure the QR is drawn before the modal becomes active
-                     // In a more complex scenario, you might use Promises or async/await
-                     setTimeout(() => {
-                          // The canvas is now fully drawn with the QR code
-                          // The modal is already open, so the user sees the final result
-                     }, 100); // Short delay to ensure image load and draw
-
-                };
-                qrCode.onerror = function() {
-                     console.error("Failed to load QR code image for ID card.");
-                     // The rest of the card is still drawn, just without the QR
-                };
-                qrCode.src = qrCodeUrl;
-            };
-            logo.onerror = function() {
-                 console.error("Failed to load logo for ID card.");
-                 // Proceed with drawing the rest, perhaps with a placeholder or text
-                 // For simplicity, we'll just call the onload handler to continue drawing
-                 logo.onload();
-            };
-            logo.src = 'https://i.ibb.co/jvN2hV16/logo.png';
-        }
-
-        // Print ID Card
-        function printIDCard() {
-             const canvas = document.getElementById('id-card-canvas');
-            const dataUrl = canvas.toDataURL('image/png');
-
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Print EMA ID Card</title>
-                    <style>
-                        body {
-                            margin: 0;
-                            padding: 20px;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            min-height: 100vh;
-                            background-color: #f0f0f0;
-                        }
-                        img {
-                            max-width: 100%;
-                            height: auto;
-                            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-                        }
-                        @media print {
-                            body {
-                                background-color: white;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <img src="${dataUrl}" alt="EMA ID Card" />
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            // window.close(); // Optional: close the window after printing
-                        };
-                    </script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        }
-
-        // Download ID Card
-        function downloadIDCardFinal() {
-            const canvas = document.getElementById('id-card-canvas');
-            const dataUrl = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = `EMA_ID_${currentUser.userId}_Card.png`;
-            link.href = dataUrl;
-            link.click();
         }
 
         // Show home screen
@@ -2382,25 +1970,51 @@
                         img.src = currentUser.profilePicture;
                         img.style.display = 'block';
                     });
-                    initialsElements.forEach(span => span.style.display = 'none';
+                    initialsElements.forEach(span => span.style.display = 'none');
                 } else {
-                    profileImgElements.forEach(img => img.style.display = 'none';
-                    initialsElements.forEach(span => span.style.display = 'block';
+                    profileImgElements.forEach(img => img.style.display = 'none');
+                    initialsElements.forEach(span => span.style.display = 'block');
                 }
 
                 showScreen('home');
-
-                // Apply theme and language after home screen is shown
-                setTimeout(() => {
-                    // Removed theme/language application as requested
-                }, 100);
-
-                // Configure UI based on user type (Guest vs Regular)
-                configureUIForUserType();
+                // Show FAB on home screen
+                quickReportBtn.style.display = 'flex';
 
             } else {
                 showScreen('login');
+                 // Hide FAB if not on home
+                quickReportBtn.style.display = 'none';
             }
+        }
+
+        // Open User Popup
+        function openUserPopup() {
+            if (!currentUser) return;
+
+            document.getElementById('popup-user-fullname').textContent = currentUser.fullName;
+            document.getElementById('popup-user-id').textContent = currentUser.userId;
+            document.getElementById('popup-user-province').textContent = currentUser.province || 'N/A';
+            document.getElementById('popup-user-district').textContent = currentUser.district || 'N/A';
+            document.getElementById('popup-user-mobile').textContent = currentUser.mobile || 'N/A';
+
+            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('popup-user-initials').textContent = initials;
+
+            const profileImgElement = document.getElementById('popup-user-image');
+            const initialsElement = document.getElementById('popup-user-initials');
+            if (currentUser.profilePicture) {
+                profileImgElement.src = currentUser.profilePicture;
+                profileImgElement.style.display = 'block';
+                initialsElement.style.display = 'none';
+            } else {
+                profileImgElement.style.display = 'none';
+                initialsElement.style.display = 'block';
+            }
+
+            // Configure UI based on user type (Guest vs Regular)
+            configureUIForUserType();
+
+            openModal('userPopup');
         }
 
         // Configure UI based on user type (Guest vs Regular)
@@ -2431,332 +2045,14 @@
         }
 
 
-        // Open User Popup
-        function openUserPopup() {
-            if (!currentUser) return;
-
-            document.getElementById('popup-user-fullname').textContent = currentUser.fullName;
-            document.getElementById('popup-user-id').textContent = currentUser.userId;
-            document.getElementById('popup-user-province').textContent = currentUser.province || 'N/A';
-            document.getElementById('popup-user-district').textContent = currentUser.district || 'N/A';
-            document.getElementById('popup-user-mobile').textContent = currentUser.mobile || 'N/A';
-
-            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-            document.getElementById('popup-user-initials').textContent = initials;
-
-            const profileImgElement = document.getElementById('popup-user-image');
-            const initialsElement = document.getElementById('popup-user-initials');
-            if (currentUser.profilePicture) {
-                profileImgElement.src = currentUser.profilePicture;
-                profileImgElement.style.display = 'block';
-                initialsElement.style.display = 'none';
-            } else {
-                profileImgElement.style.display = 'none';
-                initialsElement.style.display = 'block';
-            }
-
-            openModal('userPopup');
-        }
-
-        // Open Edit Profile Modal
-        function openEditProfileModal() {
-            if (!currentUser) return;
-            closeModal('userPopup'); // Close user popup first
-
-            // Pre-fill the form with current user data
-            document.getElementById('edit-full-name').value = currentUser.fullName || '';
-            document.getElementById('edit-province').value = currentUser.province || '';
-            document.getElementById('edit-mobile').value = currentUser.mobile || '';
-
-            // Handle district dropdown population based on selected province
-            const editProvinceSelect = document.getElementById('edit-province');
-            const editDistrictSelect = document.getElementById('edit-district');
-            const selectedProvince = currentUser.province;
-
-            editDistrictSelect.innerHTML = '<option value="">Select District</option>';
-            if (selectedProvince && sriLankanProvincesAndDistricts[selectedProvince]) {
-                sriLankanProvincesAndDistricts[selectedProvince].forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district;
-                    option.textContent = district;
-                    if (district === currentUser.district) {
-                        option.selected = true; // Select the current district
-                    }
-                    editDistrictSelect.appendChild(option);
-                });
-                editDistrictSelect.disabled = false;
-            } else {
-                editDistrictSelect.disabled = true;
-            }
-
-            // Handle profile picture preview
-            const profileImgPreview = document.getElementById('edit-profile-image-preview');
-            const initialsPreview = document.getElementById('edit-profile-initials-preview');
-            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-
-            if (currentUser.profilePicture) {
-                profileImgPreview.src = currentUser.profilePicture;
-                profileImgPreview.style.display = 'block';
-                initialsPreview.style.display = 'none';
-            } else {
-                profileImgPreview.style.display = 'none';
-                initialsPreview.textContent = initials;
-                initialsPreview.style.display = 'block';
-            }
-
-            // Reset cropping variables for edit
-            editOriginalImage = null;
-            editCroppedImageDataUrl = null;
-            document.getElementById('edit-preview-canvas').style.display = 'none';
-            document.getElementById('edit-crop-btn').classList.add('hidden');
-
-            openModal('editProfile');
-        }
-
-        // Handle edit profile picture selection and preview
-        function handleEditProfilePictureSelect(event) {
-            const file = event.target.files[0];
-            // Use the edit modal's specific elements
-            const previewCanvasEdit = document.getElementById('edit-preview-canvas');
-            const cropBtnEdit = document.getElementById('edit-crop-btn');
-
-            if (file) {
-                if (!file.type.startsWith('image/')) {
-                    alert('Please select a valid image file.');
-                    event.target.value = '';
-                    previewCanvasEdit.style.display = 'none';
-                    cropBtnEdit.classList.add('hidden');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        editOriginalImage = img;
-                        const maxWidth = 200;
-                        const maxHeight = 200;
-                        let { width, height } = calculateAspectRatioFit(img.width, img.height, maxWidth, maxHeight);
-
-                        previewCanvasEdit.width = width;
-                        previewCanvasEdit.height = height;
-                        const ctx = previewCanvasEdit.getContext('2d');
-                        ctx.clearRect(0, 0, previewCanvasEdit.width, previewCanvasEdit.height);
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        previewCanvasEdit.style.display = 'block';
-                        cropBtnEdit.classList.remove('hidden');
-                    };
-                    img.src = e.target.result;
-                };
-                reader.onerror = () => {
-                    alert('Error reading the image file.');
-                    previewCanvasEdit.style.display = 'none';
-                    cropBtnEdit.classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                previewCanvasEdit.style.display = 'none';
-                cropBtnEdit.classList.add('hidden');
-            }
-        }
-
-        // Perform cropping for edit profile picture
-        function performEditCrop() {
-            if (!editOriginalImage) return;
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const cropSize = 100;
-
-            canvas.width = cropSize;
-            canvas.height = cropSize;
-
-            const sourceWidth = editOriginalImage.width;
-            const sourceHeight = editOriginalImage.height;
-            let sourceX, sourceY, sourceSize;
-
-            if (sourceWidth > sourceHeight) {
-                sourceSize = sourceHeight;
-                sourceX = (sourceWidth - sourceHeight) / 2;
-                sourceY = 0;
-            } else {
-                sourceSize = sourceWidth;
-                sourceX = 0;
-                sourceY = (sourceHeight - sourceWidth) / 2;
-            }
-
-            ctx.drawImage(
-                editOriginalImage,
-                sourceX, sourceY, sourceSize, sourceSize,
-                0, 0, cropSize, cropSize
-            );
-
-            editCroppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-            alert("Profile picture cropped successfully!");
-            document.getElementById('edit-crop-btn').classList.add('hidden');
-
-            // Update the preview in the modal immediately
-            const profileImgPreview = document.getElementById('edit-profile-image-preview');
-            const initialsPreview = document.getElementById('edit-profile-initials-preview');
-            profileImgPreview.src = editCroppedImageDataUrl;
-            profileImgPreview.style.display = 'block';
-            initialsPreview.style.display = 'none';
-        }
-
-        // Save profile changes
-        async function saveProfileChanges(event) {
-            event.preventDefault();
-
-            if (!userDb || !currentUser) {
-                alert("Application not ready or user not logged in.");
-                return;
-            }
-
-            const updatedFullName = document.getElementById('edit-full-name').value.trim();
-            const updatedProvince = document.getElementById('edit-province').value;
-            const updatedDistrict = document.getElementById('edit-district').value;
-            const updatedMobile = document.getElementById('edit-mobile').value.trim();
-
-            // Validation (basic)
-            if (!updatedFullName) {
-                alert("Full name is required.");
-                return;
-            }
-            if (!updatedProvince) {
-                alert("Please select a province.");
-                return;
-            }
-            if (!updatedDistrict) {
-                alert("Please select a district.");
-                return;
-            }
-            const mobileRegex = /^0[0-9]{9}$/;
-            if (!updatedMobile) {
-                alert("Mobile number is required.");
-                return;
-            } else if (!mobileRegex.test(updatedMobile)) {
-                alert("Please enter a valid Sri Lankan mobile number (0XXXXXXXXX)");
-                return;
-            }
-
-            // Check if mobile number is unique (excluding current user)
-            try {
-                const usersRef = window.userRef(userDb, 'users');
-                const mobileQuery = window.userQuery(usersRef, window.userOrderByChild('mobile'), window.userEqualTo(updatedMobile));
-                const snapshot = await window.userGet(mobileQuery);
-
-                if (snapshot.exists()) {
-                    // Check if the mobile belongs to a different user
-                    const users = snapshot.val();
-                    const otherUserKey = Object.keys(users).find(key => key !== currentUser.userId);
-                    if (otherUserKey) {
-                        alert("This mobile number is already registered to another user.");
-                        return;
-                    }
-                    // If the key is the same as currentUser.userId, it's the same user, so it's okay.
-                }
-
-                // Prepare data to update
-                let updateData = {
-                    fullName: updatedFullName,
-                    province: updatedProvince,
-                    district: updatedDistrict,
-                    mobile: updatedMobile
-                };
-
-                // If a new picture was cropped, include it
-                if (editCroppedImageDataUrl !== null) {
-                    updateData.profilePicture = editCroppedImageDataUrl;
-                }
-                // If the picture input was cleared (editCroppedImageDataUrl is null and no original picture), explicitly set to null
-                // This handles the case of removing a picture, though UI for that isn't strictly implemented here.
-                // else if (!currentUser.profilePicture && !editOriginalImage) {
-                //     updateData.profilePicture = null;
-                // }
-
-                // Update user data in Firebase
-                const userRef = window.userRef(userDb, `users/${currentUser.userId}`);
-                await window.userUpdate(userRef, updateData); // Use update instead of set to only change provided fields
-
-                // Update local currentUser object
-                Object.assign(currentUser, updateData);
-                // Update session storage
-                sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
-
-                // Update UI elements that display user info
-                document.getElementById('home-user-name').textContent = currentUser.fullName;
-                document.getElementById('popup-user-fullname').textContent = currentUser.fullName;
-                document.getElementById('popup-user-province').textContent = currentUser.province || 'N/A';
-                document.getElementById('popup-user-district').textContent = currentUser.district || 'N/A';
-                document.getElementById('popup-user-mobile').textContent = currentUser.mobile || 'N/A';
-
-                const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-                document.getElementById('home-user-initials').textContent = initials;
-                document.getElementById('top-user-initials').textContent = initials;
-                document.getElementById('popup-user-initials').textContent = initials;
-
-                // Update profile picture display if it was changed
-                if (editCroppedImageDataUrl !== null) {
-                    const profileImgElements = [
-                        document.getElementById('home-user-avatar-img'),
-                        document.getElementById('top-user-avatar'),
-                        document.getElementById('popup-user-image'),
-                        document.getElementById('edit-profile-image-preview') // Also update preview in case modal is reopened quickly
-                    ];
-                    profileImgElements.forEach(img => {
-                        img.src = currentUser.profilePicture;
-                        img.style.display = 'block';
-                    });
-                    // Hide initials if picture is set
-                    document.getElementById('home-user-initials').style.display = 'none';
-                    document.getElementById('top-user-initials').style.display = 'none';
-                    document.getElementById('popup-user-initials').style.display = 'none';
-                    document.getElementById('edit-profile-initials-preview').style.display = 'none'; // Hide in edit preview too
-                }
-
-                alert("Profile updated successfully!");
-                closeModal('editProfile');
-
-            } catch (error) {
-                console.error("Error updating profile:", error);
-                alert("Failed to update profile. Please try again.");
-            }
-        }
-
         // Logout handler
         function handleLogout() {
             currentUser = null;
             sessionStorage.removeItem('emaUser');
             closeModal('userPopup');
             showScreen('login');
-        }
-
-        // Delete Account handler
-        async function handleDeleteAccount() {
-            if (!currentUser || !currentUser.userId || !userDb) {
-                alert("Cannot delete account: User not found or database not initialized.");
-                return;
-            }
-
-            const confirmation = confirm(`Are you sure you want to delete your account (${currentUser.userId})? This action cannot be undone.`);
-            if (!confirmation) return;
-
-            try {
-                const userRef = window.userRef(userDb, `users/${currentUser.userId}`);
-                await window.userRemove(userRef);
-                console.log("Account deleted successfully from database.");
-            } catch (error) {
-                console.error("Error deleting account from database:", error);
-                alert("Failed to delete account from database. Please try again or contact support.");
-                return;
-            }
-
-            currentUser = null;
-            sessionStorage.removeItem('emaUser');
-            closeModal('userPopup');
-            alert("Your account has been deleted.");
-            showScreen('login');
+            // Hide FAB on logout
+            quickReportBtn.style.display = 'none';
         }
 
         // Show error message
@@ -2936,28 +2232,30 @@
                 });
             }
 
+            // --- Enhanced Report Submission with Precise Timestamp ---
+            const preciseTimestamp = new Date().toISOString(); // Capture precise timestamp
+
             const reportData = {
                 userId: currentUser.userId,
                 userName: currentUser.fullName,
+                userProfilePicture: currentUser.profilePicture || null, // Include profile picture for display
                 location: selectedLocation,
                 numElephants: numElephants,
                 elephantNames: elephantNames || null,
                 district: district,
                 description: description || null,
                 image: imageBase64, // Will be null if no image
-                timestamp: new Date().toISOString()
+                timestamp: preciseTimestamp // Use the precise timestamp
+                // Add other fields that might be useful for future features here
+                // e.g., deviceId, appVersion, etc. (would need to be captured)
             };
+            // --- End Enhanced Report Submission ---
 
             try {
                 // Push report to the separate database
                 await window.reportPush(window.reportRef(reportDb, 'reports'), reportData);
                 alert("Report submitted successfully!");
                 closeModal('report');
-                // Reset form
-                document.getElementById('report-form').reset();
-                document.getElementById('location').value = "Click 'Get Location' or 'Pick on Map'";
-                document.getElementById('num-elephants').value = 1;
-                selectedLocation = null;
                 // The statistics should update automatically due to the real-time listener
             } catch (error) {
                 console.error("Error submitting report:", error);
@@ -2966,7 +2264,7 @@
         }
         // --- End Report Form Logic ---
 
-        // --- Alerts Modal Logic ---
+        // --- Alerts Modal Logic (Enhanced with Expandable Cards and Image Zoom) ---
         async function loadAndDisplayAlerts(filterType) {
             const alertsListElement = document.getElementById('alerts-list');
             alertsListElement.innerHTML = '<p class="text-center">Loading reports...</p>';
@@ -2977,8 +2275,10 @@
             }
 
             try {
+                // Use onValue for real-time updates, or get for a one-time load
+                // For this implementation, we'll use get for simplicity when filtering
                 const reportsRef = window.reportRef(reportDb, 'reports');
-                const snapshot = await window.userGet(reportsRef); // Use get for a one-time read
+                const snapshot = await window.userGet(reportsRef); // One-time read for filtering
                 const data = snapshot.val();
 
                 if (!data) {
@@ -3010,36 +2310,74 @@
                 // Sort by timestamp, newest first
                 filteredReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-                // Display reports
+                // Display reports as expandable cards
                 alertsListElement.innerHTML = '';
                 filteredReports.forEach(report => {
-                    const reportElement = document.createElement('div');
-                    reportElement.classList.add('alert-item');
+                    const reportCard = document.createElement('div');
+                    reportCard.classList.add('alert-card');
+                    reportCard.dataset.reportId = report.id; // Store report ID
 
                     const timestamp = new Date(report.timestamp);
                     const formattedDate = timestamp.toLocaleDateString();
                     const formattedTime = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                    let imageHtml = '';
-                    if (report.image) {
-                        imageHtml = `<img src="${report.image}" alt="Report Image" class="alert-item-image">`;
+                    // Determine reporter's avatar/initials
+                    let reporterAvatarHtml = '';
+                    const reporterInitials = report.userName ? report.userName.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
+                    if (report.userProfilePicture) {
+                        reporterAvatarHtml = `<img src="${report.userProfilePicture}" alt="${report.userName}'s Avatar">`;
+                    } else {
+                        reporterAvatarHtml = `<span>${reporterInitials}</span>`;
                     }
 
-                    reportElement.innerHTML = `
-                        <div class="alert-item-header">
-                            <span class="alert-item-user">${report.userName || 'Unknown User'}</span>
-                            <span class="alert-item-timestamp">${formattedDate} ${formattedTime}</span>
+                    reportCard.innerHTML = `
+                        <div class="alert-card-header">
+                            <div class="alert-card-user-info">
+                                <div class="alert-card-avatar">
+                                    ${reporterAvatarHtml}
+                                </div>
+                                <div class="alert-card-user-details">
+                                    <span class="alert-card-user-name">${report.userName || 'Unknown User'}</span>
+                                    <span class="alert-card-user-id">${report.userId || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div class="alert-card-meta">
+                                <span class="alert-card-timestamp">${formattedDate} ${formattedTime}</span>
+                                <span class="alert-card-district">${report.district}</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon"></i>
                         </div>
-                        <div class="alert-item-details">
-                            <p><strong>Location:</strong> Lat: ${report.location.lat.toFixed(6)}, Lng: ${report.location.lng.toFixed(6)}</p>
-                            <p><strong>Elephants:</strong> ${report.numElephants}</p>
-                            ${report.elephantNames ? `<p><strong>Names:</strong> ${report.elephantNames}</p>` : ''}
-                            <p><strong>District:</strong> ${report.district}</p>
-                            ${report.description ? `<p><strong>Description:</strong> ${report.description}</p>` : ''}
-                            ${imageHtml}
+                        <div class="alert-card-body">
+                            <div class="alert-card-details">
+                                <p><strong>Location:</strong> Lat: ${report.location.lat.toFixed(6)}, Lng: ${report.location.lng.toFixed(6)}</p>
+                                <p><strong>Elephants:</strong> ${report.numElephants}</p>
+                                ${report.elephantNames ? `<p><strong>Names:</strong> ${report.elephantNames}</p>` : ''}
+                                ${report.description ? `<p><strong>Description:</strong> ${report.description}</p>` : ''}
+                                ${report.image ? `<img src="${report.image}" alt="Report Image" class="alert-card-image" data-image-url="${report.image}">` : ''}
+                            </div>
                         </div>
                     `;
-                    alertsListElement.appendChild(reportElement);
+                    alertsListElement.appendChild(reportCard);
+
+                    // Add click listener to header for expand/collapse
+                    const header = reportCard.querySelector('.alert-card-header');
+                    header.addEventListener('click', function(e) {
+                        // Prevent collapse if clicking on the image (which has its own handler)
+                        if (e.target.classList.contains('alert-card-image')) {
+                            return;
+                        }
+                        reportCard.classList.toggle('expanded');
+                    });
+
+                    // Add click listener to image for zooming
+                    const imageElement = reportCard.querySelector('.alert-card-image');
+                    if (imageElement) {
+                        imageElement.addEventListener('click', function() {
+                            const imageUrl = this.getAttribute('data-image-url');
+                            document.getElementById('zoomed-image').src = imageUrl;
+                            openModal('imageZoom');
+                        });
+                    }
                 });
 
             } catch (error) {
@@ -3048,103 +2386,6 @@
             }
         }
         // --- End Alerts Modal Logic ---
-
-        // --- QR Code Scanning Logic ---
-        function startQRScanner() {
-            modals.qrScanner.classList.add('active'); // Use the modals object
-            lastScannedResult = null; // Reset last scan
-
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert("Sorry, your browser does not support camera access for QR scanning.");
-                stopQRScanner();
-                return;
-            }
-
-            // Get access to the camera (prefer rear camera for mobile)
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(function (mediaStream) {
-                    qrStream = mediaStream;
-                    qrVideo.srcObject = mediaStream;
-                    qrVideo.setAttribute("playsinline", true); // Required for iOS Safari
-                    qrVideo.play();
-                    qrScanning = true;
-                    requestAnimationFrame(qrTick); // Start the scanning loop
-                })
-                .catch(function (err) {
-                    console.error("Camera access error:", err);
-                    const errorMessage = err.name === 'NotAllowedError' ?
-                        "Camera access denied. Please allow camera permission and try again." :
-                        "Could not access the camera. Please ensure you have granted permission.";
-                    alert(errorMessage);
-                    stopQRScanner();
-                });
-        }
-
-        function stopQRScanner() {
-            qrScanning = false;
-            if (qrStream) {
-                const tracks = qrStream.getTracks();
-                tracks.forEach(track => track.stop()); // Stop all tracks
-                qrStream = null;
-            }
-            if (qrVideo.srcObject) {
-                qrVideo.srcObject = null;
-            }
-            modals.qrScanner.classList.remove('active'); // Use the modals object
-            // Clear any previous result display
-            document.getElementById('qr-result').textContent = '';
-            document.getElementById('qr-result').classList.add('hidden');
-        }
-
-        function qrTick() {
-            if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA && qrScanning) {
-                qrCanvasElement.height = qrVideo.videoHeight;
-                qrCanvasElement.width = qrVideo.videoWidth;
-                qrCanvas.drawImage(qrVideo, 0, 0, qrCanvasElement.width, qrCanvasElement.height);
-                const imageData = qrCanvas.getImageData(0, 0, qrCanvasElement.width, qrCanvasElement.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: "dontInvert",
-                });
-
-                if (code) {
-                    // Check if the decoded data matches the EMA ID format and hasn't been scanned recently
-                    const idRegex = /^EMA-\d{6}$/;
-                    if (idRegex.test(code.data) && code.data !== lastScannedResult) {
-                        console.log("QR Code found:", code.data);
-                        lastScannedResult = code.data; // Store to prevent re-scanning
-                        // Display result temporarily
-                        const resultElement = document.getElementById('qr-result');
-                        resultElement.textContent = `Scanned: ${code.data}`;
-                        resultElement.classList.remove('hidden');
-                        // Stop the camera
-                        stopQRScanner();
-                        // Simulate entering the ID and clicking login
-                        document.getElementById('login-id').value = code.data;
-                        // Use a small delay to ensure the value is set before calling handleLogin
-                        setTimeout(() => {
-                             // Call the existing login handler
-                             handleLogin();
-                        }, 300); // Slightly longer delay to allow UI feedback
-                        return; // Exit the tick loop
-                    } else if(code.data !== lastScannedResult) {
-                        console.log("Scanned QR code does not match EMA ID format:", code.data);
-                        // Optionally, show a message to the user for a short time
-                        const resultElement = document.getElementById('qr-result');
-                        resultElement.textContent = "Not a valid EMA ID QR code.";
-                        resultElement.classList.remove('hidden');
-                        setTimeout(() => {
-                            if (!resultElement.classList.contains('hidden')) {
-                                 resultElement.classList.add('hidden');
-                            }
-                        }, 2000); // Hide after 2 seconds
-                    }
-                }
-                requestAnimationFrame(qrTick); // Continue scanning
-            } else if (qrScanning) {
-                 requestAnimationFrame(qrTick); // Keep trying if not ready
-            }
-        }
-        // --- End QR Code Scanning Logic ---
 
 
         // Initialize the app when the DOM is fully loaded
