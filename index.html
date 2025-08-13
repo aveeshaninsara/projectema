@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMA - Login</title>
+    <title>EMA - Elephant Monitoring App</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- jsQR Library for QR Code scanning -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
         :root {
             --md-sys-color-primary: #606c38;
@@ -38,6 +36,11 @@
             --md-sys-state-focus-opacity: 0.12;
             --md-sys-state-pressed-opacity: 0.12;
             --md-sys-state-dragged-opacity: 0.16;
+
+            /* New colors for bottom bar */
+            --bottom-bar-bg: linear-gradient(to right, #606c38, #4a552a);
+            --bottom-bar-button-color: #ffffff;
+            --bottom-bar-button-active-color: #c8e6c9;
         }
 
         * {
@@ -55,6 +58,7 @@
             justify-content: center;
             align-items: center;
             padding: 16px;
+            padding-bottom: 80px; /* Space for bottom bar */
         }
 
         .screen {
@@ -158,7 +162,6 @@
             text-decoration: none;
             gap: 8px;
             min-height: 48px;
-            width: 100%; /* Make buttons full width */
         }
 
         .btn-primary {
@@ -229,11 +232,192 @@
             margin-top: 4px;
         }
 
-        .hidden {
-            display: none !important;
+        /* --- Home Screen Specific Styles --- */
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--md-sys-color-primary-container);
+            border-radius: var(--md-sys-shape-corner-large);
+            cursor: pointer;
+            box-shadow: var(--md-sys-elevation-1);
+            transition: box-shadow 0.2s;
+        }
+        .user-card:hover {
+             box-shadow: var(--md-sys-elevation-2);
         }
 
-        /* QR Scanner Modal Styles */
+        .user-card-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--md-sys-color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--md-sys-color-on-primary);
+            flex-shrink: 0;
+        }
+
+        .user-card-info {
+            flex-grow: 1;
+        }
+
+        .user-card-info h3 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--md-sys-color-on-primary-container);
+        }
+
+        .user-card-info p {
+            margin: 4px 0 0;
+            font-size: 14px;
+            color: var(--md-sys-color-on-primary-container);
+            opacity: 0.8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-card {
+            background-color: var(--md-sys-color-surface-variant);
+            border-radius: var(--md-sys-shape-corner-medium);
+            padding: 16px;
+            text-align: center;
+            box-shadow: var(--md-sys-elevation-1);
+        }
+
+        .stat-card i {
+            font-size: 24px;
+            color: var(--md-sys-color-primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .feature-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 8px;
+            background-color: var(--md-sys-color-surface-variant);
+            border-radius: var(--md-sys-shape-corner-medium);
+            box-shadow: var(--md-sys-elevation-1);
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            background-color: #d5d8c9;
+            transform: translateY(-2px);
+        }
+
+        .feature-card i {
+            font-size: 24px;
+            color: var(--md-sys-color-primary);
+            margin-bottom: 8px;
+        }
+
+        .feature-card .label {
+            font-size: 12px;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        /* --- Bottom Navigation Bar --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto; /* Center if screen is wider than max-width */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0;
+            background: var(--bottom-bar-bg);
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+            z-index: 100;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .nav-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--bottom-bar-button-color);
+            text-decoration: none;
+            font-size: 12px;
+            flex: 1; /* Distribute space evenly */
+            padding: 8px 0;
+            border-radius: var(--md-sys-shape-corner-medium);
+            transition: background-color 0.2s;
+        }
+
+        .nav-button:hover, .nav-button.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--bottom-bar-button-active-color);
+        }
+
+        .nav-button i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        /* --- End Bottom Navigation Bar --- */
+
+
+        .id-display {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .user-id {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--md-sys-color-primary);
+            word-break: break-all;
+            background-color: var(--md-sys-color-primary-container);
+            padding: 14px;
+            border-radius: var(--md-sys-shape-corner-medium);
+            margin: 14px 0;
+        }
+
+        .qr-code {
+            margin: 20px auto;
+            display: block;
+            max-width: 100%;
+            height: auto;
+            width: 180px;
+            height: 180px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -241,7 +425,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9); /* Darker background */
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 1001;
             justify-content: center;
             align-items: center;
@@ -252,63 +436,196 @@
             display: flex;
         }
 
-        .scanner-container {
-            width: 100%;
-            max-width: 500px;
+        .modal-content {
             background-color: white;
             border-radius: var(--md-sys-shape-corner-large);
-            overflow: hidden;
-            box-shadow: var(--md-sys-elevation-2);
-            position: relative; /* For positioning the close button */
-        }
-
-        #video {
             width: 100%;
-            display: block;
+            max-width: 500px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--md-sys-elevation-2);
         }
 
-        .scanner-instructions {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 18px;
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--md-sys-color-outline);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            flex-grow: 1;
             text-align: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 20px;
-            border-radius: var(--md-sys-shape-corner-medium);
-            width: 80%;
         }
 
-        .close-scanner-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
+        .close-modal-btn {
+            background: none;
             border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 1.2rem;
             cursor: pointer;
-            z-index: 10; /* Above video */
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            margin-left: auto;
         }
 
-        .close-scanner-btn:hover {
-             background: rgba(0, 0, 0, 0.7);
+        .close-modal-btn:hover {
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-error);
+        }
+
+        .modal-body {
+            padding: 16px 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 14px 16px;
+            border-radius: var(--md-sys-shape-corner-medium);
+            position: relative;
+            animation: fadeIn 0.3s ease;
+            line-height: 1.5;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: var(--md-sys-color-surface-variant);
+            padding: 14px 16px;
+            border-radius: var(--md-sys-shape-corner-medium);
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: var(--md-sys-color-on-surface-variant);
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.3s linear infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--md-sys-color-outline);
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-footer input {
+            flex-grow: 1;
+            min-height: 46px;
+            padding: 0 14px;
+        }
+
+        .modal-footer .btn {
+            min-width: 46px;
+            min-height: 46px;
+            padding: 0;
+        }
+
+        /* --- User Info Popup --- */
+        .user-popup-content {
+             text-align: center;
+        }
+        .user-popup-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            background-color: var(--md-sys-color-primary-container);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: var(--md-sys-color-on-primary-container);
+            overflow: hidden; /* Hide overflow for image */
+        }
+        .user-popup-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the area, potentially cropping */
+        }
+        .user-popup-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+        }
+        .user-popup-info p {
+            margin: 4px 0;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+        .user-popup-actions {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        /* --- End User Info Popup --- */
+
+        .hidden {
+            display: none !important;
         }
 
         @media (max-width: 360px) {
             body {
                 padding: 12px;
+                padding-bottom: 80px;
             }
             .card {
                 padding: 16px;
             }
             .btn {
                 padding: 10px 16px;
+            }
+            .stat-card, .feature-card {
+                padding: 12px;
             }
             .modal-content {
                 max-height: 95vh;
@@ -331,13 +648,10 @@
                 <input type="text" id="login-id" placeholder="EMA-XXXXXX">
                 <div id="login-error" class="error hidden"></div>
             </div>
-            <button id="access-app-btn" class="btn btn-primary">
+            <button id="access-app-btn" class="btn btn-primary btn-full">
                 <i class="fas fa-sign-in-alt"></i> Access App
             </button>
-            <button id="quick-login-btn" class="btn btn-secondary mt-16">
-                <i class="fas fa-qrcode"></i> Quick Login (Scan ID)
-            </button>
-            <button id="register-btn" class="btn btn-text mt-16">
+            <button id="register-btn" class="btn btn-secondary btn-full mt-16">
                 <i class="fas fa-user-plus"></i> New User? Register
             </button>
             <button id="guest-btn" class="btn btn-text">
@@ -383,12 +697,14 @@
                 <input type="tel" id="mobile" placeholder="0771234567">
                 <div id="mobile-error" class="error hidden"></div>
             </div>
-            <div class="input-group">
+             <div class="input-group">
                 <label for="profile-picture">Profile Picture</label>
                 <input type="file" accept="image/*" id="profile-picture" />
                 <div id="profile-picture-error" class="error hidden"></div>
+                 <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px;"></canvas>
+                 <button id="crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
             </div>
-            <button id="generate-id-btn" class="btn btn-primary">
+            <button id="generate-id-btn" class="btn btn-primary btn-full">
                 <i class="fas fa-id-card"></i> Generate My ID
             </button>
             <button id="back-to-login-btn" class="btn btn-text mt-16">
@@ -413,16 +729,168 @@
         </div>
     </div>
 
-    <!-- QR Scanner Modal -->
-    <div id="qr-scanner-modal" class="modal">
-        <div class="scanner-container">
-            <button id="close-scanner-btn" class="close-scanner-btn">
-                <i class="fas fa-times"></i>
-            </button>
-            <video id="video" playsinline></video>
-            <div class="scanner-instructions">
-                <p>Point your camera at your EMA ID QR code</p>
-                <p><i class="fas fa-qrcode fa-2x"></i></p>
+    <!-- Home Screen -->
+    <div id="home-screen" class="screen">
+         <!-- User Card at the top -->
+        <div class="card">
+            <div class="user-card" id="user-card">
+                <div class="user-card-avatar" id="home-user-avatar">U</div>
+                <div class="user-card-info">
+                    <h3 id="home-user-name">User Name</h3>
+                    <p id="home-user-id">EMA-XXXXXX</p>
+                </div>
+                <i class="fas fa-chevron-right"></i> <!-- Chevron icon -->
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-file-alt"></i>
+                    <div class="value">12</div>
+                    <div class="label">Reports</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-elephant"></i>
+                    <div class="value">8</div>
+                    <div class="label">Elephants</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div class="value">5</div>
+                    <div class="label">Locations</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-bell"></i>
+                    <div class="value">3</div>
+                    <div class="label">Alerts</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Features</h2>
+            <div class="features-grid">
+                <div class="feature-card" data-feature="report">
+                    <i class="fas fa-bullhorn"></i>
+                    <div class="label">Report Elephant</div>
+                </div>
+                <div class="feature-card" data-feature="map">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <div class="label">View Map</div>
+                </div>
+                <div class="feature-card" data-feature="radar">
+                    <i class="fas fa-radar"></i> <!-- Note: fa-radar might need Pro, use fa-bullseye or fa-crosshairs if not available -->
+                    <div class="label">Radar</div>
+                </div>
+                <div class="feature-card" data-feature="ai">
+                    <i class="fas fa-robot"></i>
+                    <div class="label">AI Chatbot</div>
+                </div>
+                <div class="feature-card" data-feature="history">
+                    <i class="fas fa-history"></i>
+                    <div class="label">History</div>
+                </div>
+                <div class="feature-card" data-feature="alerts">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="label">Alerts</div>
+                </div>
+                <div class="feature-card" data-feature="profile">
+                    <i class="fas fa-user"></i>
+                    <div class="label">Profile</div>
+                </div>
+                <div class="feature-card" data-feature="settings">
+                    <i class="fas fa-cog"></i>
+                    <div class="label">Settings</div>
+                </div>
+            </div>
+        </div>
+
+         <!-- Bottom Navigation Bar -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-button active" data-feature="report">
+                <i class="fas fa-bullhorn"></i>
+                <span>Report</span>
+            </a>
+            <a href="#" class="nav-button" data-feature="map">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Map</span>
+            </a>
+            <a href="#" class="nav-button" data-feature="radar">
+                 <i class="fas fa-radar"></i>
+                <span>Radar</span>
+            </a>
+            <a href="#" class="nav-button" data-feature="ai">
+                <i class="fas fa-robot"></i>
+                <span>AI</span>
+            </a>
+            <a href="#" class="nav-button" data-feature="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- User Info Popup Modal -->
+    <div id="user-popup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>User Information</h2>
+                <button class="close-modal-btn" id="close-user-popup">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="user-popup-content">
+                    <div class="user-popup-avatar" id="popup-user-avatar">
+                        <img id="popup-user-image" src="" alt="Profile Picture" style="display:none;">
+                        <span id="popup-user-initials">U</span>
+                    </div>
+                    <div class="user-popup-info">
+                        <h3 id="popup-user-fullname">User Name</h3>
+                        <p><strong>ID:</strong> <span id="popup-user-id">EMA-XXXXXX</span></p>
+                        <p><strong>Province:</strong> <span id="popup-user-province">Province</span></p>
+                        <p><strong>District:</strong> <span id="popup-user-district">District</span></p>
+                        <p><strong>Mobile:</strong> <span id="popup-user-mobile">077XXXXXXX</span></p>
+                    </div>
+                    <div class="user-popup-actions">
+                        <button id="delete-account-btn" class="btn btn-secondary btn-full">
+                            <i class="fas fa-trash-alt"></i> Delete Account
+                        </button>
+                        <button id="sign-out-btn" class="btn btn-primary btn-full">
+                            <i class="fas fa-sign-out-alt"></i> Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant Modal -->
+    <div id="ai-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>EMA AI Assistant</h2>
+                <button id="close-ai-modal" class="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be added here dynamically -->
+                </div>
+                <div class="typing-indicator" id="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="text" id="user-message" placeholder="Type your message...">
+                <button id="send-message-btn" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -432,7 +900,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
             authDomain: "users-ema.firebaseapp.com",
-            databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app", // No trailing space
+            databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "users-ema",
             storageBucket: "users-ema.firebasestorage.app",
             messagingSenderId: "165334149820",
@@ -445,17 +913,17 @@
             startup: document.getElementById('startup-screen'),
             login: document.getElementById('login-screen'),
             register: document.getElementById('register-screen'),
-            idDisplay: document.getElementById('id-display-screen')
+            idDisplay: document.getElementById('id-display-screen'),
+            home: document.getElementById('home-screen')
         };
 
-        const provinceSelect = document.getElementById('province');
-        const districtSelect = document.getElementById('district');
-        const qrScannerModal = document.getElementById('qr-scanner-modal');
-        const video = document.getElementById('video');
-        const canvasElement = document.createElement('canvas');
-        const canvas = canvasElement.getContext('2d');
-        let scanning = false;
-        let stream = null; // To hold the camera stream
+        const modal = document.getElementById('ai-modal');
+        const userPopupModal = document.getElementById('user-popup-modal');
+        const chatMessages = document.getElementById('chat-messages');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const userMessageInput = document.getElementById('user-message');
+        const previewCanvas = document.getElementById('preview-canvas');
+        const cropBtn = document.getElementById('crop-btn');
 
         // District data
         const districts = {
@@ -470,16 +938,31 @@
             "Sabaragamuwa": ["Ratnapura", "Kegalle"]
         };
 
+        // OpenRouter API Key - *** PLEASE VERIFY THIS IS CORRECT ***
+        const OPENROUTER_API_KEY = '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';
+
+        // Session data
+        let currentUser = null;
+        let conversationHistory = [
+             {
+                role: 'system',
+                content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant feature buttons.'
+            }
+        ];
+
+        // Image cropping variables
+        let originalImage = null;
+        let croppedImageDataUrl = null;
+
         // Firebase references (will be initialized after SDK loads)
         let db;
-        let currentUser = null; // Needed for handleLoginFromQR
 
         // Initialize app after Firebase SDK loads
         async function initApp() {
              try {
                 // Dynamically import Firebase SDKs
                 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-                const { getDatabase, ref, get, set, query, orderByChild, equalTo } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                const { getDatabase, ref, get, set, remove, query, orderByChild, equalTo } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
 
                 // Initialize Firebase
                 const app = initializeApp(firebaseConfig);
@@ -489,6 +972,7 @@
                 window.firebaseRef = ref;
                 window.firebaseGet = get;
                 window.firebaseSet = set;
+                window.firebaseRemove = remove; // For delete account
                 window.firebaseQuery = query;
                 window.firebaseOrderByChild = orderByChild;
                 window.firebaseEqualTo = equalTo;
@@ -506,6 +990,9 @@
                 setupEventListeners();
 
                 // Populate districts
+                const provinceSelect = document.getElementById('province');
+                const districtSelect = document.getElementById('district');
+
                 provinceSelect.addEventListener('change', function() {
                     const selectedProvince = this.value;
                     districtSelect.innerHTML = '<option value="">Select District</option>';
@@ -523,14 +1010,45 @@
                     }
                 });
 
+                // Initialize AI chat
+                initAIChat();
+
+                // Check for existing session
+                checkExistingSession();
+
             } catch (error) {
                 console.error("Failed to load Firebase SDK:", error);
                 alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
                 screens.startup.style.display = 'none';
                 showScreen('login');
                 setupEventListeners();
+                initAIChat();
             }
         }
+
+        // Check for existing session
+        function checkExistingSession() {
+            const storedUser = sessionStorage.getItem('emaUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+                showHomeScreen();
+            }
+        }
+
+        // Initialize AI Chat with welcome message
+        function initAIChat() {
+            chatMessages.innerHTML = '';
+             conversationHistory = [
+                 {
+                    role: 'system',
+                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant feature buttons.'
+                }
+            ];
+            // Add initial AI message
+            addMessageToChat("Hello! I'm the EMA AI Assistant. How can I help you today?", 'ai');
+            conversationHistory.push({ role: 'assistant', content: "Hello! I'm the EMA AI Assistant. How can I help you today?" });
+        }
+
 
         // Screen navigation
         function showScreen(screenName) {
@@ -541,16 +1059,74 @@
 
         // Event listeners
         function setupEventListeners() {
+            // --- Login Screen ---
             document.getElementById('access-app-btn').addEventListener('click', handleLogin);
-            document.getElementById('quick-login-btn').addEventListener('click', startQRScanner);
             document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
             document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
+
+            // --- Registration Screen ---
             document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
             document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
-            document.getElementById('profile-picture').addEventListener('change', handleProfilePictureUpload);
+            document.getElementById('profile-picture').addEventListener('change', handleProfilePictureSelect);
 
-            // QR Scanner Modal Listeners
-            document.getElementById('close-scanner-btn').addEventListener('click', stopQRScanner);
+            // --- ID Display Screen ---
+            document.getElementById('download-id-btn').addEventListener('click', downloadIDCard);
+            document.getElementById('use-id-btn').addEventListener('click', () => {
+                if (currentUser) {
+                    showHomeScreen();
+                } else {
+                    showScreen('login');
+                }
+            });
+
+            // --- Home Screen ---
+            document.getElementById('user-card').addEventListener('click', openUserPopup);
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const feature = this.getAttribute('data-feature');
+                    handleFeatureClick(feature);
+                });
+            });
+            document.querySelectorAll('.nav-button').forEach(button => {
+                 button.addEventListener('click', function(e) {
+                     e.preventDefault();
+                     const feature = this.getAttribute('data-feature');
+                     // Update active button
+                     document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                     this.classList.add('active');
+                     handleFeatureClick(feature);
+                 });
+            });
+
+            // --- User Popup Modal ---
+            document.getElementById('close-user-popup').addEventListener('click', () => userPopupModal.classList.remove('active'));
+            document.getElementById('sign-out-btn').addEventListener('click', handleLogout);
+            document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
+
+            // --- AI Assistant Modal ---
+            document.getElementById('close-ai-modal').addEventListener('click', () => modal.classList.remove('active'));
+            document.getElementById('send-message-btn').addEventListener('click', sendUserMessageToAI);
+            userMessageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendUserMessageToAI();
+                }
+            });
+
+            // --- Image Cropping ---
+            cropBtn.addEventListener('click', performCrop);
+        }
+
+        // Handle feature button clicks
+        function handleFeatureClick(feature) {
+            console.log("Feature clicked:", feature);
+            if (feature === 'ai') {
+                modal.classList.add('active');
+                 // Scroll chat to bottom
+                setTimeout(() => {
+                     chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+                }, 100);
+            }
+            // Add logic for other features here in the future
         }
 
         // Login handler
@@ -592,79 +1168,6 @@
             }
         }
 
-        // --- QR Code Scanning Logic ---
-        function startQRScanner() {
-            qrScannerModal.classList.add('active');
-
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert("Sorry, your browser does not support camera access. Please try a different browser.");
-                stopQRScanner();
-                return;
-            }
-
-            // Get access to the camera
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(function(mediaStream) {
-                    stream = mediaStream; // Store the stream
-                    video.srcObject = stream;
-                    video.setAttribute("playsinline", true); // Required for iOS Safari
-                    video.play();
-                    scanning = true;
-                    requestAnimationFrame(tick); // Start the scanning loop
-                })
-                .catch(function(err) {
-                    console.error("Camera access error:", err);
-                    alert("Could not access the camera. Please ensure you have granted permission and try again.");
-                    stopQRScanner();
-                });
-        }
-
-        function stopQRScanner() {
-            scanning = false;
-            if (stream) {
-                const tracks = stream.getTracks();
-                tracks.forEach(track => track.stop()); // Stop all tracks
-                stream = null;
-            }
-            qrScannerModal.classList.remove('active');
-        }
-
-        function tick() {
-            if (video.readyState === video.HAVE_ENOUGH_DATA && scanning) {
-                canvasElement.height = video.videoHeight;
-                canvasElement.width = video.videoWidth;
-                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-                const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: "dontInvert",
-                });
-
-                if (code) {
-                    // Check if the decoded data matches the EMA ID format
-                    const idRegex = /^EMA-\d{6}$/;
-                    if (idRegex.test(code.data)) {
-                        console.log("QR Code found:", code.data);
-                        stopQRScanner(); // Stop the camera
-                        // Simulate entering the ID and clicking login
-                        document.getElementById('login-id').value = code.data;
-                        // Use a small delay to ensure the value is set before calling handleLogin
-                        setTimeout(() => {
-                             // Call the existing login handler
-                             handleLogin();
-                        }, 100);
-                        return; // Exit the tick loop
-                    } else {
-                        console.log("Scanned QR code does not match EMA ID format:", code.data);
-                        // Optionally, show a message to the user
-                    }
-                }
-                requestAnimationFrame(tick); // Continue scanning
-            } else if (scanning) {
-                 requestAnimationFrame(tick); // Keep trying if not ready
-            }
-        }
-        // --- End QR Code Scanning Logic ---
-
         // Guest login
         function handleGuestLogin() {
             currentUser = {
@@ -678,7 +1181,114 @@
             showHomeScreen();
         }
 
-        // Registration handler - IMPROVED ERROR HANDLING
+        // Handle profile picture selection and preview
+        function handleProfilePictureSelect(event) {
+             const file = event.target.files[0];
+             const errorElement = document.getElementById('profile-picture-error');
+             errorElement.classList.add('hidden');
+             errorElement.textContent = '';
+
+             if (file) {
+                  // Basic validation
+                  if (!file.type.startsWith('image/')) {
+                       showError(errorElement, 'Please select a valid image file.');
+                       event.target.value = ''; // Clear the input
+                       previewCanvas.style.display = 'none';
+                       cropBtn.classList.add('hidden');
+                       return;
+                  }
+
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                       const img = new Image();
+                       img.onload = () => {
+                            originalImage = img;
+
+                            // Set canvas size to a fixed preview size (e.g., 200x200)
+                            const maxWidth = 200;
+                            const maxHeight = 200;
+                            let { width, height } = calculateAspectRatioFit(img.width, img.height, maxWidth, maxHeight);
+
+                            previewCanvas.width = width;
+                            previewCanvas.height = height;
+                            const ctx = previewCanvas.getContext('2d');
+                            ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            previewCanvas.style.display = 'block';
+                            cropBtn.classList.remove('hidden');
+                       };
+                       img.src = e.target.result;
+                  };
+                  reader.onerror = () => {
+                       showError(errorElement, 'Error reading the image file.');
+                       previewCanvas.style.display = 'none';
+                       cropBtn.classList.add('hidden');
+                  };
+                  reader.readAsDataURL(file);
+             } else {
+                  previewCanvas.style.display = 'none';
+                  cropBtn.classList.add('hidden');
+             }
+        }
+
+         // Helper function to maintain aspect ratio
+        function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
+            const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+            return { width: srcWidth * ratio, height: srcHeight * ratio };
+        }
+
+        // Perform cropping (simple center crop to square for base64)
+        function performCrop() {
+             if (!originalImage) return;
+
+             const canvas = document.createElement('canvas');
+             const ctx = canvas.getContext('2d');
+
+             // Desired cropped image size (small for base64 storage)
+             const cropSize = 100;
+
+             canvas.width = cropSize;
+             canvas.height = cropSize;
+
+             // Calculate source coordinates for center crop
+             const sourceWidth = originalImage.width;
+             const sourceHeight = originalImage.height;
+             let sourceX, sourceY, sourceSize;
+
+             if (sourceWidth > sourceHeight) {
+                  // Landscape: crop from the center width
+                  sourceSize = sourceHeight;
+                  sourceX = (sourceWidth - sourceHeight) / 2;
+                  sourceY = 0;
+             } else {
+                  // Portrait or Square: crop from the center height
+                  sourceSize = sourceWidth;
+                  sourceX = 0;
+                  sourceY = (sourceHeight - sourceWidth) / 2;
+             }
+
+             // Draw the cropped image onto the new canvas
+             ctx.drawImage(
+                  originalImage,
+                  sourceX, sourceY, sourceSize, sourceSize, // Source rectangle
+                  0, 0, cropSize, cropSize // Destination rectangle
+             );
+
+             // Convert to Base64
+             croppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7); // JPEG quality 70%
+
+             // Optional: Show preview of cropped image
+             // const croppedPreview = document.getElementById('cropped-preview');
+             // croppedPreview.src = croppedImageDataUrl;
+             // croppedPreview.style.display = 'block';
+
+             alert("Image cropped successfully!");
+             cropBtn.classList.add('hidden'); // Hide crop button after cropping
+        }
+
+
+        // Registration handler
         async function handleRegistration() {
             if (!db) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
@@ -689,8 +1299,8 @@
             const province = document.getElementById('province').value;
             const district = document.getElementById('district').value;
             const mobile = document.getElementById('mobile').value.trim();
-            const profilePictureInput = document.getElementById('profile-picture');
-            let profilePictureBase64 = null;
+            // Use the cropped image data URL if available, otherwise null
+            const profilePictureBase64 = croppedImageDataUrl;
 
             const nameError = document.getElementById('name-error');
             const provinceError = document.getElementById('province-error');
@@ -729,9 +1339,10 @@
                 isValid = false;
             }
 
-            if (!profilePictureInput.files[0]) {
-                showError(profilePictureError, 'Profile picture is required');
-                isValid = false;
+            // Profile picture is optional for registration now, but if selected, it must be cropped
+            if (document.getElementById('profile-picture').files.length > 0 && !profilePictureBase64) {
+                 showError(profilePictureError, 'Please crop the selected profile picture.');
+                 isValid = false;
             }
 
             if (!isValid) return;
@@ -754,48 +1365,26 @@
                     province,
                     district,
                     mobile,
-                    registeredAt: new Date().toISOString()
+                    registeredAt: new Date().toISOString(),
+                    profilePicture: profilePictureBase64 // This can be null if no image was selected/cropped
                 };
 
-                // Handle profile picture upload
-                const file = profilePictureInput.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        profilePictureBase64 = event.target.result;
-                        saveUserData(userId, userData, profilePictureBase64);
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    saveUserData(userId, userData, null);
-                }
-            } catch (error) {
-                console.error("Registration error:", error);
-                // Provide more specific error messages
-                if (error.code === 'PERMISSION_DENIED') {
-                    showError(mobileError, 'Registration failed: Database permission denied. Please contact admin.'); // More specific message
-                } else if (error.message && error.message.toLowerCase().includes('network')) {
-                    showError(mobileError, 'Registration failed: Network error. Check connection.'); // Network issue
-                } else {
-                    showError(mobileError, 'Registration failed. Try again later.'); // Generic message
-                }
-            }
-        }
+                await window.firebaseSet(window.firebaseRef(db, `users/${userId}`), userData);
 
-        async function saveUserData(userId, userData, profilePictureBase64) {
-            try {
-                await window.firebaseSet(window.firebaseRef(db, `users/${userId}`), {
-                    ...userData,
-                    profilePicture: profilePictureBase64
-                });
-
-                currentUser = { userId, ...userData, profilePicture: profilePictureBase64 };
+                currentUser = userData;
                 showIDScreen(userId);
             } catch (error) {
-                console.error("Error saving user data:", error);
-                showError(document.getElementById('mobile-error'), 'Failed to save user data. Please try again.');
+                console.error("Registration error:", error);
+                if (error.code === 'PERMISSION_DENIED') {
+                    showError(mobileError, 'Registration failed: Database permission denied. Please contact admin.');
+                } else if (error.message && error.message.toLowerCase().includes('network')) {
+                    showError(mobileError, 'Registration failed: Network error. Check connection.');
+                } else {
+                    showError(mobileError, 'Registration failed. Try again later.');
+                }
             }
         }
+
 
         // Show ID screen
         function showIDScreen(userId) {
@@ -805,32 +1394,209 @@
             showScreen('idDisplay');
         }
 
+        // Download ID card
+        function downloadIDCard() {
+            const userId = document.getElementById('user-id-display').textContent;
+            const qrCodeSrc = document.getElementById('qr-code').src;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 400;
+            canvas.height = 300;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const logo = new Image();
+            logo.crossOrigin = "Anonymous";
+            logo.onload = function() {
+                ctx.drawImage(logo, canvas.width/2 - 50, 20, 100, 100);
+
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('EMA ID Card', canvas.width/2, 150);
+
+                ctx.font = '18px Arial';
+                ctx.fillText(userId, canvas.width/2, 180);
+
+                const qrCode = new Image();
+                qrCode.onload = function() {
+                    ctx.drawImage(qrCode, canvas.width/2 - 50, 200, 100, 100);
+
+                    const link = document.createElement('a');
+                    link.download = `${userId}_ID_Card.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                };
+                qrCode.src = qrCodeSrc;
+            };
+            logo.src = 'https://i.ibb.co/jvN2hV16/logo.png';
+        }
+
+        // Show home screen
+        function showHomeScreen() {
+            if (!currentUser) {
+                const storedUser = sessionStorage.getItem('emaUser');
+                if (storedUser) {
+                     currentUser = JSON.parse(storedUser);
+                } else {
+                     showScreen('login');
+                     return;
+                }
+            }
+
+            if (currentUser) {
+                // Set user info on home screen
+                document.getElementById('home-user-name').textContent = currentUser.fullName;
+                document.getElementById('home-user-id').textContent = currentUser.userId;
+
+                const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('home-user-avatar').textContent = initials;
+
+                showScreen('home');
+            } else {
+                showScreen('login');
+            }
+        }
+
+        // Open User Popup
+        function openUserPopup() {
+             if (!currentUser) return;
+
+             // Set user info in popup
+             document.getElementById('popup-user-fullname').textContent = currentUser.fullName;
+             document.getElementById('popup-user-id').textContent = currentUser.userId;
+             document.getElementById('popup-user-province').textContent = currentUser.province || 'N/A';
+             document.getElementById('popup-user-district').textContent = currentUser.district || 'N/A';
+             document.getElementById('popup-user-mobile').textContent = currentUser.mobile || 'N/A';
+
+             const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+             document.getElementById('popup-user-initials').textContent = initials;
+
+             const profileImgElement = document.getElementById('popup-user-image');
+             const initialsElement = document.getElementById('popup-user-initials');
+             if (currentUser.profilePicture) {
+                  profileImgElement.src = currentUser.profilePicture;
+                  profileImgElement.style.display = 'block';
+                  initialsElement.style.display = 'none';
+             } else {
+                  profileImgElement.style.display = 'none';
+                  initialsElement.style.display = 'block';
+             }
+
+             userPopupModal.classList.add('active');
+        }
+
+        // Logout handler
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('emaUser');
+            userPopupModal.classList.remove('active');
+            showScreen('login');
+        }
+
+        // Delete Account handler
+        async function handleDeleteAccount() {
+             if (!currentUser || !currentUser.userId || !db) {
+                  alert("Cannot delete account: User not found or database not initialized.");
+                  return;
+             }
+
+             const confirmation = confirm(`Are you sure you want to delete your account (${currentUser.userId})? This action cannot be undone.`);
+             if (!confirmation) return;
+
+             try {
+                  const userRef = window.firebaseRef(db, `users/${currentUser.userId}`);
+                  await window.firebaseRemove(userRef);
+                  console.log("Account deleted successfully from database.");
+             } catch (error) {
+                  console.error("Error deleting account from database:", error);
+                  alert("Failed to delete account from database. Please try again or contact support.");
+                  return; // Don't proceed if DB delete failed
+             }
+
+             // If DB delete was successful, clear local session and redirect
+             currentUser = null;
+             sessionStorage.removeItem('emaUser');
+             userPopupModal.classList.remove('active');
+             alert("Your account has been deleted.");
+             showScreen('login');
+        }
+
         // Show error message
         function showError(element, message) {
             element.textContent = message;
             element.classList.remove('hidden');
         }
 
-        // Handle profile picture upload
-        function handleProfilePictureUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const base64Image = event.target.result;
-                    // You can preview the image here if needed
-                };
-                reader.readAsDataURL(file);
+        // --- AI Assistant functions ---
+        async function sendUserMessageToAI() {
+            const message = userMessageInput.value.trim();
+            if (!message) return;
+
+            addMessageToChat(message, 'user');
+            conversationHistory.push({ role: 'user', content: message });
+            userMessageInput.value = '';
+
+            typingIndicator.style.display = 'flex';
+            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'google/gemma-7b-it:free',
+                        messages: conversationHistory,
+                        temperature: 0.7,
+                        max_tokens: 500
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorMsg = `API request failed with status ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg += ` - ${errorData.message || JSON.stringify(errorData)}`;
+                    } catch (e) {
+                        errorMsg += ` - ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                typingIndicator.style.display = 'none';
+                addMessageToChat(aiResponse, 'ai');
+                conversationHistory.push({ role: 'assistant', content: aiResponse });
+
+            } catch (error) {
+                console.error('AI Assistant error:', error);
+                typingIndicator.style.display = 'none';
+                const userErrorMsg = error.message.includes('401') ?
+                    'Authentication failed. Please check the API key.' :
+                    'Sorry, I encountered an error. Please try again.';
+                addMessageToChat(userErrorMsg, 'ai');
+                conversationHistory.push({ role: 'assistant', content: userErrorMsg });
             }
         }
 
-        // Show home screen (redirect to home.html)
-        function showHomeScreen() {
-             // Redirect to home.html
-             window.location.href = 'home.html';
+        function addMessageToChat(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
         }
+        // --- End AI Assistant functions ---
 
-        // Check for existing session and initialize app
+        // Initialize the app when the DOM is fully loaded
         window.addEventListener('DOMContentLoaded', () => {
             initApp();
         });
