@@ -1086,8 +1086,21 @@
         const mapElement = document.getElementById('map');
         const mapCoordinatesElement = document.getElementById('map-coordinates');
 
-        // District data (Sri Lankan districts)
-        const sriLankanDistricts = [
+        // District data (Sri Lankan districts grouped by province)
+        const sriLankanProvincesAndDistricts = {
+            "Western": ["Colombo", "Gampaha", "Kalutara"],
+            "Central": ["Kandy", "Matale", "Nuwara Eliya"],
+            "Southern": ["Galle", "Matara", "Hambantota"],
+            "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
+            "Eastern": ["Batticaloa", "Ampara", "Trincomalee"],
+            "North Western": ["Kurunegala", "Puttalam"],
+            "North Central": ["Anuradhapura", "Polonnaruwa"],
+            "Uva": ["Badulla", "Monaragala"],
+            "Sabaragamuwa": ["Ratnapura", "Kegalle"]
+        };
+
+        // All Sri Lankan districts for report form
+        const allSriLankanDistricts = [
             "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
             "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
             "Vavuniya", "Mullaitivu", "Batticaloa", "Ampara", "Trincomalee",
@@ -1278,15 +1291,18 @@
 
         // Populate district dropdowns
         function populateDistrictDropdowns() {
-            const districtSelects = [document.getElementById('district'), document.getElementById('report-district')];
-            districtSelects.forEach(select => {
-                select.innerHTML = '<option value="">Select District</option>';
-                sriLankanDistricts.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district;
-                    option.textContent = district;
-                    select.appendChild(option);
-                });
+            // Populate registration district dropdown based on province
+            const provinceSelect = document.getElementById('province');
+            const districtSelect = document.getElementById('district');
+            
+            // Populate report district dropdown with all districts
+            const reportDistrictSelect = document.getElementById('report-district');
+            reportDistrictSelect.innerHTML = '<option value="">Select District</option>';
+            allSriLankanDistricts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                reportDistrictSelect.appendChild(option);
             });
         }
 
@@ -1337,6 +1353,30 @@
             document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
             document.getElementById('profile-picture').addEventListener('change', handleProfilePictureSelect);
             cropBtn.addEventListener('click', performCrop);
+            
+            // --- Province/District Logic ---
+            const provinceSelect = document.getElementById('province');
+            const districtSelect = document.getElementById('district');
+            
+            provinceSelect.addEventListener('change', function() {
+                const selectedProvince = this.value;
+                districtSelect.innerHTML = '<option value="">Select District</option>'; // Clear previous options
+                
+                if (selectedProvince && sriLankanProvincesAndDistricts[selectedProvince]) {
+                    sriLankanProvincesAndDistricts[selectedProvince].forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        districtSelect.appendChild(option);
+                    });
+                    districtSelect.disabled = false; // Enable district dropdown
+                } else {
+                    districtSelect.disabled = true; // Disable if no province selected
+                }
+                
+                // Clear any previous district error
+                document.getElementById('district-error').classList.add('hidden');
+            });
 
             // --- ID Display Screen ---
             document.getElementById('download-id-btn').addEventListener('click', downloadIDCard);
