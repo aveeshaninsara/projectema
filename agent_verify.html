@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMA Agent Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2196F3; /* Blue for admin */
+            --on-primary: #FFFFFF;
+            --surface: #F5F5F5;
+            --on-surface: #212121;
+            --surface-variant: #E0E0E0;
+            --outline: #BDBDBD;
+            --error: #F44336;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Roboto, Arial, sans-serif; }
+        body { background-color: var(--surface); color: var(--on-surface); min-height: 100vh; padding: 16px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 20px; margin-bottom: 20px; }
+        h1, h2 { color: var(--primary); margin-bottom: 16px; }
+        .btn { padding: 10px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: var(--on-primary); }
+        .btn-secondary { background-color: var(--surface-variant); color: var(--on-surface); }
+        .btn-danger { background-color: var(--error); color: var(--on-primary); }
+        .input-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 4px; font-weight: 500; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--outline); border-radius: 4px; }
+        .hidden { display: none !important; }
+        .requests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        .request-card { border: 1px solid var(--outline); border-radius: 8px; padding: 16px; }
+        .request-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .request-meta { font-size: 0.8em; color: #666; }
+        .request-content { margin: 10px 0; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 8px; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .status-pending { background-color: #ffeb3b; color: #000; }
+        .status-approved { background-color: #4caf50; color: white; }
+        .status-rejected { background-color: #f44336; color: white; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .reject-form { margin-top: 15px; }
+        .reject-form textarea { margin-bottom: 10px; }
+        #admin-stats { display: flex; justify-content: space-around; text-align: center; margin-bottom: 20px; }
+        #admin-stats div { padding: 10px; }
+        .error { color: var(--error); font-size: 14px; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1><i class="fas fa-user-cog"></i> EMA Admin - Agent Verification</h1>
+            <div id="admin-login-section">
+                <h2>Admin Login</h2>
+                <!-- Simple hardcoded admin login for demonstration -->
+                <div class="input-group">
+                    <label for="admin-password">Admin Password</label>
+                    <input type="password" id="admin-password" placeholder="Enter admin password">
+                </div>
+                <button class="btn btn-primary" id="admin-login-btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+                <p id="admin-login-error" class="error hidden"></p>
+            </div>
+            <div id="admin-dashboard-section" class="hidden">
+                <div class="header">
+                    <h2>Agent Requests</h2>
+                    <button class="btn btn-secondary" id="admin-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+                <div id="admin-stats">
+                    <div>Pending: <span id="pending-request-count">0</span></div>
+                    <div>Approved: <span id="approved-request-count">0</span></div>
+                    <div>Rejected: <span id="rejected-request-count">0</span></div>
+                </div>
+                <div class="input-group">
+                    <label for="request-filter">Filter Requests:</label>
+                    <select id="request-filter">
+                        <option value="all">All Requests</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div id="requests-container">
+                    <div id="requests-list" class="requests-grid">
+                        <!-- Requests will be loaded here -->
+                        <p>Loading requests...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Detail Modal -->
+    <div id="request-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Agent Request Details</h2>
+            <div id="request-detail-content">
+                <!-- Request details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Firebase Configurations ---
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
+            authDomain: "users-ema.firebaseapp.com",
+            databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "users-ema",
+            storageBucket: "users-ema.firebasestorage.app",
+            messagingSenderId: "165334149820",
+            appId: "1:165334149820:web:e2f3408f2e21808d46beb9",
+            measurementId: "G-ZZ04XCWXVQ"
+        };
+
+        // DOM Elements
+        const adminLoginSection = document.getElementById('admin-login-section');
+        const adminDashboardSection = document.getElementById('admin-dashboard-section');
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        const adminLogoutBtn = document.getElementById('admin-logout-btn');
+        const adminLoginError = document.getElementById('admin-login-error');
+        const requestsList = document.getElementById('requests-list');
+        const requestDetailModal = document.getElementById('request-detail-modal');
+        const closeModalButtons = document.querySelectorAll(".close");
+        const requestFilter = document.getElementById('request-filter');
+
+        let isAdminLoggedIn = false;
+        let allRequests = {};
+        const ADMIN_PASSWORD = "admin123"; // Hardcoded for demo. Use secure auth in production.
+
+        // Firebase references
+        let userDb = null;
+
+        // --- Initialize App ---
+        async function initApp() {
+            try {
+                // Dynamically import Firebase SDKs
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+                const { getDatabase, ref, get, update } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+
+                // Initialize Firebase App
+                const app = initializeApp(userFirebaseConfig, 'userApp');
+
+                // Get Database instance
+                userDb = getDatabase(app);
+
+                // Make Firebase functions globally available
+                window.userRef = ref;
+                window.userGet = get;
+                window.userUpdate = update;
+
+                console.log("Agent Verification: Firebase initialized.");
+
+                // Set up event listeners
+                setupEventListeners();
+
+            } catch (error) {
+                console.error("Agent Verification: Failed to initialize Firebase:", error);
+                alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
+            }
+        }
+
+        function setupEventListeners() {
+            adminLoginBtn.addEventListener('click', handleAdminLogin);
+            adminLogoutBtn.addEventListener('click', handleAdminLogout);
+            requestFilter.addEventListener('change', filterRequests);
+            closeModalButtons.forEach(btn => btn.addEventListener('click', function() {
+                requestDetailModal.style.display = "none";
+            }));
+            window.addEventListener('click', function(event) {
+                if (event.target == requestDetailModal) requestDetailModal.style.display = "none";
+            });
+        }
+
+        // --- Authentication Logic ---
+        function handleAdminLogin() {
+            const password = document.getElementById('admin-password').value;
+            adminLoginError.classList.add('hidden');
+            adminLoginError.textContent = '';
+
+            if (password === ADMIN_PASSWORD) { // Simple check for demo
+                isAdminLoggedIn = true;
+                console.log("Agent Verification: Admin login successful.");
+                showAdminDashboard();
+                loadAgentRequests();
+            } else {
+                adminLoginError.textContent = 'Invalid password.';
+                adminLoginError.classList.remove('hidden');
+            }
+        }
+
+        function handleAdminLogout() {
+            isAdminLoggedIn = false;
+            adminDashboardSection.classList.add('hidden');
+            adminLoginSection.classList.remove('hidden');
+            document.getElementById('admin-password').value = '';
+            requestsList.innerHTML = '<p>Loading requests...</p>';
+            allRequests = {};
+        }
+
+        function showAdminDashboard() {
+            adminLoginSection.classList.add('hidden');
+            adminDashboardSection.classList.remove('hidden');
+        }
+
+        // --- Agent Request Management ---
+        async function loadAgentRequests() {
+            if (!userDb) {
+                requestsList.innerHTML = '<p class="error">Database not initialized.</p>';
+                return;
+            }
+
+            try {
+                requestsList.innerHTML = '<p>Loading requests...</p>';
+                const requestsRef = window.userRef(userDb, 'agentRequests');
+                const snapshot = await window.userGet(requestsRef);
+                allRequests = snapshot.val() || {};
+
+                updateAdminStats();
+                displayRequests(Object.values(allRequests));
+
+            } catch (error) {
+                console.error("Agent Verification: Error loading requests:", error);
+                requestsList.innerHTML = '<p class="error">Failed to load requests. Please try again.</p>';
+            }
+        }
+
+        function updateAdminStats() {
+            let pending = 0, approved = 0, rejected = 0;
+            Object.values(allRequests).forEach(request => {
+                if (request.status === 'pending') pending++;
+                else if (request.status === 'approved') approved++;
+                else if (request.status === 'rejected') rejected++;
+            });
+            document.getElementById('pending-request-count').textContent = pending;
+            document.getElementById('approved-request-count').textContent = approved;
+            document.getElementById('rejected-request-count').textContent = rejected;
+        }
+
+        function filterRequests() {
+            const filterValue = requestFilter.value;
+            let filteredRequests = [];
+
+            if (filterValue === 'all') {
+                filteredRequests = Object.values(allRequests);
+            } else {
+                filteredRequests = Object.values(allRequests).filter(r => r.status === filterValue);
+            }
+
+            displayRequests(filteredRequests);
+        }
+
+        function displayRequests(requestsToDisplay) {
+            requestsList.innerHTML = '';
+
+            if (!requestsToDisplay || requestsToDisplay.length === 0) {
+                requestsList.innerHTML = '<p>No agent requests found.</p>';
+                return;
+            }
+
+            const sortedRequests = requestsToDisplay.sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
+
+            sortedRequests.forEach(request => {
+                const requestElement = createRequestCard(request);
+                requestsList.appendChild(requestElement);
+            });
+        }
+
+        function createRequestCard(request) {
+            const card = document.createElement('div');
+            card.className = 'request-card';
+            card.dataset.requestId = request.id || request.nic; // Use NIC or generated ID if no explicit ID
+
+            const requestedAt = new Date(request.requestedAt);
+            const formattedDate = requestedAt.toLocaleDateString();
+            const formattedTime = requestedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            card.innerHTML = `
+                <div class="request-header">
+                    <strong>${request.name}</strong>
+                    <span class="status-badge status-${request.status}">${request.status.toUpperCase()}</span>
+                </div>
+                <div class="request-meta">
+                    <div>${formattedDate} ${formattedTime}</div>
+                    <div>NIC: ${request.nic}</div>
+                    <div>District: ${request.district}</div>
+                </div>
+                <div class="request-content">
+                    <p><strong>Mobile:</strong> ${request.mobile}</p>
+                </div>
+                <button class="btn btn-secondary view-details-btn" data-request-id="${request.id || request.nic}"><i class="fas fa-eye"></i> View Details</button>
+            `;
+            card.querySelector('.view-details-btn').addEventListener('click', () => openRequestDetails(request));
+            return card;
+        }
+
+        function openRequestDetails(request) {
+            const content = document.getElementById('request-detail-content');
+            const requestedAt = new Date(request.requestedAt);
+            const formattedDate = requestedAt.toLocaleDateString();
+            const formattedTime = requestedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            content.innerHTML = `
+                <p><strong>Name:</strong> ${request.name}</p>
+                <p><strong>NIC:</strong> ${request.nic}</p>
+                <p><strong>District:</strong> ${request.district}</p>
+                <p><strong>Mobile:</strong> ${request.mobile}</p>
+                <p><strong>Requested At:</strong> ${formattedDate} ${formattedTime}</p>
+                <p><strong>Status:</strong> <span class="status-badge status-${request.status}">${request.status.toUpperCase()}</span></p>
+                <div class="action-buttons">
+                    ${request.status === 'pending' ? `
+                        <button class="btn btn-primary" onclick="approveRequest('${request.id || request.nic}')"><i class="fas fa-user-check"></i> Approve</button>
+                        <button class="btn btn-danger" onclick="openRejectForm('${request.id || request.nic}')"><i class="fas fa-user-times"></i> Reject</button>
+                    ` : ''}
+                </div>
+                <div id="reject-form-${request.id || request.nic}" class="reject-form hidden">
+                    <label for="reject-reason-${request.id || request.nic}">Reason for Rejection:</label>
+                    <textarea id="reject-reason-${request.id || request.nic}" rows="3" placeholder="Enter reason..."></textarea>
+                    <button class="btn btn-danger" onclick="rejectRequest('${request.id || request.nic}')"><i class="fas fa-paper-plane"></i> Submit Rejection</button>
+                </div>
+            `;
+            requestDetailModal.style.display = "block";
+        }
+
+        async function approveRequest(requestId) {
+            if (!userDb || !requestId) return;
+            try {
+                // 1. Approve request in agentRequests
+                const requestRef = window.userRef(userDb, `agentRequests/${requestId}`);
+                await window.userUpdate(requestRef, { status: 'approved', processedAt: new Date().toISOString() });
+
+                // 2. Create agent entry in agents/
+                const requestData = allRequests[requestId];
+                if (requestData) {
+                    const agentData = {
+                        name: requestData.name,
+                        nic: requestData.nic,
+                        district: requestData.district,
+                        mobile: requestData.mobile,
+                        approvedAt: new Date().toISOString(),
+                        status: 'active'
+                        // Add other agent-specific fields as needed
+                    };
+                    const agentRef = window.userRef(userDb, `agents/${requestData.agentId}`); // Use generated ID
+                    await window.userUpdate(agentRef, agentData);
+                }
+
+                console.log(`Agent request ${requestId} approved.`);
+                alert("Agent request approved and agent created.");
+                requestDetailModal.style.display = "none";
+                loadAgentRequests(); // Reload to reflect changes
+            } catch (error) {
+                console.error("Agent Verification: Error approving request:", error);
+                alert("Failed to approve agent request. Please try again.");
+            }
+        }
+
+        function openRejectForm(requestId) {
+            const form = document.getElementById(`reject-form-${requestId}`);
+            if (form) form.classList.toggle('hidden');
+        }
+
+        async function rejectRequest(requestId) {
+            if (!userDb || !requestId) return;
+            const reasonInput = document.getElementById(`reject-reason-${requestId}`);
+            const reason = reasonInput ? reasonInput.value.trim() : '';
+            if (!reason) {
+                alert("Please provide a reason for rejection.");
+                return;
+            }
+
+            try {
+                const requestRef = window.userRef(userDb, `agentRequests/${requestId}`);
+                await window.userUpdate(requestRef, { status: 'rejected', rejectReason: reason, processedAt: new Date().toISOString() });
+                console.log(`Agent request ${requestId} rejected.`);
+                alert("Agent request rejected.");
+                requestDetailModal.style.display = "none";
+                loadAgentRequests(); // Reload to reflect changes
+            } catch (error) {
+                console.error("Agent Verification: Error rejecting request:", error);
+                alert("Failed to reject agent request. Please try again.");
+            }
+        }
+
+        window.approveRequest = approveRequest;
+        window.openRejectForm = openRejectForm;
+        window.rejectRequest = rejectRequest;
+
+        // Initialize the app when the DOM is fully loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+    </script>
+</body>
+</html>
