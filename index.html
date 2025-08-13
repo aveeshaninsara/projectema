@@ -6,6 +6,8 @@
     <title>EMA - Elephant Monitoring App</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --md-sys-color-primary: #606c38;
@@ -37,10 +39,37 @@
             --md-sys-state-pressed-opacity: 0.12;
             --md-sys-state-dragged-opacity: 0.16;
 
-            /* New colors for bottom bar */
-            --bottom-bar-bg: linear-gradient(to right, #606c38, #4a552a);
-            --bottom-bar-button-color: #ffffff;
-            --bottom-bar-button-active-color: #c8e6c9;
+            /* Dark Theme Colors (default to light) */
+            --theme-surface: var(--md-sys-color-surface);
+            --theme-on-surface: var(--md-sys-color-on-surface);
+            --theme-surface-variant: var(--md-sys-color-surface-variant);
+            --theme-on-surface-variant: var(--md-sys-color-on-surface-variant);
+            --theme-primary: var(--md-sys-color-primary);
+            --theme-on-primary: var(--md-sys-color-on-primary);
+            --theme-primary-container: var(--md-sys-color-primary-container);
+            --theme-on-primary-container: var(--md-sys-color-on-primary-container);
+            --theme-secondary-container: var(--md-sys-color-secondary-container);
+            --theme-on-secondary-container: var(--md-sys-color-on-secondary-container);
+            --theme-outline: var(--md-sys-color-outline);
+            --theme-error: var(--md-sys-color-error);
+            --theme-on-error: var(--md-sys-color-on-error);
+        }
+
+        /* Dark Theme Override */
+        .theme-dark {
+            --theme-surface: #1b1c18; /* On Surface from light */
+            --theme-on-surface: #e2e3db; /* Surface from light */
+            --theme-surface-variant: #44483d; /* On Surface Variant from light */
+            --theme-on-surface-variant: #c5c7bb; /* Surface Variant from light */
+            --theme-primary: #cfcf9b;
+            --theme-on-primary: #32351e;
+            --theme-primary-container: #494d33;
+            --theme-on-primary-container: #e9f4c7; /* Primary Container from light */
+            --theme-secondary-container: #474939;
+            --theme-on-secondary-container: #e4e5c1; /* Secondary Container from light */
+            --theme-outline: #8f9286;
+            --theme-error: #ffb4ab;
+            --theme-on-error: #690005;
         }
 
         * {
@@ -51,14 +80,13 @@
         }
 
         body {
-            background-color: var(--md-sys-color-surface);
-            color: var(--md-sys-color-on-surface);
+            background-color: var(--theme-surface);
+            color: var(--theme-on-surface);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 16px;
-            padding-bottom: 80px; /* Space for bottom bar */
         }
 
         .screen {
@@ -74,12 +102,13 @@
         }
 
         .card {
-            background-color: white;
+            background-color: var(--theme-surface);
             border-radius: var(--md-sys-shape-corner-large);
             box-shadow: var(--md-sys-elevation-1);
             padding: 20px;
             width: 100%;
             flex-shrink: 0;
+            border: 1px solid var(--theme-outline);
         }
 
         .logo-container {
@@ -88,7 +117,7 @@
             align-items: center;
             height: 100vh;
             width: 100%;
-            background-color: white;
+            background-color: var(--theme-surface);
             position: fixed;
             top: 0;
             left: 0;
@@ -107,7 +136,7 @@
         }
 
         h1, h2 {
-            color: var(--md-sys-color-primary);
+            color: var(--theme-primary);
             margin-bottom: 16px;
         }
 
@@ -128,23 +157,24 @@
             display: block;
             margin-bottom: 6px;
             font-weight: 500;
-            color: var(--md-sys-color-on-surface-variant);
+            color: var(--theme-on-surface-variant);
             font-size: 0.9rem;
         }
 
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 12px 14px;
-            border: 1px solid var(--md-sys-color-outline);
+            border: 1px solid var(--theme-outline);
             border-radius: var(--md-sys-shape-corner-medium);
-            background-color: var(--md-sys-color-surface);
+            background-color: var(--theme-surface);
+            color: var(--theme-on-surface);
             font-size: 16px;
             transition: border-color 0.2s;
         }
 
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--md-sys-color-primary);
+            border-color: var(--theme-primary);
             box-shadow: 0 0 0 2px rgba(96, 108, 56, 0.2);
         }
 
@@ -165,29 +195,28 @@
         }
 
         .btn-primary {
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
+            background-color: var(--theme-primary);
+            color: var(--theme-on-primary);
             box-shadow: var(--md-sys-elevation-1);
         }
 
         .btn-primary:hover {
-            background-color: #4a552a;
-            box-shadow: var(--md-sys-elevation-2);
+            background-color: #4a552a; /* Darken primary for hover */
         }
 
         .btn-secondary {
-            background-color: var(--md-sys-color-secondary-container);
-            color: var(--md-sys-color-on-secondary-container);
+            background-color: var(--theme-secondary-container);
+            color: var(--theme-on-secondary-container);
         }
 
         .btn-secondary:hover {
-            background-color: #d7d9b0;
+            background-color: #d7d9b0; /* Lighten secondary for hover */
         }
 
         .btn-text {
             background: none;
             border: none;
-            color: var(--md-sys-color-primary);
+            color: var(--theme-primary);
             padding: 8px 4px;
             font-size: 15px;
             cursor: pointer;
@@ -221,101 +250,137 @@
         }
 
         .error {
-            color: var(--md-sys-color-error);
+            color: var(--theme-error);
             font-size: 14px;
             margin-top: 4px;
         }
 
         .success {
-            color: #2e7d32;
+            color: #2e7d32; /* Keep success green */
             font-size: 14px;
             margin-top: 4px;
         }
 
         /* --- Home Screen Specific Styles --- */
-        .user-card {
+        .home-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 16px;
-            padding: 16px;
-            background: var(--md-sys-color-primary-container);
-            border-radius: var(--md-sys-shape-corner-large);
-            cursor: pointer;
-            box-shadow: var(--md-sys-elevation-1);
-            transition: box-shadow 0.2s;
-        }
-        .user-card:hover {
-             box-shadow: var(--md-sys-elevation-2);
+            margin-bottom: 20px;
         }
 
-        .user-card-avatar {
-            width: 60px;
-            height: 60px;
+        .settings-btn, .user-btn {
+            background: none;
+            border: none;
+            color: var(--theme-on-surface);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
             border-radius: 50%;
-            background-color: var(--md-sys-color-primary);
+        }
+
+        .settings-btn:hover, .user-btn:hover {
+             background-color: rgba(96, 108, 56, 0.1); /* Subtle hover */
+        }
+
+        .user-btn {
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            overflow: hidden;
+        }
+
+        .user-btn-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover; /* Cover the area, potentially cropping */
+            display: none; /* Hidden by default */
+        }
+
+        .user-btn-initials {
             font-weight: bold;
-            color: var(--md-sys-color-on-primary);
+        }
+
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: var(--theme-primary-container);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--theme-on-primary-container);
             flex-shrink: 0;
+            overflow: hidden; /* Hide overflow for image */
         }
 
-        .user-card-info {
-            flex-grow: 1;
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the area, potentially cropping */
+            display: none; /* Hidden by default */
         }
 
-        .user-card-info h3 {
+        .user-info h3 {
             margin: 0;
-            font-size: 18px;
-            color: var(--md-sys-color-on-primary-container);
+            font-size: 17px;
+            word-break: break-word;
         }
 
-        .user-card-info p {
-            margin: 4px 0 0;
-            font-size: 14px;
-            color: var(--md-sys-color-on-primary-container);
-            opacity: 0.8;
+        .user-info p {
+            margin: 3px 0 0;
+            color: var(--theme-on-surface-variant);
+            font-size: 13px;
         }
 
-        .stats-grid {
+        .stats-grid, .features-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-top: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
         }
 
-        .stat-card {
-            background-color: var(--md-sys-color-surface-variant);
+        .stat-card, .feature-card {
+            background-color: var(--theme-surface-variant);
             border-radius: var(--md-sys-shape-corner-medium);
-            padding: 16px;
+            padding: 14px;
             text-align: center;
             box-shadow: var(--md-sys-elevation-1);
         }
 
-        .stat-card i {
-            font-size: 24px;
-            color: var(--md-sys-color-primary);
-            margin-bottom: 8px;
+        .stat-card i, .feature-card i {
+            font-size: 22px;
+            color: var(--theme-primary);
+            margin-bottom: 6px;
         }
 
         .stat-card .value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            margin: 8px 0;
+            margin: 6px 0;
         }
 
-        .stat-card .label {
-            font-size: 14px;
-            color: var(--md-sys-color-on-surface-variant);
+        .stat-card .label, .feature-card .label {
+            font-size: 13px;
+            color: var(--theme-on-surface-variant);
         }
 
         .features-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-top: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         }
 
         .feature-card {
@@ -323,75 +388,15 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 16px 8px;
-            background-color: var(--md-sys-color-surface-variant);
-            border-radius: var(--md-sys-shape-corner-medium);
-            box-shadow: var(--md-sys-elevation-1);
+            padding: 20px 14px;
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
-            text-align: center;
         }
 
         .feature-card:hover {
-            background-color: #d5d8c9;
+            background-color: #d5d8c9; /* Lighten surface-variant for hover */
             transform: translateY(-2px);
         }
-
-        .feature-card i {
-            font-size: 24px;
-            color: var(--md-sys-color-primary);
-            margin-bottom: 8px;
-        }
-
-        .feature-card .label {
-            font-size: 12px;
-            color: var(--md-sys-color-on-surface-variant);
-        }
-
-        /* --- Bottom Navigation Bar --- */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto; /* Center if screen is wider than max-width */
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 0;
-            background: var(--bottom-bar-bg);
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
-            z-index: 100;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-        }
-
-        .nav-button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--bottom-bar-button-color);
-            text-decoration: none;
-            font-size: 12px;
-            flex: 1; /* Distribute space evenly */
-            padding: 8px 0;
-            border-radius: var(--md-sys-shape-corner-medium);
-            transition: background-color 0.2s;
-        }
-
-        .nav-button:hover, .nav-button.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--bottom-bar-button-active-color);
-        }
-
-        .nav-button i {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-        /* --- End Bottom Navigation Bar --- */
-
 
         .id-display {
             text-align: center;
@@ -401,9 +406,9 @@
         .user-id {
             font-size: 22px;
             font-weight: bold;
-            color: var(--md-sys-color-primary);
+            color: var(--theme-primary);
             word-break: break-all;
-            background-color: var(--md-sys-color-primary-container);
+            background-color: var(--theme-primary-container);
             padding: 14px;
             border-radius: var(--md-sys-shape-corner-medium);
             margin: 14px 0;
@@ -437,7 +442,7 @@
         }
 
         .modal-content {
-            background-color: white;
+            background-color: var(--theme-surface);
             border-radius: var(--md-sys-shape-corner-large);
             width: 100%;
             max-width: 500px;
@@ -445,11 +450,13 @@
             display: flex;
             flex-direction: column;
             box-shadow: var(--md-sys-elevation-2);
+            border: 1px solid var(--theme-outline);
         }
 
+        /* --- IMPROVED MODAL HEADER --- */
         .modal-header {
             padding: 16px 20px;
-            border-bottom: 1px solid var(--md-sys-color-outline);
+            border-bottom: 1px solid var(--theme-outline);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -460,12 +467,13 @@
             font-size: 1.3rem;
             flex-grow: 1;
             text-align: center;
+            color: var(--theme-on-surface);
         }
 
         .close-modal-btn {
             background: none;
             border: none;
-            color: var(--md-sys-color-on-surface-variant);
+            color: var(--theme-on-surface-variant);
             font-size: 1.2rem;
             cursor: pointer;
             padding: 8px;
@@ -475,9 +483,11 @@
         }
 
         .close-modal-btn:hover {
-            background-color: var(--md-sys-color-surface-variant);
-            color: var(--md-sys-color-error);
+            background-color: var(--theme-surface-variant);
+            color: var(--theme-error);
         }
+        /* --- END IMPROVED MODAL HEADER --- */
+
 
         .modal-body {
             padding: 16px 20px;
@@ -507,22 +517,22 @@
 
         .user-message {
             align-self: flex-end;
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
+            background-color: var(--theme-primary);
+            color: var(--theme-on-primary);
             border-bottom-right-radius: 4px;
         }
 
         .ai-message {
             align-self: flex-start;
-            background-color: var(--md-sys-color-surface-variant);
-            color: var(--md-sys-color-on-surface-variant);
+            background-color: var(--theme-surface-variant);
+            color: var(--theme-on-surface-variant);
             border-bottom-left-radius: 4px;
         }
 
         .typing-indicator {
             display: none;
             align-self: flex-start;
-            background-color: var(--md-sys-color-surface-variant);
+            background-color: var(--theme-surface-variant);
             padding: 14px 16px;
             border-radius: var(--md-sys-shape-corner-medium);
             border-bottom-left-radius: 4px;
@@ -531,7 +541,7 @@
         .typing-indicator span {
             height: 8px;
             width: 8px;
-            background-color: var(--md-sys-color-on-surface-variant);
+            background-color: var(--theme-on-surface-variant);
             border-radius: 50%;
             display: inline-block;
             margin: 0 2px;
@@ -553,7 +563,7 @@
 
         .modal-footer {
             padding: 16px 20px;
-            border-top: 1px solid var(--md-sys-color-outline);
+            border-top: 1px solid var(--theme-outline);
             display: flex;
             gap: 10px;
         }
@@ -579,27 +589,29 @@
             height: 100px;
             border-radius: 50%;
             margin: 0 auto 16px;
-            background-color: var(--md-sys-color-primary-container);
+            background-color: var(--theme-primary-container);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 40px;
             font-weight: bold;
-            color: var(--md-sys-color-on-primary-container);
+            color: var(--theme-on-primary-container);
             overflow: hidden; /* Hide overflow for image */
         }
         .user-popup-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover; /* Cover the area, potentially cropping */
+            display: none; /* Hidden by default */
         }
         .user-popup-info h3 {
             margin: 0 0 8px 0;
             font-size: 20px;
+            color: var(--theme-on-surface);
         }
         .user-popup-info p {
             margin: 4px 0;
-            color: var(--md-sys-color-on-surface-variant);
+            color: var(--theme-on-surface-variant);
         }
         .user-popup-actions {
             margin-top: 20px;
@@ -609,6 +621,50 @@
         }
         /* --- End User Info Popup --- */
 
+        /* --- Report Form Styles --- */
+        .elephant-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .elephant-counter input {
+            text-align: center;
+            width: 60px;
+        }
+
+        .elephant-counter .btn {
+            min-width: 40px;
+            min-height: 40px;
+            padding: 0;
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+            margin-bottom: 16px;
+            border-radius: var(--md-sys-shape-corner-medium);
+            border: 1px solid var(--theme-outline);
+        }
+        /* --- End Report Form Styles --- */
+
+        /* --- Settings Modal --- */
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .setting-item label {
+            margin: 0;
+        }
+        /* --- End Settings Modal --- */
+
         .hidden {
             display: none !important;
         }
@@ -616,7 +672,6 @@
         @media (max-width: 360px) {
             body {
                 padding: 12px;
-                padding-bottom: 80px;
             }
             .card {
                 padding: 16px;
@@ -701,7 +756,7 @@
                 <label for="profile-picture">Profile Picture</label>
                 <input type="file" accept="image/*" id="profile-picture" />
                 <div id="profile-picture-error" class="error hidden"></div>
-                 <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px;"></canvas>
+                 <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
                  <button id="crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
             </div>
             <button id="generate-id-btn" class="btn btn-primary btn-full">
@@ -731,11 +786,23 @@
 
     <!-- Home Screen -->
     <div id="home-screen" class="screen">
-         <!-- User Card at the top -->
         <div class="card">
+            <div class="home-header">
+                <button class="settings-btn" id="open-settings-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="user-btn" id="open-user-btn" title="User Profile">
+                    <span class="user-btn-initials" id="top-user-initials">U</span>
+                    <img class="user-btn-avatar" id="top-user-avatar" src="" alt="Profile">
+                </button>
+            </div>
+             <!-- User Card at the top -->
             <div class="user-card" id="user-card">
-                <div class="user-card-avatar" id="home-user-avatar">U</div>
-                <div class="user-card-info">
+                <div class="avatar" id="home-user-avatar">
+                    <img id="home-user-avatar-img" src="" alt="Profile">
+                    <span id="home-user-initials">U</span>
+                </div>
+                <div class="user-info">
                     <h3 id="home-user-name">User Name</h3>
                     <p id="home-user-id">EMA-XXXXXX</p>
                 </div>
@@ -781,54 +848,72 @@
                     <div class="label">View Map</div>
                 </div>
                 <div class="feature-card" data-feature="radar">
-                    <i class="fas fa-radar"></i> <!-- Note: fa-radar might need Pro, use fa-bullseye or fa-crosshairs if not available -->
+                     <i class="fas fa-radar"></i> <!-- Radar icon -->
                     <div class="label">Radar</div>
                 </div>
                 <div class="feature-card" data-feature="ai">
                     <i class="fas fa-robot"></i>
                     <div class="label">AI Chatbot</div>
                 </div>
-                <div class="feature-card" data-feature="history">
-                    <i class="fas fa-history"></i>
-                    <div class="label">History</div>
-                </div>
-                <div class="feature-card" data-feature="alerts">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div class="label">Alerts</div>
-                </div>
-                <div class="feature-card" data-feature="profile">
-                    <i class="fas fa-user"></i>
-                    <div class="label">Profile</div>
-                </div>
-                <div class="feature-card" data-feature="settings">
-                    <i class="fas fa-cog"></i>
-                    <div class="label">Settings</div>
-                </div>
             </div>
         </div>
+    </div>
 
-         <!-- Bottom Navigation Bar -->
-        <div class="bottom-nav">
-            <a href="#" class="nav-button active" data-feature="report">
-                <i class="fas fa-bullhorn"></i>
-                <span>Report</span>
-            </a>
-            <a href="#" class="nav-button" data-feature="map">
-                <i class="fas fa-map-marked-alt"></i>
-                <span>Map</span>
-            </a>
-            <a href="#" class="nav-button" data-feature="radar">
-                 <i class="fas fa-radar"></i>
-                <span>Radar</span>
-            </a>
-            <a href="#" class="nav-button" data-feature="ai">
-                <i class="fas fa-robot"></i>
-                <span>AI</span>
-            </a>
-            <a href="#" class="nav-button" data-feature="profile">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </a>
+    <!-- Report Modal -->
+    <div id="report-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Report Elephant</h2>
+                <button id="close-report-modal" class="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="report-form">
+                    <div class="input-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" placeholder="Click 'Get Location' or 'Pick on Map'" readonly>
+                        <div class="mt-8" style="display: flex; gap: 8px;">
+                            <button type="button" id="get-location-btn" class="btn btn-secondary" style="flex: 1;">
+                                <i class="fas fa-location-arrow"></i> Get Location
+                            </button>
+                            <button type="button" id="open-map-btn" class="btn btn-secondary" style="flex: 1;">
+                                <i class="fas fa-map-marker-alt"></i> Pick on Map
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="num-elephants">Number of Elephants</label>
+                        <div class="elephant-counter">
+                            <button type="button" id="decrease-elephants" class="btn btn-secondary"><i class="fas fa-minus"></i></button>
+                            <input type="number" id="num-elephants" value="1" min="1">
+                            <button type="button" id="increase-elephants" class="btn btn-secondary"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="elephant-names">Names of Elephants (Optional)</label>
+                        <input type="text" id="elephant-names" placeholder="Enter names separated by commas">
+                    </div>
+                    <div class="input-group">
+                        <label for="report-district">District</label>
+                        <select id="report-district">
+                            <option value="">Select District</option>
+                            <!-- Populate districts dynamically -->
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3" placeholder="Brief description"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="image-upload">Image (Optional)</label>
+                        <input type="file" accept="image/*" id="image-upload">
+                    </div>
+                    <button type="submit" id="submit-report-btn" class="btn btn-primary btn-full">
+                        <i class="fas fa-paper-plane"></i> Submit Report
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -844,7 +929,7 @@
             <div class="modal-body">
                 <div class="user-popup-content">
                     <div class="user-popup-avatar" id="popup-user-avatar">
-                        <img id="popup-user-image" src="" alt="Profile Picture" style="display:none;">
+                        <img id="popup-user-image" src="" alt="Profile Picture">
                         <span id="popup-user-initials">U</span>
                     </div>
                     <div class="user-popup-info">
@@ -895,9 +980,62 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="close-settings-modal" class="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <label for="theme-toggle">Dark Mode</label>
+                        <label class="switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label for="language-select">Language</label>
+                        <select id="language-select">
+                            <option value="en">English</option>
+                            <option value="si">Sinhala</option>
+                            <option value="ta">Tamil</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet Map for Location Picker -->
+    <div id="map-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Location</h2>
+                <button id="close-map-modal" class="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="map"></div>
+                <p id="map-coordinates" class="text-center mb-16">Click on the map to select a location.</p>
+                <button id="confirm-location-btn" class="btn btn-primary btn-full">
+                    <i class="fas fa-check"></i> Confirm Location
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module">
-        // Firebase configuration - ENSURE THIS IS CORRECT
-        const firebaseConfig = {
+        // --- Firebase Configurations ---
+        // User Database (users-ema)
+        const userFirebaseConfig = {
             apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
             authDomain: "users-ema.firebaseapp.com",
             databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -908,6 +1046,21 @@
             measurementId: "G-ZZ04XCWXVQ"
         };
 
+        // Report Database (reports-ema)
+        const reportFirebaseConfig = {
+            apiKey: "AIzaSyAib835ipwr_zCw5vMJiy6YgYauGgn2yYg",
+            authDomain: "reports-ema.firebaseapp.com",
+            databaseURL: "https://reports-ema-default-rtdb.firebaseio.com",
+            projectId: "reports-ema",
+            storageBucket: "reports-ema.firebasestorage.app",
+            messagingSenderId: "843340696456",
+            appId: "1:843340696456:web:cbbceec058fb3d53e5883d",
+            measurementId: "G-YWEBKKFK6Y"
+        };
+
+        // OpenRouter API Key
+        const OPENROUTER_API_KEY = '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';
+
         // DOM Elements
         const screens = {
             startup: document.getElementById('startup-screen'),
@@ -917,34 +1070,35 @@
             home: document.getElementById('home-screen')
         };
 
-        const modal = document.getElementById('ai-modal');
-        const userPopupModal = document.getElementById('user-popup-modal');
+        const modals = {
+            report: document.getElementById('report-modal'),
+            userPopup: document.getElementById('user-popup-modal'),
+            ai: document.getElementById('ai-modal'),
+            settings: document.getElementById('settings-modal'),
+            map: document.getElementById('map-modal')
+        };
+
         const chatMessages = document.getElementById('chat-messages');
         const typingIndicator = document.getElementById('typing-indicator');
         const userMessageInput = document.getElementById('user-message');
         const previewCanvas = document.getElementById('preview-canvas');
         const cropBtn = document.getElementById('crop-btn');
+        const mapElement = document.getElementById('map');
+        const mapCoordinatesElement = document.getElementById('map-coordinates');
 
-        // District data
-        const districts = {
-            "Western": ["Colombo", "Gampaha", "Kalutara"],
-            "Central": ["Kandy", "Matale", "Nuwara Eliya"],
-            "Southern": ["Galle", "Matara", "Hambantota"],
-            "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
-            "Eastern": ["Batticaloa", "Ampara", "Trincomalee"],
-            "North Western": ["Kurunegala", "Puttalam"],
-            "North Central": ["Anuradhapura", "Polonnaruwa"],
-            "Uva": ["Badulla", "Monaragala"],
-            "Sabaragamuwa": ["Ratnapura", "Kegalle"]
-        };
-
-        // OpenRouter API Key - *** PLEASE VERIFY THIS IS CORRECT ***
-        const OPENROUTER_API_KEY = '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';
+        // District data (Sri Lankan districts)
+        const sriLankanDistricts = [
+            "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
+            "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
+            "Vavuniya", "Mullaitivu", "Batticaloa", "Ampara", "Trincomalee",
+            "Kurunegala", "Puttalam", "Anuradhapura", "Polonnaruwa", "Badulla",
+            "Monaragala", "Ratnapura", "Kegalle"
+        ];
 
         // Session data
         let currentUser = null;
         let conversationHistory = [
-             {
+            {
                 role: 'system',
                 content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant feature buttons.'
             }
@@ -954,28 +1108,45 @@
         let originalImage = null;
         let croppedImageDataUrl = null;
 
+        // Map variables
+        let map = null;
+        let marker = null;
+        let selectedLocation = null;
+
         // Firebase references (will be initialized after SDK loads)
-        let db;
+        let userDb = null;
+        let reportDb = null;
 
-        // Initialize app after Firebase SDK loads
+        // --- Initialize App ---
         async function initApp() {
-             try {
-                // Dynamically import Firebase SDKs
-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-                const { getDatabase, ref, get, set, remove, query, orderByChild, equalTo } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+            try {
+                // Dynamically import Firebase SDKs for User DB
+                const { initializeApp: initializeUserApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+                const { getDatabase: getUserDatabase, ref: userRef, get: userGet, set: userSet, remove: userRemove, query: userQuery, orderByChild: userOrderByChild, equalTo: userEqualTo } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
 
-                // Initialize Firebase
-                const app = initializeApp(firebaseConfig);
-                db = getDatabase(app);
+                // Dynamically import Firebase SDKs for Report DB
+                const { initializeApp: initializeReportApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+                const { getDatabase: getReportDatabase, ref: reportRef, push: reportPush } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+
+                // Initialize Firebase Apps
+                const userApp = initializeUserApp(userFirebaseConfig, 'userApp');
+                const reportApp = initializeReportApp(reportFirebaseConfig, 'reportApp');
+
+                // Get Database instances
+                userDb = getUserDatabase(userApp);
+                reportDb = getReportDatabase(reportApp);
 
                 // Make Firebase functions globally available for use in handlers
-                window.firebaseRef = ref;
-                window.firebaseGet = get;
-                window.firebaseSet = set;
-                window.firebaseRemove = remove; // For delete account
-                window.firebaseQuery = query;
-                window.firebaseOrderByChild = orderByChild;
-                window.firebaseEqualTo = equalTo;
+                window.userRef = userRef;
+                window.userGet = userGet;
+                window.userSet = userSet;
+                window.userRemove = userRemove;
+                window.userQuery = userQuery;
+                window.userOrderByChild = userOrderByChild;
+                window.userEqualTo = userEqualTo;
+
+                window.reportRef = reportRef;
+                window.reportPush = reportPush;
 
                 // Show startup screen
                 setTimeout(() => {
@@ -989,26 +1160,8 @@
                 // Set up event listeners
                 setupEventListeners();
 
-                // Populate districts
-                const provinceSelect = document.getElementById('province');
-                const districtSelect = document.getElementById('district');
-
-                provinceSelect.addEventListener('change', function() {
-                    const selectedProvince = this.value;
-                    districtSelect.innerHTML = '<option value="">Select District</option>';
-
-                    if (selectedProvince && districts[selectedProvince]) {
-                        districts[selectedProvince].forEach(district => {
-                            const option = document.createElement('option');
-                            option.value = district;
-                            option.textContent = district;
-                            districtSelect.appendChild(option);
-                        });
-                        districtSelect.disabled = false;
-                    } else {
-                        districtSelect.disabled = true;
-                    }
-                });
+                // Populate district dropdowns
+                populateDistrictDropdowns();
 
                 // Initialize AI chat
                 initAIChat();
@@ -1016,8 +1169,14 @@
                 // Check for existing session
                 checkExistingSession();
 
+                // Apply saved theme
+                applySavedTheme();
+
+                // Apply saved language
+                applySavedLanguage();
+
             } catch (error) {
-                console.error("Failed to load Firebase SDK:", error);
+                console.error("Failed to load Firebase SDK or initialize app:", error);
                 alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
                 screens.startup.style.display = 'none';
                 showScreen('login');
@@ -1025,6 +1184,8 @@
                 initAIChat();
             }
         }
+
+        // --- Helper Functions ---
 
         // Check for existing session
         function checkExistingSession() {
@@ -1035,29 +1196,136 @@
             }
         }
 
+        // Apply saved theme from Firebase or localStorage
+        async function applySavedTheme() {
+            if (!currentUser || !userDb) {
+                // Fallback to localStorage if not logged in or DB not ready
+                const savedTheme = localStorage.getItem('emaTheme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('theme-dark');
+                    document.getElementById('theme-toggle').checked = true;
+                }
+                return;
+            }
+
+            try {
+                const userSettingsRef = window.userRef(userDb, `users/${currentUser.userId}/settings`);
+                const snapshot = await window.userGet(userSettingsRef);
+                if (snapshot.exists()) {
+                    const settings = snapshot.val();
+                    if (settings.theme === 'dark') {
+                        document.body.classList.add('theme-dark');
+                        document.getElementById('theme-toggle').checked = true;
+                    } else {
+                        document.body.classList.remove('theme-dark');
+                        document.getElementById('theme-toggle').checked = false;
+                    }
+                    // Save to localStorage as well for immediate access on reload
+                    localStorage.setItem('emaTheme', settings.theme || 'light');
+                } else {
+                    // Default to light if no settings found
+                    document.body.classList.remove('theme-dark');
+                    document.getElementById('theme-toggle').checked = false;
+                    localStorage.setItem('emaTheme', 'light');
+                }
+            } catch (error) {
+                console.error("Error fetching theme:", error);
+                // Fallback to localStorage
+                const savedTheme = localStorage.getItem('emaTheme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('theme-dark');
+                    document.getElementById('theme-toggle').checked = true;
+                }
+            }
+        }
+
+        // Apply saved language from Firebase or localStorage
+        async function applySavedLanguage() {
+             // Note: Google Translate widget integration is complex in a single HTML file.
+             // This function will save/load the language preference to/from Firebase/localStorage.
+             // Actual translation would require embedding the widget script and managing it,
+             // which is outside the scope of a simple file. This part focuses on persistence.
+            if (!currentUser || !userDb) {
+                const savedLang = localStorage.getItem('emaLanguage');
+                if (savedLang) {
+                    document.getElementById('language-select').value = savedLang;
+                }
+                return;
+            }
+
+            try {
+                const userSettingsRef = window.userRef(userDb, `users/${currentUser.userId}/settings`);
+                const snapshot = await window.userGet(userSettingsRef);
+                if (snapshot.exists()) {
+                    const settings = snapshot.val();
+                    if (settings.language) {
+                        document.getElementById('language-select').value = settings.language;
+                        localStorage.setItem('emaLanguage', settings.language);
+                    }
+                } else {
+                     // Default to English if no settings found
+                     document.getElementById('language-select').value = 'en';
+                     localStorage.setItem('emaLanguage', 'en');
+                }
+            } catch (error) {
+                console.error("Error fetching language:", error);
+                const savedLang = localStorage.getItem('emaLanguage');
+                if (savedLang) {
+                    document.getElementById('language-select').value = savedLang;
+                }
+            }
+        }
+
+        // Populate district dropdowns
+        function populateDistrictDropdowns() {
+            const districtSelects = [document.getElementById('district'), document.getElementById('report-district')];
+            districtSelects.forEach(select => {
+                select.innerHTML = '<option value="">Select District</option>';
+                sriLankanDistricts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    select.appendChild(option);
+                });
+            });
+        }
+
         // Initialize AI Chat with welcome message
         function initAIChat() {
             chatMessages.innerHTML = '';
-             conversationHistory = [
-                 {
+            conversationHistory = [
+                {
                     role: 'system',
                     content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users with questions about the app, elephants, or related topics. If a user asks for their ID, politely tell them to check the user profile card. If they seem lost, guide them to the relevant feature buttons.'
                 }
             ];
-            // Add initial AI message
             addMessageToChat("Hello! I'm the EMA AI Assistant. How can I help you today?", 'ai');
             conversationHistory.push({ role: 'assistant', content: "Hello! I'm the EMA AI Assistant. How can I help you today?" });
         }
 
-
         // Screen navigation
         function showScreen(screenName) {
             Object.values(screens).forEach(screen => screen.classList.remove('active'));
-            screens[screenName].classList.add('active');
+            if (screens[screenName]) {
+                screens[screenName].classList.add('active');
+            }
             window.scrollTo(0, 0);
         }
 
-        // Event listeners
+        // Modal control
+        function openModal(modalName) {
+            if (modals[modalName]) {
+                modals[modalName].classList.add('active');
+            }
+        }
+
+        function closeModal(modalName) {
+            if (modals[modalName]) {
+                modals[modalName].classList.remove('active');
+            }
+        }
+
+        // --- Event Listeners ---
         function setupEventListeners() {
             // --- Login Screen ---
             document.getElementById('access-app-btn').addEventListener('click', handleLogin);
@@ -1068,6 +1336,7 @@
             document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
             document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
             document.getElementById('profile-picture').addEventListener('change', handleProfilePictureSelect);
+            cropBtn.addEventListener('click', performCrop);
 
             // --- ID Display Screen ---
             document.getElementById('download-id-btn').addEventListener('click', downloadIDCard);
@@ -1080,31 +1349,23 @@
             });
 
             // --- Home Screen ---
+            document.getElementById('open-user-btn').addEventListener('click', openUserPopup);
             document.getElementById('user-card').addEventListener('click', openUserPopup);
+            document.getElementById('open-settings-btn').addEventListener('click', () => openModal('settings'));
             document.querySelectorAll('.feature-card').forEach(card => {
                 card.addEventListener('click', function() {
                     const feature = this.getAttribute('data-feature');
                     handleFeatureClick(feature);
                 });
             });
-            document.querySelectorAll('.nav-button').forEach(button => {
-                 button.addEventListener('click', function(e) {
-                     e.preventDefault();
-                     const feature = this.getAttribute('data-feature');
-                     // Update active button
-                     document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
-                     this.classList.add('active');
-                     handleFeatureClick(feature);
-                 });
-            });
 
             // --- User Popup Modal ---
-            document.getElementById('close-user-popup').addEventListener('click', () => userPopupModal.classList.remove('active'));
+            document.getElementById('close-user-popup').addEventListener('click', () => closeModal('userPopup'));
             document.getElementById('sign-out-btn').addEventListener('click', handleLogout);
             document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
 
             // --- AI Assistant Modal ---
-            document.getElementById('close-ai-modal').addEventListener('click', () => modal.classList.remove('active'));
+            document.getElementById('close-ai-modal').addEventListener('click', () => closeModal('ai'));
             document.getElementById('send-message-btn').addEventListener('click', sendUserMessageToAI);
             userMessageInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -1112,26 +1373,58 @@
                 }
             });
 
-            // --- Image Cropping ---
-            cropBtn.addEventListener('click', performCrop);
+            // --- Report Modal ---
+            document.getElementById('close-report-modal').addEventListener('click', () => closeModal('report'));
+            document.getElementById('get-location-btn').addEventListener('click', getLocation);
+            document.getElementById('open-map-btn').addEventListener('click', openMapModal);
+            document.getElementById('increase-elephants').addEventListener('click', () => {
+                const input = document.getElementById('num-elephants');
+                input.value = parseInt(input.value) + 1;
+            });
+            document.getElementById('decrease-elephants').addEventListener('click', () => {
+                const input = document.getElementById('num-elephants');
+                if (parseInt(input.value) > 1) {
+                    input.value = parseInt(input.value) - 1;
+                }
+            });
+            document.getElementById('report-form').addEventListener('submit', submitReport);
+
+            // --- Settings Modal ---
+            document.getElementById('close-settings-modal').addEventListener('click', () => closeModal('settings'));
+            document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
+            document.getElementById('language-select').addEventListener('change', changeLanguage);
+
+            // --- Map Modal ---
+            document.getElementById('close-map-modal').addEventListener('click', () => closeModal('map'));
+            document.getElementById('confirm-location-btn').addEventListener('click', confirmLocation);
         }
 
         // Handle feature button clicks
         function handleFeatureClick(feature) {
             console.log("Feature clicked:", feature);
             if (feature === 'ai') {
-                modal.classList.add('active');
-                 // Scroll chat to bottom
+                openModal('ai');
                 setTimeout(() => {
-                     chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+                    chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
                 }, 100);
+            } else if (feature === 'report') {
+                openModal('report');
+                // Reset form fields
+                document.getElementById('report-form').reset();
+                document.getElementById('location').value = "Click 'Get Location' or 'Pick on Map'";
+                document.getElementById('num-elephants').value = 1;
+                selectedLocation = null;
+                // Repopulate district dropdown in case it was changed elsewhere
+                populateDistrictDropdowns();
             }
-            // Add logic for other features here in the future
+            // Add logic for other features (map, radar) here
         }
+
+        // --- Authentication Logic ---
 
         // Login handler
         async function handleLogin() {
-             if (!db) {
+            if (!userDb) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
                 return;
             }
@@ -1144,16 +1437,15 @@
                 return;
             }
 
-            // Validate EMA ID format
             const idRegex = /^EMA-\d{6}$/;
             if (!idRegex.test(userId)) {
-                 showError(errorElement, 'Please enter a valid EMA ID (e.g., EMA-123456)');
-                 return;
+                showError(errorElement, 'Please enter a valid EMA ID (e.g., EMA-123456)');
+                return;
             }
 
             try {
-                const userRef = window.firebaseRef(db, `users/${userId}`);
-                const snapshot = await window.firebaseGet(userRef);
+                const userRef = window.userRef(userDb, `users/${userId}`);
+                const snapshot = await window.userGet(userRef);
 
                 if (snapshot.exists()) {
                     currentUser = { userId, ...snapshot.val() };
@@ -1183,56 +1475,52 @@
 
         // Handle profile picture selection and preview
         function handleProfilePictureSelect(event) {
-             const file = event.target.files[0];
-             const errorElement = document.getElementById('profile-picture-error');
-             errorElement.classList.add('hidden');
-             errorElement.textContent = '';
+            const file = event.target.files[0];
+            const errorElement = document.getElementById('profile-picture-error');
+            errorElement.classList.add('hidden');
+            errorElement.textContent = '';
 
-             if (file) {
-                  // Basic validation
-                  if (!file.type.startsWith('image/')) {
-                       showError(errorElement, 'Please select a valid image file.');
-                       event.target.value = ''; // Clear the input
-                       previewCanvas.style.display = 'none';
-                       cropBtn.classList.add('hidden');
-                       return;
-                  }
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showError(errorElement, 'Please select a valid image file.');
+                    event.target.value = '';
+                    previewCanvas.style.display = 'none';
+                    cropBtn.classList.add('hidden');
+                    return;
+                }
 
-                  const reader = new FileReader();
-                  reader.onload = (e) => {
-                       const img = new Image();
-                       img.onload = () => {
-                            originalImage = img;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        originalImage = img;
+                        const maxWidth = 200;
+                        const maxHeight = 200;
+                        let { width, height } = calculateAspectRatioFit(img.width, img.height, maxWidth, maxHeight);
 
-                            // Set canvas size to a fixed preview size (e.g., 200x200)
-                            const maxWidth = 200;
-                            const maxHeight = 200;
-                            let { width, height } = calculateAspectRatioFit(img.width, img.height, maxWidth, maxHeight);
+                        previewCanvas.width = width;
+                        previewCanvas.height = height;
+                        const ctx = previewCanvas.getContext('2d');
+                        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                        ctx.drawImage(img, 0, 0, width, height);
 
-                            previewCanvas.width = width;
-                            previewCanvas.height = height;
-                            const ctx = previewCanvas.getContext('2d');
-                            ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                            ctx.drawImage(img, 0, 0, width, height);
-
-                            previewCanvas.style.display = 'block';
-                            cropBtn.classList.remove('hidden');
-                       };
-                       img.src = e.target.result;
-                  };
-                  reader.onerror = () => {
-                       showError(errorElement, 'Error reading the image file.');
-                       previewCanvas.style.display = 'none';
-                       cropBtn.classList.add('hidden');
-                  };
-                  reader.readAsDataURL(file);
-             } else {
-                  previewCanvas.style.display = 'none';
-                  cropBtn.classList.add('hidden');
-             }
+                        previewCanvas.style.display = 'block';
+                        cropBtn.classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => {
+                    showError(errorElement, 'Error reading the image file.');
+                    previewCanvas.style.display = 'none';
+                    cropBtn.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewCanvas.style.display = 'none';
+                cropBtn.classList.add('hidden');
+            }
         }
 
-         // Helper function to maintain aspect ratio
         function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
             const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
             return { width: srcWidth * ratio, height: srcHeight * ratio };
@@ -1240,57 +1528,43 @@
 
         // Perform cropping (simple center crop to square for base64)
         function performCrop() {
-             if (!originalImage) return;
+            if (!originalImage) return;
 
-             const canvas = document.createElement('canvas');
-             const ctx = canvas.getContext('2d');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const cropSize = 100; // Small size for storage
 
-             // Desired cropped image size (small for base64 storage)
-             const cropSize = 100;
+            canvas.width = cropSize;
+            canvas.height = cropSize;
 
-             canvas.width = cropSize;
-             canvas.height = cropSize;
+            const sourceWidth = originalImage.width;
+            const sourceHeight = originalImage.height;
+            let sourceX, sourceY, sourceSize;
 
-             // Calculate source coordinates for center crop
-             const sourceWidth = originalImage.width;
-             const sourceHeight = originalImage.height;
-             let sourceX, sourceY, sourceSize;
+            if (sourceWidth > sourceHeight) {
+                sourceSize = sourceHeight;
+                sourceX = (sourceWidth - sourceHeight) / 2;
+                sourceY = 0;
+            } else {
+                sourceSize = sourceWidth;
+                sourceX = 0;
+                sourceY = (sourceHeight - sourceWidth) / 2;
+            }
 
-             if (sourceWidth > sourceHeight) {
-                  // Landscape: crop from the center width
-                  sourceSize = sourceHeight;
-                  sourceX = (sourceWidth - sourceHeight) / 2;
-                  sourceY = 0;
-             } else {
-                  // Portrait or Square: crop from the center height
-                  sourceSize = sourceWidth;
-                  sourceX = 0;
-                  sourceY = (sourceHeight - sourceWidth) / 2;
-             }
+            ctx.drawImage(
+                originalImage,
+                sourceX, sourceY, sourceSize, sourceSize,
+                0, 0, cropSize, cropSize
+            );
 
-             // Draw the cropped image onto the new canvas
-             ctx.drawImage(
-                  originalImage,
-                  sourceX, sourceY, sourceSize, sourceSize, // Source rectangle
-                  0, 0, cropSize, cropSize // Destination rectangle
-             );
-
-             // Convert to Base64
-             croppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7); // JPEG quality 70%
-
-             // Optional: Show preview of cropped image
-             // const croppedPreview = document.getElementById('cropped-preview');
-             // croppedPreview.src = croppedImageDataUrl;
-             // croppedPreview.style.display = 'block';
-
-             alert("Image cropped successfully!");
-             cropBtn.classList.add('hidden'); // Hide crop button after cropping
+            croppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7); // JPEG quality 70%
+            alert("Image cropped successfully!");
+            cropBtn.classList.add('hidden');
         }
-
 
         // Registration handler
         async function handleRegistration() {
-            if (!db) {
+            if (!userDb) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
                 return;
             }
@@ -1299,8 +1573,7 @@
             const province = document.getElementById('province').value;
             const district = document.getElementById('district').value;
             const mobile = document.getElementById('mobile').value.trim();
-            // Use the cropped image data URL if available, otherwise null
-            const profilePictureBase64 = croppedImageDataUrl;
+            const profilePictureBase64 = croppedImageDataUrl; // Can be null
 
             const nameError = document.getElementById('name-error');
             const provinceError = document.getElementById('province-error');
@@ -1339,18 +1612,12 @@
                 isValid = false;
             }
 
-            // Profile picture is optional for registration now, but if selected, it must be cropped
-            if (document.getElementById('profile-picture').files.length > 0 && !profilePictureBase64) {
-                 showError(profilePictureError, 'Please crop the selected profile picture.');
-                 isValid = false;
-            }
-
             if (!isValid) return;
 
             try {
-                const usersRef = window.firebaseRef(db, 'users');
-                const mobileQuery = window.firebaseQuery(usersRef, window.firebaseOrderByChild('mobile'), window.firebaseEqualTo(mobile));
-                const snapshot = await window.firebaseGet(mobileQuery);
+                const usersRef = window.userRef(userDb, 'users');
+                const mobileQuery = window.userQuery(usersRef, window.userOrderByChild('mobile'), window.userEqualTo(mobile));
+                const snapshot = await window.userGet(mobileQuery);
 
                 if (snapshot.exists()) {
                     showError(mobileError, 'This mobile number is already registered');
@@ -1358,7 +1625,6 @@
                 }
 
                 const userId = `EMA-${Math.floor(100000 + Math.random() * 900000)}`;
-
                 const userData = {
                     userId,
                     fullName,
@@ -1366,10 +1632,10 @@
                     district,
                     mobile,
                     registeredAt: new Date().toISOString(),
-                    profilePicture: profilePictureBase64 // This can be null if no image was selected/cropped
+                    profilePicture: profilePictureBase64
                 };
 
-                await window.firebaseSet(window.firebaseRef(db, `users/${userId}`), userData);
+                await window.userSet(window.userRef(userDb, `users/${userId}`), userData);
 
                 currentUser = userData;
                 showIDScreen(userId);
@@ -1377,14 +1643,11 @@
                 console.error("Registration error:", error);
                 if (error.code === 'PERMISSION_DENIED') {
                     showError(mobileError, 'Registration failed: Database permission denied. Please contact admin.');
-                } else if (error.message && error.message.toLowerCase().includes('network')) {
-                    showError(mobileError, 'Registration failed: Network error. Check connection.');
                 } else {
                     showError(mobileError, 'Registration failed. Try again later.');
                 }
             }
         }
-
 
         // Show ID screen
         function showIDScreen(userId) {
@@ -1409,21 +1672,18 @@
 
             const logo = new Image();
             logo.crossOrigin = "Anonymous";
-            logo.onload = function() {
-                ctx.drawImage(logo, canvas.width/2 - 50, 20, 100, 100);
-
+            logo.onload = function () {
+                ctx.drawImage(logo, canvas.width / 2 - 50, 20, 100, 100);
                 ctx.fillStyle = '#000000';
                 ctx.font = 'bold 24px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('EMA ID Card', canvas.width/2, 150);
-
+                ctx.fillText('EMA ID Card', canvas.width / 2, 150);
                 ctx.font = '18px Arial';
-                ctx.fillText(userId, canvas.width/2, 180);
+                ctx.fillText(userId, canvas.width / 2, 180);
 
                 const qrCode = new Image();
-                qrCode.onload = function() {
-                    ctx.drawImage(qrCode, canvas.width/2 - 50, 200, 100, 100);
-
+                qrCode.onload = function () {
+                    ctx.drawImage(qrCode, canvas.width / 2 - 50, 200, 100, 100);
                     const link = document.createElement('a');
                     link.download = `${userId}_ID_Card.png`;
                     link.href = canvas.toDataURL();
@@ -1439,10 +1699,10 @@
             if (!currentUser) {
                 const storedUser = sessionStorage.getItem('emaUser');
                 if (storedUser) {
-                     currentUser = JSON.parse(storedUser);
+                    currentUser = JSON.parse(storedUser);
                 } else {
-                     showScreen('login');
-                     return;
+                    showScreen('login');
+                    return;
                 }
             }
 
@@ -1450,11 +1710,42 @@
                 // Set user info on home screen
                 document.getElementById('home-user-name').textContent = currentUser.fullName;
                 document.getElementById('home-user-id').textContent = currentUser.userId;
+                document.getElementById('top-user-initials').textContent = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
 
                 const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-                document.getElementById('home-user-avatar').textContent = initials;
+                document.getElementById('home-user-initials').textContent = initials;
+                document.getElementById('top-user-initials').textContent = initials;
+
+                // Handle profile picture display
+                const profileImgElements = [
+                    document.getElementById('home-user-avatar-img'),
+                    document.getElementById('top-user-avatar'),
+                    document.getElementById('popup-user-image')
+                ];
+                const initialsElements = [
+                    document.getElementById('home-user-initials'),
+                    document.getElementById('top-user-initials'),
+                    document.getElementById('popup-user-initials')
+                ];
+
+                if (currentUser.profilePicture) {
+                    profileImgElements.forEach(img => {
+                        img.src = currentUser.profilePicture;
+                        img.style.display = 'block';
+                    });
+                    initialsElements.forEach(span => span.style.display = 'none');
+                } else {
+                    profileImgElements.forEach(img => img.style.display = 'none');
+                    initialsElements.forEach(span => span.style.display = 'block');
+                }
 
                 showScreen('home');
+
+                // Apply theme and language after home screen is shown
+                setTimeout(() => {
+                    applySavedTheme();
+                    applySavedLanguage();
+                }, 100);
             } else {
                 showScreen('login');
             }
@@ -1462,66 +1753,64 @@
 
         // Open User Popup
         function openUserPopup() {
-             if (!currentUser) return;
+            if (!currentUser) return;
 
-             // Set user info in popup
-             document.getElementById('popup-user-fullname').textContent = currentUser.fullName;
-             document.getElementById('popup-user-id').textContent = currentUser.userId;
-             document.getElementById('popup-user-province').textContent = currentUser.province || 'N/A';
-             document.getElementById('popup-user-district').textContent = currentUser.district || 'N/A';
-             document.getElementById('popup-user-mobile').textContent = currentUser.mobile || 'N/A';
+            document.getElementById('popup-user-fullname').textContent = currentUser.fullName;
+            document.getElementById('popup-user-id').textContent = currentUser.userId;
+            document.getElementById('popup-user-province').textContent = currentUser.province || 'N/A';
+            document.getElementById('popup-user-district').textContent = currentUser.district || 'N/A';
+            document.getElementById('popup-user-mobile').textContent = currentUser.mobile || 'N/A';
 
-             const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-             document.getElementById('popup-user-initials').textContent = initials;
+            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('popup-user-initials').textContent = initials;
 
-             const profileImgElement = document.getElementById('popup-user-image');
-             const initialsElement = document.getElementById('popup-user-initials');
-             if (currentUser.profilePicture) {
-                  profileImgElement.src = currentUser.profilePicture;
-                  profileImgElement.style.display = 'block';
-                  initialsElement.style.display = 'none';
-             } else {
-                  profileImgElement.style.display = 'none';
-                  initialsElement.style.display = 'block';
-             }
+            const profileImgElement = document.getElementById('popup-user-image');
+            const initialsElement = document.getElementById('popup-user-initials');
+            if (currentUser.profilePicture) {
+                profileImgElement.src = currentUser.profilePicture;
+                profileImgElement.style.display = 'block';
+                initialsElement.style.display = 'none';
+            } else {
+                profileImgElement.style.display = 'none';
+                initialsElement.style.display = 'block';
+            }
 
-             userPopupModal.classList.add('active');
+            openModal('userPopup');
         }
 
         // Logout handler
         function handleLogout() {
             currentUser = null;
             sessionStorage.removeItem('emaUser');
-            userPopupModal.classList.remove('active');
+            closeModal('userPopup');
             showScreen('login');
         }
 
         // Delete Account handler
         async function handleDeleteAccount() {
-             if (!currentUser || !currentUser.userId || !db) {
-                  alert("Cannot delete account: User not found or database not initialized.");
-                  return;
-             }
+            if (!currentUser || !currentUser.userId || !userDb) {
+                alert("Cannot delete account: User not found or database not initialized.");
+                return;
+            }
 
-             const confirmation = confirm(`Are you sure you want to delete your account (${currentUser.userId})? This action cannot be undone.`);
-             if (!confirmation) return;
+            const confirmation = confirm(`Are you sure you want to delete your account (${currentUser.userId})? This action cannot be undone.`);
+            if (!confirmation) return;
 
-             try {
-                  const userRef = window.firebaseRef(db, `users/${currentUser.userId}`);
-                  await window.firebaseRemove(userRef);
-                  console.log("Account deleted successfully from database.");
-             } catch (error) {
-                  console.error("Error deleting account from database:", error);
-                  alert("Failed to delete account from database. Please try again or contact support.");
-                  return; // Don't proceed if DB delete failed
-             }
+            try {
+                const userRef = window.userRef(userDb, `users/${currentUser.userId}`);
+                await window.userRemove(userRef);
+                console.log("Account deleted successfully from database.");
+            } catch (error) {
+                console.error("Error deleting account from database:", error);
+                alert("Failed to delete account from database. Please try again or contact support.");
+                return;
+            }
 
-             // If DB delete was successful, clear local session and redirect
-             currentUser = null;
-             sessionStorage.removeItem('emaUser');
-             userPopupModal.classList.remove('active');
-             alert("Your account has been deleted.");
-             showScreen('login');
+            currentUser = null;
+            sessionStorage.removeItem('emaUser');
+            closeModal('userPopup');
+            alert("Your account has been deleted.");
+            showScreen('login');
         }
 
         // Show error message
@@ -1595,6 +1884,177 @@
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
         }
         // --- End AI Assistant functions ---
+
+        // --- Report Form Logic ---
+
+        // Get user's current location
+        function getLocation() {
+            const locationInput = document.getElementById('location');
+            locationInput.value = "Getting location...";
+
+            if (!navigator.geolocation) {
+                locationInput.value = "Geolocation is not supported by your browser.";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    selectedLocation = { lat, lng };
+                    // Simple reverse geocode placeholder - in a real app, you'd call an API
+                    locationInput.value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                    locationInput.value = "Unable to retrieve your location. Please try picking on the map.";
+                }
+            );
+        }
+
+        // Open map modal for location picking
+        function openMapModal() {
+            openModal('map');
+            // Initialize map only when modal is opened
+            if (!map) {
+                // Use a default center (e.g., Sri Lanka) and zoom
+                map = L.map('map').setView([7.8731, 80.7718], 7);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                map.on('click', function (e) {
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker(e.latlng).addTo(map);
+                    mapCoordinatesElement.textContent = `Selected: Lat ${e.latlng.lat.toFixed(6)}, Lng ${e.latlng.lng.toFixed(6)}`;
+                });
+            }
+        }
+
+        // Confirm location selected on map
+        function confirmLocation() {
+            if (marker) {
+                const latlng = marker.getLatLng();
+                selectedLocation = { lat: latlng.lat, lng: latlng.lng };
+                document.getElementById('location').value = `Lat: ${latlng.lat.toFixed(6)}, Lng: ${latlng.lng.toFixed(6)}`;
+                closeModal('map');
+            } else {
+                alert("Please click on the map to select a location first.");
+            }
+        }
+
+        // Submit report
+        async function submitReport(event) {
+            event.preventDefault();
+
+            if (!reportDb || !currentUser) {
+                alert("Application not ready or user not logged in. Please try again.");
+                return;
+            }
+
+            const locationInput = document.getElementById('location').value;
+            const numElephants = document.getElementById('num-elephants').value;
+            const elephantNames = document.getElementById('elephant-names').value;
+            const district = document.getElementById('report-district').value;
+            const description = document.getElementById('description').value;
+            const imageFile = document.getElementById('image-upload').files[0];
+
+            if (!selectedLocation) {
+                alert("Please select a location using 'Get Location' or 'Pick on Map'.");
+                return;
+            }
+
+            if (!district) {
+                alert("Please select a district.");
+                return;
+            }
+
+            let imageBase64 = null;
+            if (imageFile) {
+                // Convert image to Base64
+                imageBase64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(imageFile);
+                });
+            }
+
+            const reportData = {
+                userId: currentUser.userId,
+                userName: currentUser.fullName,
+                location: selectedLocation,
+                numElephants: parseInt(numElephants),
+                elephantNames: elephantNames || null,
+                district: district,
+                description: description || null,
+                image: imageBase64, // Will be null if no image
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                // Push report to the separate database
+                await window.reportPush(window.reportRef(reportDb, 'reports'), reportData);
+                alert("Report submitted successfully!");
+                closeModal('report');
+            } catch (error) {
+                console.error("Error submitting report:", error);
+                alert("Failed to submit report. Please try again.");
+            }
+        }
+        // --- End Report Form Logic ---
+
+        // --- Settings Logic ---
+
+        // Toggle theme
+        async function toggleTheme() {
+            const isDarkMode = document.getElementById('theme-toggle').checked;
+            if (isDarkMode) {
+                document.body.classList.add('theme-dark');
+            } else {
+                document.body.classList.remove('theme-dark');
+            }
+
+            // Save preference locally
+            const themeValue = isDarkMode ? 'dark' : 'light';
+            localStorage.setItem('emaTheme', themeValue);
+
+            // Save preference to Firebase if user is logged in
+            if (currentUser && userDb) {
+                try {
+                    const userSettingsRef = window.userRef(userDb, `users/${currentUser.userId}/settings`);
+                    await window.userSet(userSettingsRef, { theme: themeValue });
+                } catch (error) {
+                    console.error("Error saving theme to Firebase:", error);
+                    // It's okay if this fails, localStorage fallback exists
+                }
+            }
+        }
+
+        // Change language
+        async function changeLanguage() {
+            const selectedLanguage = document.getElementById('language-select').value;
+            // Save preference locally
+            localStorage.setItem('emaLanguage', selectedLanguage);
+
+            // Save preference to Firebase if user is logged in
+            if (currentUser && userDb) {
+                try {
+                    const userSettingsRef = window.userRef(userDb, `users/${currentUser.userId}/settings`);
+                    await window.userSet(userSettingsRef, { language: selectedLanguage });
+                } catch (error) {
+                    console.error("Error saving language to Firebase:", error);
+                }
+            }
+
+            // Note: Actual page translation using Google Translate widget
+            // would be implemented here if it were embedded.
+            // This is a placeholder for the persistence logic.
+            alert(`Language preference set to ${selectedLanguage}. (Actual translation requires widget integration)`);
+        }
+        // --- End Settings Logic ---
 
         // Initialize the app when the DOM is fully loaded
         window.addEventListener('DOMContentLoaded', () => {
