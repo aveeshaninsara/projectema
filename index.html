@@ -7,8 +7,6 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ... (All your existing CSS styles remain exactly the same) ... */
-        /* Paste the entire CSS block from the previous response here */
         :root {
             --md-sys-color-primary: #606c38;
             --md-sys-color-on-primary: #ffffff;
@@ -28,8 +26,12 @@
             --md-sys-color-on-surface-variant: #44483d;
             --md-sys-elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
             --md-sys-elevation-2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+            --md-sys-shape-corner-none: 0px;
+            --md-sys-shape-corner-extra-small: 4px;
+            --md-sys-shape-corner-small: 8px;
             --md-sys-shape-corner-medium: 12px;
             --md-sys-shape-corner-large: 16px;
+            --md-sys-shape-corner-extra-large: 28px;
             --md-sys-state-hover-opacity: 0.08;
             --md-sys-state-focus-opacity: 0.12;
             --md-sys-state-pressed-opacity: 0.12;
@@ -49,8 +51,9 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Changed to flex-start */
             padding: 16px;
+            padding-top: 40px; /* Add some top padding */
         }
 
         .screen {
@@ -58,7 +61,7 @@
             max-width: 500px;
             display: none;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px; /* Slightly reduced gap */
         }
 
         .active {
@@ -69,7 +72,7 @@
             background-color: white;
             border-radius: var(--md-sys-shape-corner-large);
             box-shadow: var(--md-sys-elevation-1);
-            padding: 24px;
+            padding: 20px; /* Slightly reduced padding */
             width: 100%;
         }
 
@@ -89,7 +92,7 @@
         }
 
         .logo {
-            width: 150px;
+            width: 120px; /* Slightly smaller logo */
             height: auto;
         }
 
@@ -102,24 +105,33 @@
             margin-bottom: 16px;
         }
 
+        h1 {
+            font-size: 1.8rem; /* Responsive font size */
+        }
+
+        h2 {
+            font-size: 1.4rem; /* Responsive font size */
+        }
+
         .input-group {
             margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* Slightly smaller margin */
             font-weight: 500;
             color: var(--md-sys-color-on-surface-variant);
+            font-size: 0.9rem; /* Smaller label font */
         }
 
         input, select {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px 14px; /* Adjusted padding */
             border: 1px solid var(--md-sys-color-outline);
             border-radius: var(--md-sys-shape-corner-medium);
             background-color: var(--md-sys-color-surface);
-            font-size: 16px;
+            font-size: 16px; /* Keep base size for mobile */
             transition: border-color 0.2s;
         }
 
@@ -133,7 +145,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 12px 24px;
+            padding: 12px 20px; /* Adjusted padding */
             border-radius: var(--md-sys-shape-corner-medium);
             font-weight: 500;
             font-size: 16px;
@@ -142,6 +154,7 @@
             border: none;
             text-decoration: none;
             gap: 8px;
+            min-height: 48px; /* Minimum touch target size */
         }
 
         .btn-primary {
@@ -168,9 +181,10 @@
             background: none;
             border: none;
             color: var(--md-sys-color-primary);
-            padding: 8px;
-            font-size: 14px;
+            padding: 8px 4px; /* Adjusted padding */
+            font-size: 15px; /* Slightly smaller text */
             cursor: pointer;
+            min-height: 40px; /* Minimum touch target size */
         }
 
         .btn-text:hover {
@@ -193,6 +207,10 @@
             margin-bottom: 16px;
         }
 
+        .mt-8 {
+            margin-top: 8px;
+        }
+
         .error {
             color: var(--md-sys-color-error);
             font-size: 14px;
@@ -208,74 +226,76 @@
         .user-header {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 16px 0;
+            gap: 14px; /* Slightly smaller gap */
+            padding: 14px 0; /* Adjusted padding */
         }
 
         .avatar {
-            width: 56px;
-            height: 56px;
+            width: 52px; /* Slightly smaller avatar */
+            height: 52px;
             border-radius: 50%;
             background-color: var(--md-sys-color-primary-container);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px; /* Adjusted font size */
             font-weight: bold;
             color: var(--md-sys-color-on-primary-container);
+            flex-shrink: 0; /* Prevent avatar from shrinking */
         }
 
         .user-info h3 {
             margin: 0;
-            font-size: 18px;
+            font-size: 17px; /* Adjusted font size */
+            word-break: break-word; /* Handle long names */
         }
 
         .user-info p {
-            margin: 4px 0 0;
+            margin: 3px 0 0;
             color: var(--md-sys-color-on-surface-variant);
-            font-size: 14px;
+            font-size: 13px; /* Adjusted font size */
         }
 
         .stats-grid, .features-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        @media (min-width: 600px) {
-            .stats-grid, .features-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+            /* grid-template-columns: repeat(2, 1fr); */ /* Removed fixed columns */
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(0, 1fr); /* Allow columns to shrink */
+            overflow-x: auto; /* Enable horizontal scrolling if needed */
+            gap: 14px; /* Slightly smaller gap */
+            margin-top: 14px;
+            padding-bottom: 8px; /* Add padding for scrollbar */
         }
 
         .stat-card, .feature-card {
             background-color: var(--md-sys-color-surface-variant);
             border-radius: var(--md-sys-shape-corner-medium);
-            padding: 16px;
+            padding: 14px; /* Adjusted padding */
             text-align: center;
             box-shadow: var(--md-sys-elevation-1);
+            min-width: 110px; /* Minimum width for cards */
+            flex-shrink: 0; /* Prevent cards from shrinking too much */
         }
 
         .stat-card i, .feature-card i {
-            font-size: 24px;
+            font-size: 22px; /* Adjusted icon size */
             color: var(--md-sys-color-primary);
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* Slightly smaller margin */
         }
 
         .stat-card .value {
-            font-size: 20px;
+            font-size: 18px; /* Adjusted font size */
             font-weight: bold;
-            margin: 8px 0;
+            margin: 6px 0; /* Adjusted margin */
         }
 
         .stat-card .label, .feature-card .label {
-            font-size: 14px;
+            font-size: 13px; /* Adjusted font size */
             color: var(--md-sys-color-on-surface-variant);
         }
 
         .features-grid {
-            grid-template-columns: repeat(2, 1fr);
+            /* grid-template-columns: repeat(2, 1fr); */ /* Removed fixed columns */
         }
 
         .feature-card {
@@ -283,7 +303,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px 16px;
+            padding: 20px 14px; /* Adjusted padding */
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
         }
@@ -295,25 +315,27 @@
 
         .id-display {
             text-align: center;
-            padding: 24px;
+            padding: 20px; /* Adjusted padding */
         }
 
         .user-id {
-            font-size: 24px;
+            font-size: 22px; /* Adjusted font size */
             font-weight: bold;
             color: var(--md-sys-color-primary);
             word-break: break-all;
             background-color: var(--md-sys-color-primary-container);
-            padding: 16px;
+            padding: 14px; /* Adjusted padding */
             border-radius: var(--md-sys-shape-corner-medium);
-            margin: 16px 0;
+            margin: 14px 0; /* Adjusted margin */
         }
 
         .qr-code {
-            margin: 24px auto;
+            margin: 20px auto; /* Adjusted margin */
             display: block;
             max-width: 100%;
             height: auto;
+            width: 180px; /* Set a fixed width for QR */
+            height: 180px; /* Set a fixed height for QR */
         }
 
         .modal {
@@ -327,6 +349,7 @@
             z-index: 1001;
             justify-content: center;
             align-items: center;
+            padding: 16px; /* Add padding for small screens */
         }
 
         .modal.active {
@@ -336,16 +359,16 @@
         .modal-content {
             background-color: white;
             border-radius: var(--md-sys-shape-corner-large);
-            width: 95%;
+            width: 100%;
             max-width: 500px;
-            max-height: 80vh;
+            max-height: 90vh; /* Limit max height */
             display: flex;
             flex-direction: column;
             box-shadow: var(--md-sys-elevation-2);
         }
 
         .modal-header {
-            padding: 16px 24px;
+            padding: 14px 20px; /* Adjusted padding */
             border-bottom: 1px solid var(--md-sys-color-outline);
             display: flex;
             justify-content: space-between;
@@ -354,10 +377,11 @@
 
         .modal-header h2 {
             margin: 0;
+            font-size: 1.3rem; /* Responsive font size */
         }
 
         .modal-body {
-            padding: 16px 24px;
+            padding: 14px 20px; /* Adjusted padding */
             overflow-y: auto;
             flex-grow: 1;
         }
@@ -365,15 +389,16 @@
         .chat-messages {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px; /* Slightly smaller gap */
         }
 
         .message {
-            max-width: 80%;
-            padding: 12px 16px;
+            max-width: 85%; /* Slightly wider messages */
+            padding: 12px 14px; /* Adjusted padding */
             border-radius: var(--md-sys-shape-corner-medium);
             position: relative;
             animation: fadeIn 0.3s ease;
+            line-height: 1.4; /* Improve readability */
         }
 
         @keyframes fadeIn {
@@ -399,7 +424,7 @@
             display: none;
             align-self: flex-start;
             background-color: var(--md-sys-color-surface-variant);
-            padding: 12px 16px;
+            padding: 12px 14px; /* Adjusted padding */
             border-radius: var(--md-sys-shape-corner-medium);
             border-bottom-left-radius: 4px;
         }
@@ -428,7 +453,7 @@
         }
 
         .modal-footer {
-            padding: 16px 24px;
+            padding: 14px 20px; /* Adjusted padding */
             border-top: 1px solid var(--md-sys-color-outline);
             display: flex;
             gap: 8px;
@@ -436,10 +461,37 @@
 
         .modal-footer input {
             flex-grow: 1;
+            min-height: 44px; /* Minimum touch target size */
+        }
+
+        .modal-footer .btn {
+            min-width: 44px; /* Minimum touch target size */
+            min-height: 44px; /* Minimum touch target size */
         }
 
         .hidden {
             display: none !important;
+        }
+
+        /* Specific adjustments for very small screens */
+        @media (max-width: 360px) {
+            body {
+                padding: 12px;
+                padding-top: 30px;
+            }
+            .card {
+                padding: 16px;
+            }
+            .btn {
+                padding: 10px 16px;
+            }
+            .stat-card, .feature-card {
+                min-width: 100px;
+                padding: 12px;
+            }
+            .modal-content {
+                max-height: 95vh;
+            }
         }
     </style>
 </head>
@@ -614,16 +666,14 @@
     <div id="ai-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>AI Assistant</h2>
+                <h2>EMA ID Recovery</h2>
                 <button id="close-modal-btn" class="btn btn-text">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="chat-messages" id="chat-messages">
-                    <div class="message ai-message">
-                        Hello! I'm here to help you recover your ID. Please provide your registered mobile number.
-                    </div>
+                    <!-- Messages will be added here dynamically -->
                 </div>
                 <div class="typing-indicator" id="typing-indicator">
                     <span></span>
@@ -685,12 +735,15 @@
 
         // Session data
         let currentUser = null;
-        let conversationHistory = [
-            {
-                role: 'system',
-                content: 'You are an AI assistant for the Elephant Monitoring App (EMA). Your primary function is to help users recover their EMA ID or reset their password. If a user asks about anything else, politely redirect them to ID recovery. When a user provides a Sri Lankan mobile number (format: 0XXXXXXXXX), you should inform them that you will check the database for their account.'
-            }
-        ];
+        let conversationHistory = [];
+        
+        // AI Security State
+        let aiState = {
+            awaitingMobile: true,
+            awaitingConfirmation: false,
+            foundUser: null,
+            confirmationType: null // 'name' or 'province'
+        };
 
         // Firebase references (will be initialized after SDK loads)
         let db;
@@ -747,6 +800,9 @@
                     }
                 });
 
+                // Initialize AI chat
+                initAIChat();
+
             } catch (error) {
                 console.error("Failed to load Firebase SDK:", error);
                 alert("Failed to initialize the application. Please check your internet connection and try again.");
@@ -754,13 +810,38 @@
                 screens.startup.style.display = 'none';
                 showScreen('login');
                 setupEventListeners(); // Setup listeners for non-Firebase features
+                initAIChat(); // Initialize AI chat even without Firebase
             }
+        }
+
+        // Initialize AI Chat with welcome message
+        function initAIChat() {
+            // Clear chat and reset state
+            chatMessages.innerHTML = '';
+            aiState = {
+                awaitingMobile: true,
+                awaitingConfirmation: false,
+                foundUser: null,
+                confirmationType: null
+            };
+            conversationHistory = [
+                {
+                    role: 'system',
+                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your job is to help users recover their EMA ID securely. Here is the process: 1. Ask the user for their registered mobile number (format: 0XXXXXXXXX). 2. When they provide it, you will check the database. 3. If found, you will ask them to confirm either the first letter of their full name OR the first three letters of their province for security. 4. Only after they provide the correct confirmation detail should you reveal their EMA ID. Always be polite and encouraging. If they seem frustrated, offer reassurance.'
+                }
+            ];
+            
+            // Add initial AI message
+            addMessageToChat("Hello! I'm the EMA ID Recovery Assistant. I can help you find your ID securely. Please tell me your registered mobile number (e.g., 0771234567).", 'ai');
         }
 
         // Screen navigation
         function showScreen(screenName) {
             Object.values(screens).forEach(screen => screen.classList.remove('active'));
             screens[screenName].classList.add('active');
+            
+            // Scroll to top when changing screens
+            window.scrollTo(0, 0);
         }
 
         // Event listeners
@@ -771,8 +852,11 @@
             document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
             document.getElementById('forgot-id-btn').addEventListener('click', () => {
                 modal.classList.add('active');
+                initAIChat(); // Reset chat when opening
                 // Scroll to bottom of chat
-                chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+                setTimeout(() => {
+                    chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+                }, 100);
             });
 
             // Registration screen
@@ -1036,7 +1120,8 @@
 
             // Add user message to chat and history
             addMessageToChat(message, 'user');
-            conversationHistory.push({ role: 'user', content: message });
+            // Note: We don't add user messages to conversationHistory for OpenRouter in this secure version
+            // The AI logic is handled locally based on aiState
             userMessageInput.value = '';
 
             // Show typing indicator
@@ -1044,52 +1129,84 @@
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
 
             try {
-                // Check for mobile number in message
-                const mobileRegex = /0[0-9]{9}/g;
-                const matches = message.match(mobileRegex);
+                // Handle secure ID recovery flow
+                if (aiState.awaitingMobile) {
+                    // Check for mobile number in message
+                    const mobileRegex = /0[0-9]{9}/g;
+                    const matches = message.match(mobileRegex);
 
-                if (matches && matches.length > 0) {
-                    const mobileNumber = matches[0];
-                    const userId = await lookupUserByMobile(mobileNumber);
+                    if (matches && matches.length > 0) {
+                        const mobileNumber = matches[0];
+                        const user = await lookupUserByMobile(mobileNumber);
 
-                    if (userId) {
-                        // Add AI response with found ID
-                        const responseText = `I found your account! Your ID is: ${userId}`;
+                        if (user) {
+                            aiState.foundUser = user;
+                            aiState.awaitingMobile = false;
+                            
+                            // Decide confirmation type (name or province)
+                            aiState.confirmationType = Math.random() > 0.5 ? 'name' : 'province';
+                            
+                            let confirmationPrompt = "";
+                            if (aiState.confirmationType === 'name') {
+                                confirmationPrompt = `Great! I found an account. For security, please confirm the first letter of your full name is '${user.fullName.charAt(0).toUpperCase()}'.`;
+                            } else {
+                                confirmationPrompt = `Great! I found an account. For security, please confirm the first three letters of your province are '${user.province.substring(0, 3).toUpperCase()}'.`;
+                            }
+                            
+                            typingIndicator.style.display = 'none';
+                            addMessageToChat(confirmationPrompt, 'ai');
+                            aiState.awaitingConfirmation = true;
+                        } else {
+                            typingIndicator.style.display = 'none';
+                            addMessageToChat("I couldn't find an account with that mobile number. Please double-check the number or let me know if you'd like to register.", 'ai');
+                        }
+                    } else {
+                        // Not a mobile number, let the AI respond naturally
                         typingIndicator.style.display = 'none';
-                        addMessageToChat(responseText, 'ai');
-                        conversationHistory.push({ role: 'assistant', content: responseText });
-                        return;
+                        addMessageToChat("Please provide your registered mobile number (e.g., 0771234567) so I can help you find your ID.", 'ai');
+                    }
+                } else if (aiState.awaitingConfirmation) {
+                    const user = aiState.foundUser;
+                    let isConfirmed = false;
+
+                    if (aiState.confirmationType === 'name') {
+                        const firstLetter = user.fullName.charAt(0).toUpperCase();
+                        // Check if message contains the first letter (case insensitive)
+                        isConfirmed = message.toLowerCase().includes(firstLetter.toLowerCase());
+                    } else { // province
+                        const firstThreeLetters = user.province.substring(0, 3).toUpperCase();
+                        // Check if message contains the first three letters (case insensitive)
+                        isConfirmed = message.toLowerCase().includes(firstThreeLetters.toLowerCase());
+                    }
+
+                    if (isConfirmed) {
+                        typingIndicator.style.display = 'none';
+                        addMessageToChat(`Thank you for confirming! Your EMA ID is: ${user.userId}`, 'ai');
+                        // Reset state for potential new requests
+                        aiState = {
+                            awaitingMobile: true,
+                            awaitingConfirmation: false,
+                            foundUser: null,
+                            confirmationType: null
+                        };
+                    } else {
+                        typingIndicator.style.display = 'none';
+                        addMessageToChat("Sorry, that confirmation didn't match. Please try again or let me know if you need help with something else.", 'ai');
                     }
                 }
 
-                // Call OpenRouter API
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'google/gemma-7b-it:free',
-                        messages: conversationHistory,
-                        temperature: 0.7,
-                        max_tokens: 500
-                    })
-                });
-
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
-
-                // Hide typing indicator and show AI response
-                typingIndicator.style.display = 'none';
-                addMessageToChat(aiResponse, 'ai');
-                conversationHistory.push({ role: 'assistant', content: aiResponse });
             } catch (error) {
                 console.error('AI Assistant error:', error);
                 typingIndicator.style.display = 'none';
                 const errorMsg = 'Sorry, I encountered an error. Please try again.';
                 addMessageToChat(errorMsg, 'ai');
-                conversationHistory.push({ role: 'assistant', content: errorMsg });
+                // Reset state on error
+                aiState = {
+                    awaitingMobile: true,
+                    awaitingConfirmation: false,
+                    foundUser: null,
+                    confirmationType: null
+                };
             }
         }
 
@@ -1116,9 +1233,9 @@
 
                 if (snapshot.exists()) {
                     const users = snapshot.val();
-                    // Get the first matching user ID (there should ideally be only one)
+                    // Get the first matching user data
                     const userId = Object.keys(users)[0];
-                    return userId;
+                    return { userId, ...users[userId] };
                 }
             } catch (error) {
                 console.error('Database lookup error:', error);
