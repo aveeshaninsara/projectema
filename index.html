@@ -51,10 +51,8 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            /* align-items: flex-start;  Center vertically too, but allow scrolling */
-            align-items: center;
+            align-items: center; /* Center vertically */
             padding: 16px;
-            /* padding-top: 40px; Removed top padding */
         }
 
         .screen {
@@ -75,7 +73,6 @@
             box-shadow: var(--md-sys-elevation-1);
             padding: 20px;
             width: 100%;
-            /* Added to prevent card from shrinking too much on short screens */
             flex-shrink: 0;
         }
 
@@ -110,7 +107,7 @@
 
         h1 {
             font-size: 1.8rem;
-            text-align: center; /* Center title */
+            text-align: center;
         }
 
         h2 {
@@ -135,7 +132,7 @@
             border: 1px solid var(--md-sys-color-outline);
             border-radius: var(--md-sys-shape-corner-medium);
             background-color: var(--md-sys-color-surface);
-            font-size: 16px; /* Keep base size for mobile */
+            font-size: 16px;
             transition: border-color 0.2s;
         }
 
@@ -158,7 +155,7 @@
             border: none;
             text-decoration: none;
             gap: 8px;
-            min-height: 48px; /* Minimum touch target size */
+            min-height: 48px;
         }
 
         .btn-primary {
@@ -189,15 +186,15 @@
             font-size: 15px;
             cursor: pointer;
             min-height: 40px;
-            width: 100%; /* Make text buttons full width on their line */
-            text-align: center; /* Center text */
+            width: 100%;
+            text-align: center;
         }
 
         .btn-text:hover {
             text-decoration: underline;
         }
 
-         .btn-full {
+        .btn-full {
             width: 100%;
         }
 
@@ -262,10 +259,9 @@
             font-size: 13px;
         }
 
-        /* Stats and Features Grid */
         .stats-grid, .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Responsive grid */
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
             gap: 14px;
             margin-top: 14px;
         }
@@ -296,7 +292,7 @@
         }
 
         .features-grid {
-             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Responsive grid for features */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         }
 
         .feature-card {
@@ -477,7 +473,6 @@
         @media (max-width: 360px) {
             body {
                 padding: 12px;
-                /* padding-top: 30px; */
             }
             .card {
                 padding: 16px;
@@ -486,7 +481,6 @@
                 padding: 10px 16px;
             }
             .stat-card, .feature-card {
-                /* min-width: 100px; */
                 padding: 12px;
             }
             .modal-content {
@@ -691,11 +685,11 @@
     </div>
 
     <script type="module">
-        // Firebase configuration - CHECK THIS CAREFULLY
+        // Firebase configuration - CORRECTED URL
         const firebaseConfig = {
             apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
             authDomain: "users-ema.firebaseapp.com",
-            databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app", // Ensure NO trailing space
+            databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app", // No trailing space
             projectId: "users-ema",
             storageBucket: "users-ema.firebasestorage.app",
             messagingSenderId: "165334149820",
@@ -735,15 +729,13 @@
 
         // Session data
         let currentUser = null;
-        let conversationHistory = [];
+        let conversationHistory = [
+             {
+                role: 'system',
+                content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users recover their EMA ID if they forget it. Here is the secure process: 1. Ask the user for their registered mobile number (format: 0XXXXXXXXX). 2. When they provide it, you MUST use the internal database lookup tool. 3. If the database tool finds a user, it will respond with "DB_LOOKUP_RESULT: FOUND: EMA-XXXXXX: Full Name: XXX XXX, Province: XXX". You must then ask the user to confirm a detail from this information (e.g., the first letter of their first name or the first three letters of their province) for security. 4. Only after they provide the correct confirmation detail should you tell them their full EMA ID. 5. If the database tool responds with "DB_LOOKUP_RESULT: NOT_FOUND", tell the user you could not find an account and suggest they check the number or register. 6. If the user asks about anything else, politely remind them you are here to help recover their ID and ask for their mobile number. Never reveal an ID without confirmation. Never make up an ID.'
+            }
+        ];
 
-        // AI Security State
-        let aiState = {
-            awaitingMobile: true,
-            awaitingConfirmation: false,
-            foundUser: null,
-            confirmationType: null // 'name' or 'province'
-        };
 
         // Firebase references (will be initialized after SDK loads)
         let db;
@@ -805,7 +797,7 @@
 
             } catch (error) {
                 console.error("Failed to load Firebase SDK:", error);
-                alert("Failed to initialize the application. Please check your internet connection and try again.");
+                alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
                 screens.startup.style.display = 'none';
                 showScreen('login');
                 setupEventListeners();
@@ -816,25 +808,17 @@
         // Initialize AI Chat with welcome message
         function initAIChat() {
             chatMessages.innerHTML = '';
-            resetAIState();
-            // Add initial AI message
-            addMessageToChat("Hello! I'm the EMA ID Recovery Assistant. Please tell me your registered mobile number (e.g., 0771234567).", 'ai');
-        }
-
-        function resetAIState() {
-            aiState = {
-                awaitingMobile: true,
-                awaitingConfirmation: false,
-                foundUser: null,
-                confirmationType: null
-            };
              conversationHistory = [
-                {
+                 {
                     role: 'system',
-                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your job is to help users recover their EMA ID securely. Strictly follow this process: 1. Ask the user for their registered mobile number (format: 0XXXXXXXXX). 2. When they provide it, you will check the database. 3. If found, you will ask them to confirm either the first letter of their full name OR the first three letters of their province for security. 4. Only after they provide the correct confirmation detail should you reveal their EMA ID. Always be polite and encouraging. If they seem frustrated, offer reassurance. If they ask about anything else, gently remind them you are here to help recover their ID and ask for their mobile number.'
+                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your primary role is to help users recover their EMA ID if they forget it. Here is the secure process: 1. Ask the user for their registered mobile number (format: 0XXXXXXXXX). 2. When they provide it, you MUST use the internal database lookup tool. 3. If the database tool finds a user, it will respond with "DB_LOOKUP_RESULT: FOUND: EMA-XXXXXX: Full Name: XXX XXX, Province: XXX". You must then ask the user to confirm a detail from this information (e.g., the first letter of their first name or the first three letters of their province) for security. 4. Only after they provide the correct confirmation detail should you tell them their full EMA ID. 5. If the database tool responds with "DB_LOOKUP_RESULT: NOT_FOUND", tell the user you could not find an account and suggest they check the number or register. 6. If the user asks about anything else, politely remind them you are here to help recover their ID and ask for their mobile number. Never reveal an ID without confirmation. Never make up an ID.'
                 }
             ];
+            // Add initial AI message
+            addMessageToChat("Hello! I'm the EMA ID Recovery Assistant. Please tell me your registered mobile number (e.g., 0771234567).", 'ai');
+            conversationHistory.push({ role: 'assistant', content: "Hello! I'm the EMA ID Recovery Assistant. Please tell me your registered mobile number (e.g., 0771234567)." });
         }
+
 
         // Screen navigation
         function showScreen(screenName) {
@@ -873,10 +857,10 @@
             document.getElementById('close-modal-btn').addEventListener('click', () => {
                 modal.classList.remove('active');
             });
-            document.getElementById('send-message-btn').addEventListener('click', sendUserMessage);
+            document.getElementById('send-message-btn').addEventListener('click', sendUserMessageToAI);
             userMessageInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    sendUserMessage();
+                    sendUserMessageToAI();
                 }
             });
         }
@@ -928,7 +912,7 @@
 
         // Registration handler - IMPROVED ERROR HANDLING
         async function handleRegistration() {
-             if (!db) {
+            if (!db) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
                 return;
             }
@@ -1006,13 +990,12 @@
                 console.error("Registration error:", error);
                 // Provide more specific error messages
                 if (error.code === 'PERMISSION_DENIED') {
-                     alert('Registration failed: Permission denied. Please contact the administrator.'); // More specific message
-                } else if (error.message && error.message.includes('network')) {
-                     alert('Registration failed: Network error. Please check your connection.'); // Network issue
+                    showError(mobileError, 'Registration failed: Database permission denied. Please contact admin.'); // More specific message
+                } else if (error.message && error.message.toLowerCase().includes('network')) {
+                    showError(mobileError, 'Registration failed: Network error. Check connection.'); // Network issue
                 } else {
-                     alert('Registration failed. Please try again later.'); // Generic message
+                    showError(mobileError, 'Registration failed. Try again later.'); // Generic message
                 }
-                 // alert('Registration failed. Please try again.'); // Original generic message
             }
         }
 
@@ -1095,86 +1078,75 @@
             element.classList.remove('hidden');
         }
 
-        // AI Assistant functions - IMPROVED FLOW
-        async function sendUserMessage() {
+       // AI Assistant functions - Simplified to use OpenRouter primarily
+        async function sendUserMessageToAI() {
             const message = userMessageInput.value.trim();
             if (!message) return;
 
+            // Add user message to chat and history
             addMessageToChat(message, 'user');
+            conversationHistory.push({ role: 'user', content: message });
             userMessageInput.value = '';
 
+            // Show typing indicator
             typingIndicator.style.display = 'flex';
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
 
             try {
-                if (aiState.awaitingMobile) {
-                    const mobileRegex = /0[0-9]{9}/g;
-                    const matches = message.match(mobileRegex);
+                 // Check for mobile number in the latest user message for database lookup
+                const mobileRegex = /0[0-9]{9}/;
+                const mobileMatch = message.match(mobileRegex);
 
-                    if (matches && matches.length > 0) {
-                        const mobileNumber = matches[0];
-                        const user = await lookupUserByMobile(mobileNumber);
+                let fullResponse = "";
 
-                        if (user) {
-                            aiState.foundUser = user;
-                            aiState.awaitingMobile = false;
+                if (mobileMatch) {
+                    const mobileNumber = mobileMatch[0];
+                    console.log("Attempting DB lookup for:", mobileNumber);
+                    const dbResult = await lookupUserByMobileForAI(mobileNumber);
+                    console.log("DB Lookup Result:", dbResult);
 
-                            aiState.confirmationType = Math.random() > 0.5 ? 'name' : 'province';
-
-                            let confirmationPrompt = "";
-                            if (aiState.confirmationType === 'name') {
-                                confirmationPrompt = `Found your account! For security, please confirm the first letter of your name is '${user.fullName.charAt(0).toUpperCase()}'.`;
-                            } else {
-                                confirmationPrompt = `Found your account! For security, please confirm the first three letters of your province are '${user.province.substring(0, 3).toUpperCase()}'.`;
-                            }
-
-                            typingIndicator.style.display = 'none';
-                            addMessageToChat(confirmationPrompt, 'ai');
-                            aiState.awaitingConfirmation = true;
-                        } else {
-                            typingIndicator.style.display = 'none';
-                            addMessageToChat("I couldn't find an account with that number. Please check or register.", 'ai');
-                        }
-                    } else {
-                        // If not a mobile number, guide back to asking for it
-                         typingIndicator.style.display = 'none';
-                         addMessageToChat("To help you, I need your registered mobile number (e.g., 0771234567).", 'ai');
-                    }
-                } else if (aiState.awaitingConfirmation) {
-                    const user = aiState.foundUser;
-                    let isConfirmed = false;
-
-                    if (aiState.confirmationType === 'name') {
-                        const firstLetter = user.fullName.charAt(0).toUpperCase();
-                        isConfirmed = message.toLowerCase().includes(firstLetter.toLowerCase());
-                    } else {
-                        const firstThreeLetters = user.province.substring(0, 3).toUpperCase();
-                        isConfirmed = message.toLowerCase().includes(firstThreeLetters.toLowerCase());
-                    }
-
-                    if (isConfirmed) {
-                        typingIndicator.style.display = 'none';
-                        addMessageToChat(`Thank you! Your EMA ID is: ${user.userId}`, 'ai');
-                        resetAIState(); // Reset for potential new requests in same session
-                    } else {
-                        typingIndicator.style.display = 'none';
-                         addMessageToChat("That didn't match. Please try again or say 'reset' to start over.", 'ai');
-                         // Optional: Add a 'reset' command
-                         if (message.toLowerCase().includes('reset')) {
-                             resetAIState();
-                             addMessageToChat("Okay, let's start over. Please tell me your mobile number.", 'ai');
-                         }
-                    }
+                    // Inject database result into conversation history for AI to process
+                    const dbMessage = { role: 'system', content: `DB_LOOKUP_RESULT: ${dbResult}` };
+                    conversationHistory.push(dbMessage);
+                    fullResponse = `DB_LOOKUP_RESULT: ${dbResult}`; // For immediate processing
                 }
+
+
+                // Call OpenRouter API with updated history
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'google/gemma-7b-it:free', // Or another suitable free model
+                        messages: conversationHistory,
+                        temperature: 0.7,
+                        max_tokens: 500
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                // Hide typing indicator and show AI response
+                typingIndicator.style.display = 'none';
+                addMessageToChat(aiResponse, 'ai');
+                conversationHistory.push({ role: 'assistant', content: aiResponse });
 
             } catch (error) {
                 console.error('AI Assistant error:', error);
                 typingIndicator.style.display = 'none';
-                addMessageToChat('Sorry, I encountered an error. Please try again.', 'ai');
-                resetAIState();
+                const errorMsg = 'Sorry, I encountered an error. Please try again.';
+                addMessageToChat(errorMsg, 'ai');
+                conversationHistory.push({ role: 'assistant', content: errorMsg });
             }
         }
-
 
         // Add message to chat
         function addMessageToChat(content, sender) {
@@ -1186,9 +1158,11 @@
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
         }
 
-        // Lookup user by mobile number
-        async function lookupUserByMobile(mobileNumber) {
-             if (!db) return null;
+        // Lookup user by mobile number FOR AI ASSISTANT (returns formatted string)
+        async function lookupUserByMobileForAI(mobileNumber) {
+            if (!db) {
+                 return "ERROR: Database not initialized.";
+            }
 
             try {
                 const usersRef = window.firebaseRef(db, 'users');
@@ -1198,17 +1172,21 @@
                 if (snapshot.exists()) {
                     const users = snapshot.val();
                     const userId = Object.keys(users)[0];
-                    return { userId, ...users[userId] };
+                    const userData = users[userId];
+                    // Return a specific format the AI can recognize and parse
+                    return `FOUND: ${userData.userId}: Full Name: ${userData.fullName}, Province: ${userData.province}`;
+                } else {
+                     return "NOT_FOUND";
                 }
             } catch (error) {
-                console.error('Database lookup error:', error);
-                 // It's okay to not find a user, but log other errors
-                 if (error.code !== 'PERMISSION_DENIED') { // Example of checking specific error
-                      console.warn("Lookup issue (might be 'not found'):", error.message);
-                 }
+                console.error('Database lookup error for AI:', error);
+                if (error.code === 'PERMISSION_DENIED') {
+                     return "ERROR: Permission denied for database lookup.";
+                }
+                return `ERROR: ${error.message}`;
             }
-            return null;
         }
+
 
         // Check for existing session and initialize app
         window.addEventListener('DOMContentLoaded', () => {
