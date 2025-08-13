@@ -7,6 +7,8 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        /* ... (All your existing CSS styles remain exactly the same) ... */
+        /* Paste the entire CSS block from the previous response here */
         :root {
             --md-sys-color-primary: #606c38;
             --md-sys-color-on-primary: #ffffff;
@@ -638,11 +640,7 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-    <script>
+    <script type="module">
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
@@ -654,10 +652,6 @@
             appId: "1:165334149820:web:e2f3408f2e21808d46beb9",
             measurementId: "G-ZZ04XCWXVQ"
         };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
 
         // DOM Elements
         const screens = {
@@ -698,40 +692,69 @@
             }
         ];
 
-        // Initialize app
-        function initApp() {
-            // Show startup screen
-            setTimeout(() => {
-                screens.startup.classList.add('fade-out');
+        // Firebase references (will be initialized after SDK loads)
+        let db;
+
+        // Initialize app after Firebase SDK loads
+        async function initApp() {
+             try {
+                // Dynamically import Firebase SDKs
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+                const { getDatabase, ref, get, set, query, orderByChild, equalTo } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                db = getDatabase(app);
+
+                // Make Firebase functions globally available for use in handlers
+                window.firebaseRef = ref;
+                window.firebaseGet = get;
+                window.firebaseSet = set;
+                window.firebaseQuery = query;
+                window.firebaseOrderByChild = orderByChild;
+                window.firebaseEqualTo = equalTo;
+
+                // Show startup screen
                 setTimeout(() => {
-                    screens.startup.style.display = 'none';
-                    showScreen('login');
-                }, 1000);
-            }, 2000);
+                    screens.startup.classList.add('fade-out');
+                    setTimeout(() => {
+                        screens.startup.style.display = 'none';
+                        showScreen('login');
+                    }, 1000);
+                }, 2000);
 
-            // Set up event listeners
-            setupEventListeners();
+                // Set up event listeners
+                setupEventListeners();
 
-            // Populate districts
-            const provinceSelect = document.getElementById('province');
-            const districtSelect = document.getElementById('district');
+                // Populate districts
+                const provinceSelect = document.getElementById('province');
+                const districtSelect = document.getElementById('district');
 
-            provinceSelect.addEventListener('change', function() {
-                const selectedProvince = this.value;
-                districtSelect.innerHTML = '<option value="">Select District</option>';
+                provinceSelect.addEventListener('change', function() {
+                    const selectedProvince = this.value;
+                    districtSelect.innerHTML = '<option value="">Select District</option>';
 
-                if (selectedProvince && districts[selectedProvince]) {
-                    districts[selectedProvince].forEach(district => {
-                        const option = document.createElement('option');
-                        option.value = district;
-                        option.textContent = district;
-                        districtSelect.appendChild(option);
-                    });
-                    districtSelect.disabled = false;
-                } else {
-                    districtSelect.disabled = true;
-                }
-            });
+                    if (selectedProvince && districts[selectedProvince]) {
+                        districts[selectedProvince].forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district;
+                            option.textContent = district;
+                            districtSelect.appendChild(option);
+                        });
+                        districtSelect.disabled = false;
+                    } else {
+                        districtSelect.disabled = true;
+                    }
+                });
+
+            } catch (error) {
+                console.error("Failed to load Firebase SDK:", error);
+                alert("Failed to initialize the application. Please check your internet connection and try again.");
+                // Even if Firebase fails, we can still show the UI
+                screens.startup.style.display = 'none';
+                showScreen('login');
+                setupEventListeners(); // Setup listeners for non-Firebase features
+            }
         }
 
         // Screen navigation
@@ -783,6 +806,11 @@
 
         // Login handler
         async function handleLogin() {
+             if (!db) {
+                alert("Application is not fully loaded. Please wait or refresh the page.");
+                return;
+            }
+
             const userId = document.getElementById('login-id').value.trim();
             const errorElement = document.getElementById('login-error');
 
@@ -792,8 +820,8 @@
             }
 
             try {
-                const userRef = db.ref(`users/${userId}`);
-                const snapshot = await userRef.once('value');
+                const userRef = window.firebaseRef(db, `users/${userId}`);
+                const snapshot = await window.firebaseGet(userRef);
 
                 if (snapshot.exists()) {
                     currentUser = { userId, ...snapshot.val() };
@@ -823,6 +851,11 @@
 
         // Registration handler
         async function handleRegistration() {
+             if (!db) {
+                alert("Application is not fully loaded. Please wait or refresh the page.");
+                return;
+            }
+
             // Get form values
             const fullName = document.getElementById('full-name').value.trim();
             const province = document.getElementById('province').value;
@@ -872,8 +905,9 @@
 
             try {
                 // Check if mobile number already exists
-                const mobileQuery = db.ref('users').orderByChild('mobile').equalTo(mobile);
-                const snapshot = await mobileQuery.once('value');
+                const usersRef = window.firebaseRef(db, 'users');
+                const mobileQuery = window.firebaseQuery(usersRef, window.firebaseOrderByChild('mobile'), window.firebaseEqualTo(mobile));
+                const snapshot = await window.firebaseGet(mobileQuery);
 
                 if (snapshot.exists()) {
                     showError(mobileError, 'This mobile number is already registered');
@@ -893,7 +927,7 @@
                     registeredAt: new Date().toISOString()
                 };
 
-                await db.ref(`users/${userId}`).set(userData);
+                await window.firebaseSet(window.firebaseRef(db, `users/${userId}`), userData);
 
                 // Show ID display screen
                 currentUser = userData;
@@ -1071,11 +1105,14 @@
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
         }
 
-        // Lookup user by mobile number
+        // Lookup user by mobile number (using global Firebase functions)
         async function lookupUserByMobile(mobileNumber) {
+             if (!db) return null;
+
             try {
-                const mobileQuery = db.ref('users').orderByChild('mobile').equalTo(mobileNumber);
-                const snapshot = await mobileQuery.once('value');
+                const usersRef = window.firebaseRef(db, 'users');
+                const mobileQuery = window.firebaseQuery(usersRef, window.firebaseOrderByChild('mobile'), window.firebaseEqualTo(mobileNumber));
+                const snapshot = await window.firebaseGet(mobileQuery);
 
                 if (snapshot.exists()) {
                     const users = snapshot.val();
@@ -1089,12 +1126,16 @@
             return null;
         }
 
-        // Check for existing session
+        // Check for existing session and initialize app
         window.addEventListener('DOMContentLoaded', () => {
             const storedUser = sessionStorage.getItem('emaUser');
             if (storedUser) {
                 currentUser = JSON.parse(storedUser);
-                showHomeScreen();
+                // Initialize app, then show home
+                initApp().then(() => {
+                     // Delay showing home to ensure Firebase is loaded if needed for future features on home
+                     setTimeout(showHomeScreen, 100);
+                });
             } else {
                 initApp();
             }
