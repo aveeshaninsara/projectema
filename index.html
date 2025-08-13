@@ -51,9 +51,10 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Changed to flex-start */
+            /* align-items: flex-start;  Center vertically too, but allow scrolling */
+            align-items: center;
             padding: 16px;
-            padding-top: 40px; /* Add some top padding */
+            /* padding-top: 40px; Removed top padding */
         }
 
         .screen {
@@ -61,7 +62,7 @@
             max-width: 500px;
             display: none;
             flex-direction: column;
-            gap: 20px; /* Slightly reduced gap */
+            gap: 20px;
         }
 
         .active {
@@ -72,8 +73,10 @@
             background-color: white;
             border-radius: var(--md-sys-shape-corner-large);
             box-shadow: var(--md-sys-elevation-1);
-            padding: 20px; /* Slightly reduced padding */
+            padding: 20px;
             width: 100%;
+            /* Added to prevent card from shrinking too much on short screens */
+            flex-shrink: 0;
         }
 
         .logo-container {
@@ -92,7 +95,7 @@
         }
 
         .logo {
-            width: 120px; /* Slightly smaller logo */
+            width: 120px;
             height: auto;
         }
 
@@ -106,11 +109,12 @@
         }
 
         h1 {
-            font-size: 1.8rem; /* Responsive font size */
+            font-size: 1.8rem;
+            text-align: center; /* Center title */
         }
 
         h2 {
-            font-size: 1.4rem; /* Responsive font size */
+            font-size: 1.4rem;
         }
 
         .input-group {
@@ -119,15 +123,15 @@
 
         label {
             display: block;
-            margin-bottom: 6px; /* Slightly smaller margin */
+            margin-bottom: 6px;
             font-weight: 500;
             color: var(--md-sys-color-on-surface-variant);
-            font-size: 0.9rem; /* Smaller label font */
+            font-size: 0.9rem;
         }
 
         input, select {
             width: 100%;
-            padding: 12px 14px; /* Adjusted padding */
+            padding: 12px 14px;
             border: 1px solid var(--md-sys-color-outline);
             border-radius: var(--md-sys-shape-corner-medium);
             background-color: var(--md-sys-color-surface);
@@ -145,7 +149,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 12px 20px; /* Adjusted padding */
+            padding: 12px 20px;
             border-radius: var(--md-sys-shape-corner-medium);
             font-weight: 500;
             font-size: 16px;
@@ -181,17 +185,19 @@
             background: none;
             border: none;
             color: var(--md-sys-color-primary);
-            padding: 8px 4px; /* Adjusted padding */
-            font-size: 15px; /* Slightly smaller text */
+            padding: 8px 4px;
+            font-size: 15px;
             cursor: pointer;
-            min-height: 40px; /* Minimum touch target size */
+            min-height: 40px;
+            width: 100%; /* Make text buttons full width on their line */
+            text-align: center; /* Center text */
         }
 
         .btn-text:hover {
             text-decoration: underline;
         }
 
-        .btn-full {
+         .btn-full {
             width: 100%;
         }
 
@@ -226,76 +232,71 @@
         .user-header {
             display: flex;
             align-items: center;
-            gap: 14px; /* Slightly smaller gap */
-            padding: 14px 0; /* Adjusted padding */
+            gap: 14px;
+            padding: 14px 0;
         }
 
         .avatar {
-            width: 52px; /* Slightly smaller avatar */
+            width: 52px;
             height: 52px;
             border-radius: 50%;
             background-color: var(--md-sys-color-primary-container);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px; /* Adjusted font size */
+            font-size: 22px;
             font-weight: bold;
             color: var(--md-sys-color-on-primary-container);
-            flex-shrink: 0; /* Prevent avatar from shrinking */
+            flex-shrink: 0;
         }
 
         .user-info h3 {
             margin: 0;
-            font-size: 17px; /* Adjusted font size */
-            word-break: break-word; /* Handle long names */
+            font-size: 17px;
+            word-break: break-word;
         }
 
         .user-info p {
             margin: 3px 0 0;
             color: var(--md-sys-color-on-surface-variant);
-            font-size: 13px; /* Adjusted font size */
+            font-size: 13px;
         }
 
+        /* Stats and Features Grid */
         .stats-grid, .features-grid {
             display: grid;
-            /* grid-template-columns: repeat(2, 1fr); */ /* Removed fixed columns */
-            grid-auto-flow: column;
-            grid-auto-columns: minmax(0, 1fr); /* Allow columns to shrink */
-            overflow-x: auto; /* Enable horizontal scrolling if needed */
-            gap: 14px; /* Slightly smaller gap */
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Responsive grid */
+            gap: 14px;
             margin-top: 14px;
-            padding-bottom: 8px; /* Add padding for scrollbar */
         }
 
         .stat-card, .feature-card {
             background-color: var(--md-sys-color-surface-variant);
             border-radius: var(--md-sys-shape-corner-medium);
-            padding: 14px; /* Adjusted padding */
+            padding: 14px;
             text-align: center;
             box-shadow: var(--md-sys-elevation-1);
-            min-width: 110px; /* Minimum width for cards */
-            flex-shrink: 0; /* Prevent cards from shrinking too much */
         }
 
         .stat-card i, .feature-card i {
-            font-size: 22px; /* Adjusted icon size */
+            font-size: 22px;
             color: var(--md-sys-color-primary);
-            margin-bottom: 6px; /* Slightly smaller margin */
+            margin-bottom: 6px;
         }
 
         .stat-card .value {
-            font-size: 18px; /* Adjusted font size */
+            font-size: 18px;
             font-weight: bold;
-            margin: 6px 0; /* Adjusted margin */
+            margin: 6px 0;
         }
 
         .stat-card .label, .feature-card .label {
-            font-size: 13px; /* Adjusted font size */
+            font-size: 13px;
             color: var(--md-sys-color-on-surface-variant);
         }
 
         .features-grid {
-            /* grid-template-columns: repeat(2, 1fr); */ /* Removed fixed columns */
+             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Responsive grid for features */
         }
 
         .feature-card {
@@ -303,7 +304,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px 14px; /* Adjusted padding */
+            padding: 20px 14px;
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
         }
@@ -315,27 +316,27 @@
 
         .id-display {
             text-align: center;
-            padding: 20px; /* Adjusted padding */
+            padding: 20px;
         }
 
         .user-id {
-            font-size: 22px; /* Adjusted font size */
+            font-size: 22px;
             font-weight: bold;
             color: var(--md-sys-color-primary);
             word-break: break-all;
             background-color: var(--md-sys-color-primary-container);
-            padding: 14px; /* Adjusted padding */
+            padding: 14px;
             border-radius: var(--md-sys-shape-corner-medium);
-            margin: 14px 0; /* Adjusted margin */
+            margin: 14px 0;
         }
 
         .qr-code {
-            margin: 20px auto; /* Adjusted margin */
+            margin: 20px auto;
             display: block;
             max-width: 100%;
             height: auto;
-            width: 180px; /* Set a fixed width for QR */
-            height: 180px; /* Set a fixed height for QR */
+            width: 180px;
+            height: 180px;
         }
 
         .modal {
@@ -349,7 +350,7 @@
             z-index: 1001;
             justify-content: center;
             align-items: center;
-            padding: 16px; /* Add padding for small screens */
+            padding: 16px;
         }
 
         .modal.active {
@@ -361,14 +362,14 @@
             border-radius: var(--md-sys-shape-corner-large);
             width: 100%;
             max-width: 500px;
-            max-height: 90vh; /* Limit max height */
+            max-height: 90vh;
             display: flex;
             flex-direction: column;
             box-shadow: var(--md-sys-elevation-2);
         }
 
         .modal-header {
-            padding: 14px 20px; /* Adjusted padding */
+            padding: 14px 20px;
             border-bottom: 1px solid var(--md-sys-color-outline);
             display: flex;
             justify-content: space-between;
@@ -377,11 +378,11 @@
 
         .modal-header h2 {
             margin: 0;
-            font-size: 1.3rem; /* Responsive font size */
+            font-size: 1.3rem;
         }
 
         .modal-body {
-            padding: 14px 20px; /* Adjusted padding */
+            padding: 14px 20px;
             overflow-y: auto;
             flex-grow: 1;
         }
@@ -389,16 +390,16 @@
         .chat-messages {
             display: flex;
             flex-direction: column;
-            gap: 14px; /* Slightly smaller gap */
+            gap: 14px;
         }
 
         .message {
-            max-width: 85%; /* Slightly wider messages */
-            padding: 12px 14px; /* Adjusted padding */
+            max-width: 85%;
+            padding: 12px 14px;
             border-radius: var(--md-sys-shape-corner-medium);
             position: relative;
             animation: fadeIn 0.3s ease;
-            line-height: 1.4; /* Improve readability */
+            line-height: 1.4;
         }
 
         @keyframes fadeIn {
@@ -424,7 +425,7 @@
             display: none;
             align-self: flex-start;
             background-color: var(--md-sys-color-surface-variant);
-            padding: 12px 14px; /* Adjusted padding */
+            padding: 12px 14px;
             border-radius: var(--md-sys-shape-corner-medium);
             border-bottom-left-radius: 4px;
         }
@@ -453,7 +454,7 @@
         }
 
         .modal-footer {
-            padding: 14px 20px; /* Adjusted padding */
+            padding: 14px 20px;
             border-top: 1px solid var(--md-sys-color-outline);
             display: flex;
             gap: 8px;
@@ -461,23 +462,22 @@
 
         .modal-footer input {
             flex-grow: 1;
-            min-height: 44px; /* Minimum touch target size */
+            min-height: 44px;
         }
 
         .modal-footer .btn {
-            min-width: 44px; /* Minimum touch target size */
-            min-height: 44px; /* Minimum touch target size */
+            min-width: 44px;
+            min-height: 44px;
         }
 
         .hidden {
             display: none !important;
         }
 
-        /* Specific adjustments for very small screens */
         @media (max-width: 360px) {
             body {
                 padding: 12px;
-                padding-top: 30px;
+                /* padding-top: 30px; */
             }
             .card {
                 padding: 16px;
@@ -486,7 +486,7 @@
                 padding: 10px 16px;
             }
             .stat-card, .feature-card {
-                min-width: 100px;
+                /* min-width: 100px; */
                 padding: 12px;
             }
             .modal-content {
@@ -504,7 +504,7 @@
     <!-- Login Screen -->
     <div id="login-screen" class="screen">
         <div class="card">
-            <h1 class="text-center">Welcome to EMA</h1>
+            <h1>Welcome to EMA</h1>
             <div class="input-group">
                 <label for="login-id">Enter Your ID</label>
                 <input type="text" id="login-id" placeholder="EMA-XXXXXX">
@@ -516,10 +516,10 @@
             <button id="register-btn" class="btn btn-secondary btn-full mt-16">
                 <i class="fas fa-user-plus"></i> New User? Register
             </button>
-            <button id="guest-btn" class="btn btn-text btn-full">
+            <button id="guest-btn" class="btn btn-text">
                 <i class="fas fa-user-secret"></i> Continue as Guest
             </button>
-            <button id="forgot-id-btn" class="btn btn-text btn-full">
+            <button id="forgot-id-btn" class="btn btn-text">
                 <i class="fas fa-question-circle"></i> Forgot ID?
             </button>
         </div>
@@ -528,7 +528,7 @@
     <!-- Registration Screen -->
     <div id="register-screen" class="screen">
         <div class="card">
-            <h1 class="text-center">Register</h1>
+            <h1>Register</h1>
             <div class="input-group">
                 <label for="full-name">Full Name</label>
                 <input type="text" id="full-name" placeholder="Enter your full name">
@@ -565,7 +565,7 @@
             <button id="generate-id-btn" class="btn btn-primary btn-full">
                 <i class="fas fa-id-card"></i> Generate My ID
             </button>
-            <button id="back-to-login-btn" class="btn btn-text btn-full mt-16">
+            <button id="back-to-login-btn" class="btn btn-text mt-16">
                 <i class="fas fa-arrow-left"></i> Back to Login
             </button>
         </div>
@@ -581,7 +581,7 @@
             <button id="download-id-btn" class="btn btn-primary btn-full mt-16">
                 <i class="fas fa-download"></i> Download ID Card
             </button>
-            <button id="use-id-btn" class="btn btn-text btn-full mt-16">
+            <button id="use-id-btn" class="btn btn-text mt-16">
                 Use This ID Now
             </button>
         </div>
@@ -691,11 +691,11 @@
     </div>
 
     <script type="module">
-        // Firebase configuration
+        // Firebase configuration - CHECK THIS CAREFULLY
         const firebaseConfig = {
             apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
             authDomain: "users-ema.firebaseapp.com",
-            databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app",
+            databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app", // Ensure NO trailing space
             projectId: "users-ema",
             storageBucket: "users-ema.firebasestorage.app",
             messagingSenderId: "165334149820",
@@ -736,7 +736,7 @@
         // Session data
         let currentUser = null;
         let conversationHistory = [];
-        
+
         // AI Security State
         let aiState = {
             awaitingMobile: true,
@@ -806,64 +806,59 @@
             } catch (error) {
                 console.error("Failed to load Firebase SDK:", error);
                 alert("Failed to initialize the application. Please check your internet connection and try again.");
-                // Even if Firebase fails, we can still show the UI
                 screens.startup.style.display = 'none';
                 showScreen('login');
-                setupEventListeners(); // Setup listeners for non-Firebase features
-                initAIChat(); // Initialize AI chat even without Firebase
+                setupEventListeners();
+                initAIChat();
             }
         }
 
         // Initialize AI Chat with welcome message
         function initAIChat() {
-            // Clear chat and reset state
             chatMessages.innerHTML = '';
+            resetAIState();
+            // Add initial AI message
+            addMessageToChat("Hello! I'm the EMA ID Recovery Assistant. Please tell me your registered mobile number (e.g., 0771234567).", 'ai');
+        }
+
+        function resetAIState() {
             aiState = {
                 awaitingMobile: true,
                 awaitingConfirmation: false,
                 foundUser: null,
                 confirmationType: null
             };
-            conversationHistory = [
+             conversationHistory = [
                 {
                     role: 'system',
-                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your job is to help users recover their EMA ID securely. Here is the process: 1. Ask the user for their registered mobile number (format: 0XXXXXXXXX). 2. When they provide it, you will check the database. 3. If found, you will ask them to confirm either the first letter of their full name OR the first three letters of their province for security. 4. Only after they provide the correct confirmation detail should you reveal their EMA ID. Always be polite and encouraging. If they seem frustrated, offer reassurance.'
+                    content: 'You are a friendly and helpful assistant for the Elephant Monitoring App (EMA). Your job is to help users recover their EMA ID securely. Strictly follow this process: 1. Ask the user for their registered mobile number (format: 0XXXXXXXXX). 2. When they provide it, you will check the database. 3. If found, you will ask them to confirm either the first letter of their full name OR the first three letters of their province for security. 4. Only after they provide the correct confirmation detail should you reveal their EMA ID. Always be polite and encouraging. If they seem frustrated, offer reassurance. If they ask about anything else, gently remind them you are here to help recover their ID and ask for their mobile number.'
                 }
             ];
-            
-            // Add initial AI message
-            addMessageToChat("Hello! I'm the EMA ID Recovery Assistant. I can help you find your ID securely. Please tell me your registered mobile number (e.g., 0771234567).", 'ai');
         }
 
         // Screen navigation
         function showScreen(screenName) {
             Object.values(screens).forEach(screen => screen.classList.remove('active'));
             screens[screenName].classList.add('active');
-            
-            // Scroll to top when changing screens
             window.scrollTo(0, 0);
         }
 
         // Event listeners
         function setupEventListeners() {
-            // Login screen
             document.getElementById('access-app-btn').addEventListener('click', handleLogin);
             document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
             document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
             document.getElementById('forgot-id-btn').addEventListener('click', () => {
                 modal.classList.add('active');
-                initAIChat(); // Reset chat when opening
-                // Scroll to bottom of chat
+                initAIChat();
                 setTimeout(() => {
                     chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
                 }, 100);
             });
 
-            // Registration screen
             document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
             document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
 
-            // ID display screen
             document.getElementById('download-id-btn').addEventListener('click', downloadIDCard);
             document.getElementById('use-id-btn').addEventListener('click', () => {
                 if (currentUser) {
@@ -873,10 +868,8 @@
                 }
             });
 
-            // Home screen
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
 
-            // AI Assistant
             document.getElementById('close-modal-btn').addEventListener('click', () => {
                 modal.classList.remove('active');
             });
@@ -933,26 +926,23 @@
             showHomeScreen();
         }
 
-        // Registration handler
+        // Registration handler - IMPROVED ERROR HANDLING
         async function handleRegistration() {
              if (!db) {
                 alert("Application is not fully loaded. Please wait or refresh the page.");
                 return;
             }
 
-            // Get form values
             const fullName = document.getElementById('full-name').value.trim();
             const province = document.getElementById('province').value;
             const district = document.getElementById('district').value;
             const mobile = document.getElementById('mobile').value.trim();
 
-            // Get error elements
             const nameError = document.getElementById('name-error');
             const provinceError = document.getElementById('province-error');
             const districtError = document.getElementById('district-error');
             const mobileError = document.getElementById('mobile-error');
 
-            // Reset errors
             [nameError, provinceError, districtError, mobileError].forEach(el => {
                 el.classList.add('hidden');
                 el.textContent = '';
@@ -960,7 +950,6 @@
 
             let isValid = true;
 
-            // Validate inputs
             if (!fullName) {
                 showError(nameError, 'Full name is required');
                 isValid = false;
@@ -988,7 +977,6 @@
             if (!isValid) return;
 
             try {
-                // Check if mobile number already exists
                 const usersRef = window.firebaseRef(db, 'users');
                 const mobileQuery = window.firebaseQuery(usersRef, window.firebaseOrderByChild('mobile'), window.firebaseEqualTo(mobile));
                 const snapshot = await window.firebaseGet(mobileQuery);
@@ -998,10 +986,8 @@
                     return;
                 }
 
-                // Generate user ID
                 const userId = `EMA-${Math.floor(100000 + Math.random() * 900000)}`;
 
-                // Save user data
                 const userData = {
                     userId,
                     fullName,
@@ -1011,25 +997,31 @@
                     registeredAt: new Date().toISOString()
                 };
 
+                // Attempt to save user data
                 await window.firebaseSet(window.firebaseRef(db, `users/${userId}`), userData);
 
-                // Show ID display screen
                 currentUser = userData;
                 showIDScreen(userId);
             } catch (error) {
                 console.error("Registration error:", error);
-                alert('Registration failed. Please try again.');
+                // Provide more specific error messages
+                if (error.code === 'PERMISSION_DENIED') {
+                     alert('Registration failed: Permission denied. Please contact the administrator.'); // More specific message
+                } else if (error.message && error.message.includes('network')) {
+                     alert('Registration failed: Network error. Please check your connection.'); // Network issue
+                } else {
+                     alert('Registration failed. Please try again later.'); // Generic message
+                }
+                 // alert('Registration failed. Please try again.'); // Original generic message
             }
         }
+
 
         // Show ID screen
         function showIDScreen(userId) {
             document.getElementById('user-id-display').textContent = userId;
-
-            // Generate QR code
             const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(userId)}&size=200`;
             document.getElementById('qr-code').src = qrCodeUrl;
-
             showScreen('idDisplay');
         }
 
@@ -1038,23 +1030,19 @@
             const userId = document.getElementById('user-id-display').textContent;
             const qrCodeSrc = document.getElementById('qr-code').src;
 
-            // Create canvas
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 400;
             canvas.height = 300;
 
-            // Draw background
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw logo
             const logo = new Image();
             logo.crossOrigin = "Anonymous";
             logo.onload = function() {
                 ctx.drawImage(logo, canvas.width/2 - 50, 20, 100, 100);
 
-                // Draw text
                 ctx.fillStyle = '#000000';
                 ctx.font = 'bold 24px Arial';
                 ctx.textAlign = 'center';
@@ -1063,12 +1051,10 @@
                 ctx.font = '18px Arial';
                 ctx.fillText(userId, canvas.width/2, 180);
 
-                // Draw QR code
                 const qrCode = new Image();
                 qrCode.onload = function() {
                     ctx.drawImage(qrCode, canvas.width/2 - 50, 200, 100, 100);
 
-                    // Create download link
                     const link = document.createElement('a');
                     link.download = `${userId}_ID_Card.png`;
                     link.href = canvas.toDataURL();
@@ -1086,14 +1072,10 @@
             }
 
             if (currentUser) {
-                // Set user info
                 document.getElementById('home-user-name').textContent = currentUser.fullName;
                 document.getElementById('home-user-id').textContent = currentUser.userId;
-
-                // Set avatar
                 const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
                 document.getElementById('user-avatar').textContent = initials;
-
                 showScreen('home');
             } else {
                 showScreen('login');
@@ -1113,25 +1095,19 @@
             element.classList.remove('hidden');
         }
 
-        // AI Assistant functions
+        // AI Assistant functions - IMPROVED FLOW
         async function sendUserMessage() {
             const message = userMessageInput.value.trim();
             if (!message) return;
 
-            // Add user message to chat and history
             addMessageToChat(message, 'user');
-            // Note: We don't add user messages to conversationHistory for OpenRouter in this secure version
-            // The AI logic is handled locally based on aiState
             userMessageInput.value = '';
 
-            // Show typing indicator
             typingIndicator.style.display = 'flex';
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
 
             try {
-                // Handle secure ID recovery flow
                 if (aiState.awaitingMobile) {
-                    // Check for mobile number in message
                     const mobileRegex = /0[0-9]{9}/g;
                     const matches = message.match(mobileRegex);
 
@@ -1142,28 +1118,27 @@
                         if (user) {
                             aiState.foundUser = user;
                             aiState.awaitingMobile = false;
-                            
-                            // Decide confirmation type (name or province)
+
                             aiState.confirmationType = Math.random() > 0.5 ? 'name' : 'province';
-                            
+
                             let confirmationPrompt = "";
                             if (aiState.confirmationType === 'name') {
-                                confirmationPrompt = `Great! I found an account. For security, please confirm the first letter of your full name is '${user.fullName.charAt(0).toUpperCase()}'.`;
+                                confirmationPrompt = `Found your account! For security, please confirm the first letter of your name is '${user.fullName.charAt(0).toUpperCase()}'.`;
                             } else {
-                                confirmationPrompt = `Great! I found an account. For security, please confirm the first three letters of your province are '${user.province.substring(0, 3).toUpperCase()}'.`;
+                                confirmationPrompt = `Found your account! For security, please confirm the first three letters of your province are '${user.province.substring(0, 3).toUpperCase()}'.`;
                             }
-                            
+
                             typingIndicator.style.display = 'none';
                             addMessageToChat(confirmationPrompt, 'ai');
                             aiState.awaitingConfirmation = true;
                         } else {
                             typingIndicator.style.display = 'none';
-                            addMessageToChat("I couldn't find an account with that mobile number. Please double-check the number or let me know if you'd like to register.", 'ai');
+                            addMessageToChat("I couldn't find an account with that number. Please check or register.", 'ai');
                         }
                     } else {
-                        // Not a mobile number, let the AI respond naturally
-                        typingIndicator.style.display = 'none';
-                        addMessageToChat("Please provide your registered mobile number (e.g., 0771234567) so I can help you find your ID.", 'ai');
+                        // If not a mobile number, guide back to asking for it
+                         typingIndicator.style.display = 'none';
+                         addMessageToChat("To help you, I need your registered mobile number (e.g., 0771234567).", 'ai');
                     }
                 } else if (aiState.awaitingConfirmation) {
                     const user = aiState.foundUser;
@@ -1171,44 +1146,35 @@
 
                     if (aiState.confirmationType === 'name') {
                         const firstLetter = user.fullName.charAt(0).toUpperCase();
-                        // Check if message contains the first letter (case insensitive)
                         isConfirmed = message.toLowerCase().includes(firstLetter.toLowerCase());
-                    } else { // province
+                    } else {
                         const firstThreeLetters = user.province.substring(0, 3).toUpperCase();
-                        // Check if message contains the first three letters (case insensitive)
                         isConfirmed = message.toLowerCase().includes(firstThreeLetters.toLowerCase());
                     }
 
                     if (isConfirmed) {
                         typingIndicator.style.display = 'none';
-                        addMessageToChat(`Thank you for confirming! Your EMA ID is: ${user.userId}`, 'ai');
-                        // Reset state for potential new requests
-                        aiState = {
-                            awaitingMobile: true,
-                            awaitingConfirmation: false,
-                            foundUser: null,
-                            confirmationType: null
-                        };
+                        addMessageToChat(`Thank you! Your EMA ID is: ${user.userId}`, 'ai');
+                        resetAIState(); // Reset for potential new requests in same session
                     } else {
                         typingIndicator.style.display = 'none';
-                        addMessageToChat("Sorry, that confirmation didn't match. Please try again or let me know if you need help with something else.", 'ai');
+                         addMessageToChat("That didn't match. Please try again or say 'reset' to start over.", 'ai');
+                         // Optional: Add a 'reset' command
+                         if (message.toLowerCase().includes('reset')) {
+                             resetAIState();
+                             addMessageToChat("Okay, let's start over. Please tell me your mobile number.", 'ai');
+                         }
                     }
                 }
 
             } catch (error) {
                 console.error('AI Assistant error:', error);
                 typingIndicator.style.display = 'none';
-                const errorMsg = 'Sorry, I encountered an error. Please try again.';
-                addMessageToChat(errorMsg, 'ai');
-                // Reset state on error
-                aiState = {
-                    awaitingMobile: true,
-                    awaitingConfirmation: false,
-                    foundUser: null,
-                    confirmationType: null
-                };
+                addMessageToChat('Sorry, I encountered an error. Please try again.', 'ai');
+                resetAIState();
             }
         }
+
 
         // Add message to chat
         function addMessageToChat(content, sender) {
@@ -1217,12 +1183,10 @@
             messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
             messageDiv.textContent = content;
             chatMessages.appendChild(messageDiv);
-
-            // Scroll to bottom
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
         }
 
-        // Lookup user by mobile number (using global Firebase functions)
+        // Lookup user by mobile number
         async function lookupUserByMobile(mobileNumber) {
              if (!db) return null;
 
@@ -1233,12 +1197,15 @@
 
                 if (snapshot.exists()) {
                     const users = snapshot.val();
-                    // Get the first matching user data
                     const userId = Object.keys(users)[0];
                     return { userId, ...users[userId] };
                 }
             } catch (error) {
                 console.error('Database lookup error:', error);
+                 // It's okay to not find a user, but log other errors
+                 if (error.code !== 'PERMISSION_DENIED') { // Example of checking specific error
+                      console.warn("Lookup issue (might be 'not found'):", error.message);
+                 }
             }
             return null;
         }
@@ -1248,9 +1215,7 @@
             const storedUser = sessionStorage.getItem('emaUser');
             if (storedUser) {
                 currentUser = JSON.parse(storedUser);
-                // Initialize app, then show home
                 initApp().then(() => {
-                     // Delay showing home to ensure Firebase is loaded if needed for future features on home
                      setTimeout(showHomeScreen, 100);
                 });
             } else {
