@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMA - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     <style>
+        /* ... (Include all your existing CSS styles here) ... */
+        /* Example placeholder styles - replace with your full set */
         :root {
             --md-sys-color-primary: #606c38;
             --md-sys-color-on-primary: #ffffff;
@@ -37,214 +40,45 @@
             --md-sys-state-dragged-opacity: 0.16;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', 'Segoe UI', sans-serif;
-        }
-
-        body {
-            background-color: var(--md-sys-color-surface);
-            color: var(--md-sys-color-on-surface);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-        }
-
-        .screen {
-            width: 100%;
-            max-width: 500px;
-            display: flex; /* Show login screen by default */
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .card {
-            background-color: white;
-            border-radius: var(--md-sys-shape-corner-large);
-            box-shadow: var(--md-sys-elevation-1);
-            padding: 20px;
-            width: 100%;
-            flex-shrink: 0;
-            border: 1px solid var(--md-sys-color-outline);
-        }
-
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100%;
-            background-color: white;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            opacity: 1;
-            transition: opacity 1s ease-in-out;
-        }
-
-        .logo {
-            width: 120px;
-            height: auto;
-        }
-
-        .fade-out {
-            opacity: 0 !important;
-        }
-
-        h1, h2 {
-            color: var(--md-sys-color-primary);
-            margin-bottom: 16px;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            text-align: center;
-        }
-
-        h2 {
-            font-size: 1.4rem;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: var(--md-sys-color-on-surface-variant);
-            font-size: 0.9rem;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--md-sys-color-outline);
-            border-radius: var(--md-sys-shape-corner-medium);
-            background-color: var(--md-sys-color-surface);
-            color: var(--md-sys-color-on-surface);
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--md-sys-color-primary);
-            box-shadow: 0 0 0 2px rgba(96, 108, 56, 0.2);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 20px;
-            border-radius: var(--md-sys-shape-corner-medium);
-            font-weight: 500;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            text-decoration: none;
-            gap: 8px;
-            min-height: 48px;
-            width: 100%; /* Make buttons full width */
-        }
-
-        .btn-primary {
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
-            box-shadow: var(--md-sys-elevation-1);
-        }
-
-        .btn-primary:hover {
-            background-color: #4a552a;
-            box-shadow: var(--md-sys-elevation-2);
-        }
-
-        .btn-secondary {
-            background-color: var(--md-sys-color-secondary-container);
-            color: var(--md-sys-color-on-secondary-container);
-        }
-
-        .btn-secondary:hover {
-            background-color: #d7d9b0;
-        }
-
-        .btn-text {
-            background: none;
-            border: none;
-            color: var(--md-sys-color-primary);
-            padding: 8px 4px;
-            font-size: 15px;
-            cursor: pointer;
-            min-height: 40px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .btn-text:hover {
-            text-decoration: underline;
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-16 {
-            margin-top: 16px;
-        }
-
-        .mb-16 {
-            margin-bottom: 16px;
-        }
-
-        .mt-8 {
-            margin-top: 8px;
-        }
-
-        .error {
-            color: var(--md-sys-color-error);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        .success {
-            color: #2e7d32;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        @media (max-width: 360px) {
-            body {
-                padding: 12px;
-            }
-            .card {
-                padding: 16px;
-            }
-            .btn {
-                padding: 10px 16px;
-            }
-            .stat-card, .feature-card {
-                padding: 12px;
-            }
-            .modal-content {
-                max-height: 95vh;
-            }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', 'Segoe UI', sans-serif; }
+        body { background-color: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 16px; }
+        .screen { width: 100%; max-width: 500px; display: none; flex-direction: column; gap: 20px; }
+        .active { display: flex; }
+        .card { background-color: white; border-radius: var(--md-sys-shape-corner-large); box-shadow: var(--md-sys-elevation-1); padding: 20px; width: 100%; flex-shrink: 0; }
+        .logo-container { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; background-color: white; position: fixed; top: 0; left: 0; z-index: 1000; opacity: 1; transition: opacity 1s ease-in-out; }
+        .logo { width: 120px; height: auto; }
+        .fade-out { opacity: 0 !important; }
+        h1, h2 { color: var(--md-sys-color-primary); margin-bottom: 16px; }
+        h1 { font-size: 1.8rem; text-align: center; }
+        h2 { font-size: 1.4rem; }
+        .input-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
+        input, select, textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-medium); background-color: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font-size: 16px; transition: border-color 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 2px rgba(96, 108, 56, 0.2); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: var(--md-sys-shape-corner-medium); font-weight: 500; font-size: 16px; cursor: pointer; transition: all 0.2s ease; border: none; text-decoration: none; gap: 8px; min-height: 48px; }
+        .btn-primary { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); box-shadow: var(--md-sys-elevation-1); }
+        .btn-primary:hover { background-color: #4a552a; box-shadow: var(--md-sys-elevation-2); }
+        .btn-secondary { background-color: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+        .btn-secondary:hover { background-color: #d7d9b0; }
+        .btn-text { background: none; border: none; color: var(--md-sys-color-primary); padding: 8px 4px; font-size: 15px; cursor: pointer; min-height: 40px; width: 100%; text-align: center; }
+        .btn-text:hover { text-decoration: underline; }
+        .btn-full { width: 100%; }
+        .text-center { text-align: center; }
+        .mt-16 { margin-top: 16px; }
+        .mb-16 { margin-bottom: 16px; }
+        .mt-8 { margin-top: 8px; }
+        .error { color: var(--md-sys-color-error); font-size: 14px; margin-top: 4px; }
+        .success { color: #2e7d32; font-size: 14px; margin-top: 4px; }
+        .hidden { display: none !important; }
+        @media (max-width: 360px) { body { padding: 12px; } .card { padding: 16px; } .btn { padding: 10px 16px; } }
+        /* --- ID Card Download Styles --- */
+        #id-card-download { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 1002; justify-content: center; align-items: center; padding: 16px; }
+        #id-card-download.active { display: flex; }
+        #id-card-canvas-container { background-color: white; padding: 20px; border-radius: var(--md-sys-shape-corner-large); box-shadow: var(--md-sys-elevation-2); }
+        #id-card-canvas { display: block; max-width: 100%; height: auto; }
+        #id-card-download-buttons { display: flex; justify-content: center; gap: 16px; margin-top: 20px; }
+        #id-card-download-buttons .btn { min-width: 120px; }
+        /* --- End ID Card Download Styles --- */
     </style>
 </head>
 <body>
@@ -275,7 +109,7 @@
     </div>
 
     <!-- Registration Screen -->
-    <div id="register-screen" class="screen hidden">
+    <div id="register-screen" class="screen">
         <div class="card">
             <h1>Register</h1>
             <div class="input-group">
@@ -311,6 +145,13 @@
                 <input type="tel" id="mobile" placeholder="0771234567">
                 <div id="mobile-error" class="error hidden"></div>
             </div>
+             <div class="input-group">
+                <label for="profile-picture">Profile Picture</label>
+                <input type="file" accept="image/*" id="profile-picture" />
+                <div id="profile-picture-error" class="error hidden"></div>
+                 <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
+                 <button id="crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
+            </div>
             <button id="generate-id-btn" class="btn btn-primary btn-full">
                 <i class="fas fa-id-card"></i> Generate My ID
             </button>
@@ -320,9 +161,46 @@
         </div>
     </div>
 
-    <script type="module">
+    <!-- ID Display Screen -->
+    <div id="id-display-screen" class="screen">
+        <div class="card id-display">
+            <h1>Your EMA ID</h1>
+            <p>Save this ID for future access</p>
+            <div id="user-id-display" class="user-id"></div>
+            <canvas id="qr-code-canvas" class="qr-code" style="margin: 20px auto; display: block; max-width: 100%; height: auto; width: 180px; height: 180px;"></canvas>
+            <button id="download-id-btn" class="btn btn-primary btn-full mt-16">
+                <i class="fas fa-download"></i> Download ID Card
+            </button>
+            <button id="use-id-btn" class="btn btn-text mt-16">
+                Use This ID Now
+            </button>
+        </div>
+    </div>
+
+    <!-- ID Card Download Modal -->
+    <div id="id-card-download" class="modal">
+        <div id="id-card-canvas-container">
+            <canvas id="id-card-canvas" width="800" height="500"></canvas> <!-- Landscape format -->
+            <div id="id-card-download-buttons">
+                <button id="print-id-card-btn" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button id="download-id-card-btn" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button id="close-id-card-download-btn" class="btn btn-text">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script>
         // --- Firebase Configurations ---
-        const userFirebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyBSwWl0kwwk1mke8OA8ma4jPJTm15RX6dg",
             authDomain: "users-ema.firebaseapp.com",
             databaseURL: "https://users-ema-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -333,25 +211,27 @@
             measurementId: "G-ZZ04XCWXVQ"
         };
 
-        // --- DOM Elements ---
-        const startupScreen = document.getElementById('startup-screen');
-        const loginScreen = document.getElementById('login-screen');
-        const registerScreen = document.getElementById('register-screen');
-        const loginIdInput = document.getElementById('login-id');
-        const loginError = document.getElementById('login-error');
-        const accessAppBtn = document.getElementById('access-app-btn');
-        const registerBtn = document.getElementById('register-btn');
-        const guestBtn = document.getElementById('guest-btn');
-        const fullNameInput = document.getElementById('full-name');
-        const provinceSelect = document.getElementById('province');
-        const districtSelect = document.getElementById('district');
-        const mobileInput = document.getElementById('mobile');
-        const nameError = document.getElementById('name-error');
-        const provinceError = document.getElementById('province-error');
-        const districtError = document.getElementById('district-error');
-        const mobileError = document.getElementById('mobile-error');
-        const generateIdBtn = document.getElementById('generate-id-btn');
-        const backToLoginBtn = document.getElementById('back-to-login-btn');
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // DOM Elements
+        const screens = {
+            startup: document.getElementById('startup-screen'),
+            login: document.getElementById('login-screen'),
+            register: document.getElementById('register-screen'),
+            idDisplay: document.getElementById('id-display-screen'),
+            home: document.getElementById('home-screen')
+        };
+
+        const modals = {
+            idCardDownload: document.getElementById('id-card-download')
+        };
+
+        const idCardCanvas = document.getElementById('id-card-canvas');
+        const qrCodeCanvas = document.getElementById('qr-code-canvas');
+        const previewCanvas = document.getElementById('preview-canvas');
+        const cropBtn = document.getElementById('crop-btn');
 
         // District data
         const districts = {
@@ -366,36 +246,19 @@
             "Sabaragamuwa": ["Ratnapura", "Kegalle"]
         };
 
-        // Firebase references (will be initialized after SDK loads)
-        let userDb = null;
+        // Session data
+        let currentUser = null;
+        let croppedImageDataUrl = null; // For profile picture
 
         // --- Initialize App ---
-        async function initApp() {
+        function initApp() {
              try {
-                // Dynamically import Firebase SDKs
-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-                const { getDatabase, ref, get, set, query, orderByChild, equalTo } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
-
-                // Initialize Firebase
-                const app = initializeApp(userFirebaseConfig, 'userApp');
-                userDb = getDatabase(app);
-
-                // Make Firebase functions globally available for use in handlers
-                window.userRef = ref;
-                window.userGet = get;
-                window.userSet = set;
-                window.userQuery = query;
-                window.userOrderByChild = orderByChild;
-                window.userEqualTo = equalTo;
-
-                console.log("Login App: Firebase initialized.");
-
                 // Show startup screen
                 setTimeout(() => {
-                    startupScreen.classList.add('fade-out');
+                    screens.startup.classList.add('fade-out');
                     setTimeout(() => {
-                        startupScreen.style.display = 'none';
-                        loginScreen.classList.remove('hidden'); // Show login screen
+                        screens.startup.style.display = 'none';
+                        showScreen('login');
                     }, 1000);
                 }, 2000);
 
@@ -406,16 +269,19 @@
                 populateDistrictDropdowns();
 
             } catch (error) {
-                console.error("Login App: Failed to initialize Firebase:", error);
+                console.error("Failed to initialize app:", error);
                 alert("Critical Error: Failed to initialize the application. Please check your internet connection and try again.");
-                startupScreen.style.display = 'none';
-                loginScreen.classList.remove('hidden');
+                screens.startup.style.display = 'none';
+                showScreen('login');
                 setupEventListeners();
             }
         }
 
         // Populate district dropdowns
         function populateDistrictDropdowns() {
+            const provinceSelect = document.getElementById('province');
+            const districtSelect = document.getElementById('district');
+
             provinceSelect.addEventListener('change', function() {
                 const selectedProvince = this.value;
                 districtSelect.innerHTML = '<option value="">Select District</option>';
@@ -434,88 +300,211 @@
             });
         }
 
-        // Set up event listeners
+        // Screen navigation
+        function showScreen(screenName) {
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            screens[screenName].classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Modal control
+        function openModal(modalName) {
+            if (modals[modalName]) {
+                modals[modalName].classList.add('active');
+            }
+        }
+
+        function closeModal(modalName) {
+            if (modals[modalName]) {
+                modals[modalName].classList.remove('active');
+            }
+        }
+
+        // Event listeners
         function setupEventListeners() {
-            accessAppBtn.addEventListener('click', handleLogin);
-            registerBtn.addEventListener('click', () => {
-                loginScreen.classList.add('hidden');
-                registerScreen.classList.remove('hidden');
+            // --- Login Screen ---
+            document.getElementById('access-app-btn').addEventListener('click', handleLogin);
+            document.getElementById('register-btn').addEventListener('click', () => showScreen('register'));
+            document.getElementById('guest-btn').addEventListener('click', handleGuestLogin);
+
+            // --- Registration Screen ---
+            document.getElementById('generate-id-btn').addEventListener('click', handleRegistration);
+            document.getElementById('back-to-login-btn').addEventListener('click', () => showScreen('login'));
+            document.getElementById('profile-picture').addEventListener('change', handleProfilePictureSelect);
+            cropBtn.addEventListener('click', performCrop);
+
+            // --- ID Display Screen ---
+            document.getElementById('download-id-btn').addEventListener('click', showIDCardDownload);
+            document.getElementById('use-id-btn').addEventListener('click', () => {
+                if (currentUser) {
+                    // Redirect to home.html
+                    window.location.href = 'home.html';
+                } else {
+                    showScreen('login');
+                }
             });
-            guestBtn.addEventListener('click', handleGuestLogin);
-            generateIdBtn.addEventListener('click', handleRegistration);
-            backToLoginBtn.addEventListener('click', () => {
-                registerScreen.classList.add('hidden');
-                loginScreen.classList.remove('hidden');
-            });
+
+            // --- ID Card Download Modal ---
+            document.getElementById('print-id-card-btn').addEventListener('click', printIDCard);
+            document.getElementById('download-id-card-btn').addEventListener('click', downloadIDCardFinal);
+            document.getElementById('close-id-card-download-btn').addEventListener('click', () => closeModal('idCardDownload'));
         }
 
         // --- Authentication Logic ---
 
         // Login handler
         async function handleLogin() {
-             if (!userDb) {
-                alert("Application is not fully loaded. Please wait or refresh the page.");
-                return;
-            }
-
-            const userId = loginIdInput.value.trim();
-            loginError.classList.add('hidden');
-            loginError.textContent = '';
+            const userId = document.getElementById('login-id').value.trim();
+            const errorElement = document.getElementById('login-error');
 
             if (!userId) {
-                showError(loginError, 'Please enter your ID');
+                showError(errorElement, 'Please enter your ID');
                 return;
             }
 
             const idRegex = /^EMA-\d{6}$/;
             if (!idRegex.test(userId)) {
-                showError(loginError, 'Please enter a valid EMA ID (e.g., EMA-123456)');
+                showError(errorElement, 'Please enter a valid EMA ID (e.g., EMA-123456)');
                 return;
             }
 
             try {
-                const userRef = window.userRef(userDb, `users/${userId}`);
-                const snapshot = await window.userGet(userRef);
+                const userRef = db.ref(`users/${userId}`);
+                const snapshot = await userRef.once('value');
 
                 if (snapshot.exists()) {
-                    const userData = { userId, ...snapshot.val() };
-                    sessionStorage.setItem('emaUser', JSON.stringify(userData));
-                    window.location.href = 'home.html'; // Redirect to home
+                    currentUser = { userId, ...snapshot.val() };
+                    sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
+                    // Redirect to home.html
+                    window.location.href = 'home.html';
                 } else {
-                    showError(loginError, 'Invalid ID. Please check and try again.');
+                    showError(errorElement, 'Invalid ID. Please check and try again.');
                 }
             } catch (error) {
                 console.error("Login error:", error);
-                showError(loginError, 'An error occurred. Please try again.');
+                showError(errorElement, 'An error occurred. Please try again.');
             }
         }
 
         // Guest login
         function handleGuestLogin() {
-            const guestUser = {
+            currentUser = {
                 userId: 'GUEST',
                 fullName: 'Guest User',
                 province: 'N/A',
                 district: 'N/A',
                 mobile: 'N/A'
             };
-            sessionStorage.setItem('emaUser', JSON.stringify(guestUser));
-            window.location.href = 'home.html'; // Redirect to home
+            sessionStorage.setItem('emaUser', JSON.stringify(currentUser));
+            // Redirect to home.html
+            window.location.href = 'home.html';
+        }
+
+        // Handle profile picture selection and preview
+        function handleProfilePictureSelect(event) {
+            const file = event.target.files[0];
+            const errorElement = document.getElementById('profile-picture-error');
+            errorElement.classList.add('hidden');
+            errorElement.textContent = '';
+
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showError(errorElement, 'Please select a valid image file.');
+                    event.target.value = '';
+                    previewCanvas.style.display = 'none';
+                    cropBtn.classList.add('hidden');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        // Store original image for cropping
+                        originalImage = img;
+                        const maxWidth = 200;
+                        const maxHeight = 200;
+                        let { width, height } = calculateAspectRatioFit(img.width, img.height, maxWidth, maxHeight);
+
+                        previewCanvas.width = width;
+                        previewCanvas.height = height;
+                        const ctx = previewCanvas.getContext('2d');
+                        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        previewCanvas.style.display = 'block';
+                        cropBtn.classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => {
+                    showError(errorElement, 'Error reading the image file.');
+                    previewCanvas.style.display = 'none';
+                    cropBtn.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewCanvas.style.display = 'none';
+                cropBtn.classList.add('hidden');
+            }
+        }
+
+        function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
+            const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+            return { width: srcWidth * ratio, height: srcHeight * ratio };
+        }
+
+        // Perform cropping (simple center crop to square for base64)
+        function performCrop() {
+            if (!originalImage) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const cropSize = 100; // Small size for storage
+
+            canvas.width = cropSize;
+            canvas.height = cropSize;
+
+            const sourceWidth = originalImage.width;
+            const sourceHeight = originalImage.height;
+            let sourceX, sourceY, sourceSize;
+
+            if (sourceWidth > sourceHeight) {
+                sourceSize = sourceHeight;
+                sourceX = (sourceWidth - sourceHeight) / 2;
+                sourceY = 0;
+            } else {
+                sourceSize = sourceWidth;
+                sourceX = 0;
+                sourceY = (sourceHeight - sourceWidth) / 2;
+            }
+
+            ctx.drawImage(
+                originalImage,
+                sourceX, sourceY, sourceSize, sourceSize,
+                0, 0, cropSize, cropSize
+            );
+
+            croppedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7); // JPEG quality 70%
+            alert("Image cropped successfully!");
+            cropBtn.classList.add('hidden');
         }
 
         // Registration handler
         async function handleRegistration() {
-            if (!userDb) {
-                alert("Application is not fully loaded. Please wait or refresh the page.");
-                return;
-            }
+            const fullName = document.getElementById('full-name').value.trim();
+            const province = document.getElementById('province').value;
+            const district = document.getElementById('district').value;
+            const mobile = document.getElementById('mobile').value.trim();
+            const profilePictureBase64 = croppedImageDataUrl; // Can be null
 
-            const fullName = fullNameInput.value.trim();
-            const province = provinceSelect.value;
-            const district = districtSelect.value;
-            const mobile = mobileInput.value.trim();
+            const nameError = document.getElementById('name-error');
+            const provinceError = document.getElementById('province-error');
+            const districtError = document.getElementById('district-error');
+            const mobileError = document.getElementById('mobile-error');
+            const profilePictureError = document.getElementById('profile-picture-error');
 
-            [nameError, provinceError, districtError, mobileError].forEach(el => {
+            [nameError, provinceError, districtError, mobileError, profilePictureError].forEach(el => {
                 el.classList.add('hidden');
                 el.textContent = '';
             });
@@ -549,31 +538,34 @@
             if (!isValid) return;
 
             try {
-                const usersRef = window.userRef(userDb, 'users');
-                const mobileQuery = window.userQuery(usersRef, window.userOrderByChild('mobile'), window.userEqualTo(mobile));
-                const snapshot = await window.userGet(mobileQuery);
+                // Check if mobile number already exists
+                const usersRef = db.ref('users');
+                const mobileQuery = usersRef.orderByChild('mobile').equalTo(mobile);
+                const snapshot = await mobileQuery.once('value');
 
                 if (snapshot.exists()) {
                     showError(mobileError, 'This mobile number is already registered');
                     return;
                 }
 
+                // Generate user ID
                 const userId = `EMA-${Math.floor(100000 + Math.random() * 900000)}`;
 
+                // Save user data
                 const userData = {
                     userId,
                     fullName,
                     province,
                     district,
                     mobile,
-                    registeredAt: new Date().toISOString()
+                    registeredAt: new Date().toISOString(),
+                    profilePicture: profilePictureBase64 // Store Base64 string
                 };
 
-                await window.userSet(window.userRef(userDb, `users/${userId}`), userData);
+                await db.ref(`users/${userId}`).set(userData);
 
-                sessionStorage.setItem('emaUser', JSON.stringify({ userId, ...userData }));
-                window.location.href = 'home.html'; // Redirect to home after registration
-
+                currentUser = userData;
+                showIDScreen(userId);
             } catch (error) {
                 console.error("Registration error:", error);
                 if (error.code === 'PERMISSION_DENIED') {
@@ -582,6 +574,153 @@
                     showError(mobileError, 'Registration failed. Try again later.');
                 }
             }
+        }
+
+        // Show ID screen with QR code
+        function showIDScreen(userId) {
+            document.getElementById('user-id-display').textContent = userId;
+
+            // Generate QR code using qrious
+            const qr = new QRious({
+                element: qrCodeCanvas,
+                value: userId,
+                size: 200 // Set size
+            });
+            qrCodeCanvas.style.display = 'block'; // Ensure canvas is visible
+
+            showScreen('idDisplay');
+        }
+
+        // Show ID card download modal
+        function showIDCardDownload() {
+            openModal('idCardDownload');
+
+            const canvas = idCardCanvas;
+            const ctx = canvas.getContext('2d');
+            canvas.width = 800;
+            canvas.height = 500;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background
+            ctx.fillStyle = '#ffffff'; // White background
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw logo
+            const logo = new Image();
+            logo.crossOrigin = "Anonymous";
+            logo.onload = function () {
+                // Center the logo
+                const logoWidth = 150;
+                const logoHeight = 150;
+                const logoX = (canvas.width - logoWidth) / 2;
+                const logoY = 50; // Position from top
+                ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+
+                // Draw title
+                ctx.fillStyle = '#4CAF50'; // Green color
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('EMA ID Card', canvas.width / 2, logoY + logoHeight + 50);
+
+                // Draw ID
+                ctx.fillStyle = '#212121'; // Dark text
+                ctx.font = '28px Arial';
+                ctx.fillText(currentUser.userId, canvas.width / 2, logoY + logoHeight + 100);
+
+                // Generate and draw QR Code
+                const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(currentUser.userId)}&size=200`; // Larger QR for print
+                const qrCode = new Image();
+                qrCode.crossOrigin = "Anonymous";
+                qrCode.onload = function () {
+                    // Position QR code below the ID
+                    const qrX = (canvas.width - 200) / 2;
+                    const qrY = logoY + logoHeight + 120; // Below the ID text
+                    ctx.drawImage(qrCode, qrX, qrY, 200, 200);
+
+                    // Draw footer note
+                    ctx.fillStyle = '#9E9E9E'; // Light gray
+                    ctx.font = '16px Arial';
+                    ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
+
+                    // Re-trigger the final draw to ensure QR is included
+                    setTimeout(() => {
+                        // The canvas is now fully drawn with the QR code
+                    }, 100);
+
+                };
+                qrCode.onerror = function() {
+                    console.error("Failed to load QR code image for ID card.");
+                    // Draw footer note even if QR fails
+                    ctx.fillStyle = '#9E9E9E';
+                    ctx.font = '16px Arial';
+                    ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
+                };
+                qrCode.src = qrCodeUrl;
+            };
+            logo.onerror = function() {
+                console.error("Failed to load logo for ID card.");
+                // Proceed with drawing the rest, perhaps with a placeholder or text
+                logo.onload();
+            };
+            logo.src = 'https://i.ibb.co/jvN2hV16/logo.png';
+        }
+
+        // Print ID Card
+        function printIDCard() {
+            const canvas = idCardCanvas;
+            const dataUrl = canvas.toDataURL('image/png');
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print EMA ID Card</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            background-color: #f0f0f0;
+                        }
+                        img {
+                            max-width: 100%;
+                            height: auto;
+                            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+                        }
+                        @media print {
+                            body {
+                                background-color: white;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <img src="${dataUrl}" alt="EMA ID Card" />
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            // window.close(); // Optional: close the window after printing
+                        };
+                    </script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // Download ID Card
+        function downloadIDCardFinal() {
+            const canvas = idCardCanvas;
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `${currentUser.userId}_ID_Card.png`;
+            link.href = dataUrl;
+            link.click();
         }
 
         // Show error message
