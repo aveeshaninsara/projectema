@@ -12,24 +12,25 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
         :root {
-            --md-sys-color-primary: #606c38;
-            --md-sys-color-on-primary: #ffffff;
-            --md-sys-color-primary-container: #e9f4c7;
-            --md-sys-color-on-primary-container: #1d2000;
-            --md-sys-color-secondary: #5f614d;
-            --md-sys-color-on-secondary: #ffffff;
-            --md-sys-color-secondary-container: #e4e5c1;
-            --md-sys-color-on-secondary-container: #1b1d0c;
-            --md-sys-color-surface: #fafdf6;
-            --md-sys-color-on-surface: #1b1c18;
-            --md-sys-color-outline: #75796c;
-            --md-sys-color-error: #ba1a1a;
-            --md-sys-color-on-error: #ffffff;
+            /* Refined Green/Nature Palette */
+            --md-sys-color-primary: #4CAF50; /* Main Green */
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #C8E6C9; /* Light Green */
+            --md-sys-color-on-primary-container: #1B5E20;
+            --md-sys-color-secondary: #81C784; /* Softer Green */
+            --md-sys-color-on-secondary: #FFFFFF;
+            --md-sys-color-secondary-container: #E8F5E9;
+            --md-sys-color-on-secondary-container: #2E7D32;
+            --md-sys-color-surface: #F5F5F5; /* Very Light Gray/Greenish */
+            --md-sys-color-on-surface: #212121;
+            --md-sys-color-outline: #BDBDBD;
+            --md-sys-color-error: #F44336;
+            --md-sys-color-on-error: #FFFFFF;
             --md-sys-color-shadow: #000000;
-            --md-sys-color-surface-variant: #e1e4d5;
-            --md-sys-color-on-surface-variant: #44483d;
-            --md-sys-elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
-            --md-sys-elevation-2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+            --md-sys-color-surface-variant: #E0E0E0;
+            --md-sys-color-on-surface-variant: #616161;
+            --md-sys-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+            --md-sys-elevation-2: 0 1px 5px 0 rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
             --md-sys-shape-corner-none: 0px;
             --md-sys-shape-corner-extra-small: 4px;
             --md-sys-shape-corner-small: 8px;
@@ -57,21 +58,9 @@
             --theme-on-error: var(--md-sys-color-on-error);
         }
 
-        /* Dark Theme Override */
+        /* Dark Theme Override (if needed later) */
         .theme-dark {
-            --theme-surface: #1b1c18; /* On Surface from light */
-            --theme-on-surface: #e2e3db; /* Surface from light */
-            --theme-surface-variant: #44483d; /* On Surface Variant from light */
-            --theme-on-surface-variant: #c5c7bb; /* Surface Variant from light */
-            --theme-primary: #cfcf9b;
-            --theme-on-primary: #32351e;
-            --theme-primary-container: #494d33;
-            --theme-on-primary-container: #e9f4c7; /* Primary Container from light */
-            --theme-secondary-container: #474939;
-            --theme-on-secondary-container: #e4e5c1; /* Secondary Container from light */
-            --theme-outline: #8f9286;
-            --theme-error: #ffb4ab;
-            --theme-on-error: #690005;
+            /* Define dark theme colors if necessary */
         }
 
         * {
@@ -178,7 +167,7 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--theme-primary);
-            box-shadow: 0 0 0 2px rgba(96, 108, 56, 0.2);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
 
         .btn {
@@ -204,7 +193,7 @@
         }
 
         .btn-primary:hover {
-            background-color: #4a552a; /* Darken primary for hover */
+            background-color: #43A047; /* Darken primary for hover */
         }
 
         .btn-secondary {
@@ -213,7 +202,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: #d7d9b0; /* Lighten secondary for hover */
+            background-color: #A5D6A7; /* Lighten secondary for hover */
         }
 
         .btn-text {
@@ -258,8 +247,14 @@
             margin-top: 4px;
         }
 
+        .warning {
+            color: #FF9800; /* Orange warning color */
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
         .success {
-            color: #2e7d32; /* Keep success green */
+            color: #4CAF50; /* Keep success green */
             font-size: 14px;
             margin-top: 4px;
         }
@@ -280,19 +275,16 @@
             cursor: pointer;
             padding: 8px;
             border-radius: 50%;
-        }
-
-        .user-btn:hover {
-             background-color: rgba(96, 108, 56, 0.1); /* Subtle hover */
-        }
-
-        .user-btn {
             width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+        }
+
+        .user-btn:hover {
+             background-color: rgba(76, 175, 80, 0.1); /* Subtle hover */
         }
 
         .user-btn-avatar {
@@ -448,7 +440,7 @@
         }
 
         .fab:hover {
-            background-color: #4a552a; /* Darken primary for hover */
+            background-color: #43A047; /* Darken primary for hover */
             transform: scale(1.05);
         }
 
@@ -868,6 +860,49 @@
             margin: 0 20px;
         }
 
+        /* --- ID Card Download Styles --- */
+        #id-card-download {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1002;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #id-card-download.active {
+            display: flex;
+        }
+
+        #id-card-canvas-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--md-sys-shape-corner-large);
+            box-shadow: var(--md-sys-elevation-2);
+        }
+
+        #id-card-canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        #id-card-download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        #id-card-download-buttons .btn {
+            min-width: 120px;
+        }
+        /* --- End ID Card Download Styles --- */
+
         .hidden {
             display: none !important;
         }
@@ -882,7 +917,7 @@
             .btn {
                 padding: 10px 16px;
             }
-            .stat-card, .action-card {
+            .stat-card, .feature-card {
                 padding: 12px;
             }
             .modal-content {
@@ -929,6 +964,7 @@
             <div class="input-group">
                 <label for="full-name">Full Name</label>
                 <input type="text" id="full-name" placeholder="Enter your full name">
+                <div id="name-warning" class="warning hidden"></div> <!-- Warning for name format -->
                 <div id="name-error" class="error hidden"></div>
             </div>
             <div class="input-group">
@@ -962,6 +998,7 @@
              <div class="input-group">
                 <label for="profile-picture">Profile Picture</label>
                 <input type="file" accept="image/*" id="profile-picture" />
+                <div id="profile-picture-warning" class="warning hidden"></div> <!-- Warning for profile picture -->
                 <div id="profile-picture-error" class="error hidden"></div>
                  <canvas id="preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
                  <button id="crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
@@ -971,22 +1008,6 @@
             </button>
             <button id="back-to-login-btn" class="btn btn-text mt-16">
                 <i class="fas fa-arrow-left"></i> Back to Login
-            </button>
-        </div>
-    </div>
-
-    <!-- ID Display Screen -->
-    <div id="id-display-screen" class="screen">
-        <div class="card id-display">
-            <h1>Your EMA ID</h1>
-            <p>Save this ID for future access</p>
-            <div id="user-id-display" class="user-id"></div>
-            <img id="qr-code" class="qr-code" alt="QR Code">
-            <button id="download-id-btn" class="btn btn-primary btn-full mt-16">
-                <i class="fas fa-download"></i> Download ID Card
-            </button>
-            <button id="use-id-btn" class="btn btn-text mt-16">
-                Use This ID Now
             </button>
         </div>
     </div>
@@ -1018,22 +1039,22 @@
             <h2>Statistics</h2>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <i class="fas fa-file-alt"></i>
+                    <i class="fas fa-file-alt"></i> <!-- Report icon -->
                     <div class="value" id="total-reports">0</div>
                     <div class="label">Reports</div>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-elephant"></i>
+                    <i class="fas fa-elephant"></i> <!-- Elephant icon -->
                     <div class="value" id="total-elephants">0</div>
                     <div class="label">Elephants</div>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-map-marker-alt"></i>
+                    <i class="fas fa-map-marker-alt"></i> <!-- Location icon -->
                     <div class="value" id="unique-locations">0</div>
                     <div class="label">Locations</div>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-bell"></i>
+                    <i class="fas fa-bell"></i> <!-- Alert icon -->
                     <div class="value" id="recent-alerts">0</div>
                     <div class="label">Alerts</div>
                 </div>
@@ -1044,11 +1065,11 @@
             <h2>Actions</h2> <!-- Changed from Features to Actions -->
             <div class="actions-grid">
                 <div class="action-card" data-action="report">
-                    <i class="fas fa-bullhorn"></i>
+                    <i class="fas fa-bullhorn"></i> <!-- Report Elephant icon -->
                     <div class="label">Report Elephant</div>
                 </div>
                 <div class="action-card" data-action="map">
-                    <i class="fas fa-map-marked-alt"></i>
+                    <i class="fas fa-map-marked-alt"></i> <!-- View Map icon -->
                     <div class="label">View Map</div>
                 </div>
                 <div class="action-card" data-action="radar">
@@ -1056,11 +1077,11 @@
                     <div class="label">Radar</div>
                 </div>
                 <div class="action-card" data-action="ai">
-                    <i class="fas fa-robot"></i>
+                    <i class="fas fa-robot"></i> <!-- AI Chatbot icon -->
                     <div class="label">AI Chatbot</div>
                 </div>
                  <div class="action-card" data-action="alerts">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle"></i> <!-- Alerts icon -->
                     <div class="label">Alerts</div>
                 </div>
             </div>
@@ -1152,7 +1173,8 @@
                         <p><strong>District:</strong> <span id="popup-user-district">District</span></p>
                         <p><strong>Mobile:</strong> <span id="popup-user-mobile">077XXXXXXX</span></p>
                     </div>
-                    <div class="user-popup-actions">
+                    <div class="user-popup-actions" id="user-popup-actions">
+                        <!-- Buttons will be dynamically added/removed based on user type -->
                         <button id="edit-profile-btn" class="btn btn-secondary btn-full">
                             <i class="fas fa-edit"></i> Edit Profile
                         </button>
@@ -1243,6 +1265,8 @@
                      <div class="input-group">
                         <label for="edit-full-name">Full Name</label>
                         <input type="text" id="edit-full-name" placeholder="Enter your full name">
+                         <div id="edit-name-warning" class="warning hidden"></div> <!-- Warning for name format -->
+                        <div id="edit-name-error" class="error hidden"></div>
                     </div>
                     <div class="input-group">
                         <label for="edit-province">Province</label>
@@ -1258,16 +1282,19 @@
                             <option value="Uva">Uva</option>
                             <option value="Sabaragamuwa">Sabaragamuwa</option>
                         </select>
+                        <div id="edit-province-error" class="error hidden"></div>
                     </div>
                     <div class="input-group">
                         <label for="edit-district">District</label>
                         <select id="edit-district" disabled>
                             <option value="">Select District</option>
                         </select>
+                        <div id="edit-district-error" class="error hidden"></div>
                     </div>
                     <div class="input-group">
                         <label for="edit-mobile">Mobile Number</label>
                         <input type="tel" id="edit-mobile" placeholder="0771234567">
+                        <div id="edit-mobile-error" class="error hidden"></div>
                     </div>
                      <canvas id="edit-preview-canvas" style="display:none; max-width: 100%; margin-top: 10px; border-radius: var(--md-sys-shape-corner-medium);"></canvas>
                      <button id="edit-crop-btn" class="btn btn-secondary btn-full mt-8 hidden"><i class="fas fa-crop-alt"></i> Crop Image</button>
@@ -1313,6 +1340,24 @@
         </div>
     </div>
 
+    <!-- ID Card Download Modal -->
+    <div id="id-card-download" class="modal">
+        <div id="id-card-canvas-container">
+            <canvas id="id-card-canvas" width="800" height="500"></canvas> <!-- Landscape format -->
+            <div id="id-card-download-buttons">
+                <button id="print-id-card-btn" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button id="download-id-card-btn" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button id="close-id-card-download-btn" class="btn btn-text">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module">
@@ -1349,8 +1394,7 @@
             startup: document.getElementById('startup-screen'),
             login: document.getElementById('login-screen'),
             register: document.getElementById('register-screen'),
-            idDisplay: document.getElementById('id-display-screen'),
-            home: document.getElementById('home-screen')
+            home: document.getElementById('home-screen') // Removed idDisplay screen
         };
 
         const modals = {
@@ -1360,7 +1404,8 @@
             alerts: document.getElementById('alerts-modal'),
             editProfile: document.getElementById('edit-profile-modal'),
             map: document.getElementById('map-modal'),
-            qrScanner: document.getElementById('qr-scanner-modal') // Add QR Scanner Modal
+            qrScanner: document.getElementById('qr-scanner-modal'),
+            idCardDownload: document.getElementById('id-card-download') // Add ID Card Download Modal
         };
 
         const chatMessages = document.getElementById('chat-messages');
@@ -1418,10 +1463,6 @@
         let marker = null;
         let selectedLocation = null;
 
-        // Firebase references (will be initialized after SDK loads)
-        let userDb = null;
-        let reportDb = null;
-
         // --- QR Scanner Variables ---
         const qrVideo = document.getElementById('qr-video');
         const qrCanvasElement = document.createElement('canvas');
@@ -1429,6 +1470,10 @@
         let qrScanning = false;
         let qrStream = null;
         let lastScannedResult = null; // To prevent duplicate scans
+
+        // Firebase references (will be initialized after SDK loads)
+        let userDb = null;
+        let reportDb = null;
 
         // --- Initialize App ---
         async function initApp() {
@@ -1613,6 +1658,12 @@
                 screens[screenName].classList.add('active');
             }
             window.scrollTo(0, 0);
+             // Show/hide FAB based on screen
+            if (screenName === 'home') {
+                quickReportBtn.style.display = 'flex';
+            } else {
+                quickReportBtn.style.display = 'none';
+            }
         }
 
         // Modal control
@@ -1684,17 +1735,6 @@
                     editDistrictSelect.disabled = false; // Enable district dropdown
                 } else {
                     editDistrictSelect.disabled = true; // Disable if no province selected
-                }
-            });
-
-            // --- ID Display Screen ---
-            document.getElementById('download-id-btn').addEventListener('click', downloadIDCard);
-            document.getElementById('use-id-btn').addEventListener('click', () => {
-                if (currentUser) {
-                    showHomeScreen();
-                    listenForStatsUpdates(); // Start listening for stats when user logs in via ID screen
-                } else {
-                    showScreen('login');
                 }
             });
 
@@ -1780,6 +1820,20 @@
 
             // --- QR Scanner Modal ---
             document.getElementById('close-scanner-btn').addEventListener('click', stopQRScanner);
+
+            // --- ID Card Download Modal ---
+            document.getElementById('close-id-card-download-btn').addEventListener('click', () => closeModal('idCardDownload'));
+            document.getElementById('print-id-card-btn').addEventListener('click', printIDCard);
+            document.getElementById('download-id-card-btn').addEventListener('click', downloadIDCardFinal);
+
+             // --- Name Validation for Registration ---
+            document.getElementById('full-name').addEventListener('blur', validateRegistrationName);
+            document.getElementById('profile-picture').addEventListener('change', validateProfilePictureName);
+
+             // --- Name Validation for Edit Profile ---
+            document.getElementById('edit-full-name').addEventListener('blur', validateEditProfileName);
+            document.getElementById('edit-profile-picture').addEventListener('change', validateEditProfilePictureName);
+
         }
 
         // Handle action button clicks (renamed from feature)
@@ -1806,6 +1860,121 @@
             }
             // Add logic for other actions (map, radar) here
         }
+
+        // --- Name Validation Functions ---
+        function validateRegistrationName() {
+            const fullName = document.getElementById('full-name').value.trim();
+            const warningElement = document.getElementById('name-warning');
+            const errorElement = document.getElementById('name-error');
+
+            // Clear previous warnings/errors
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
+            errorElement.classList.add('hidden');
+            errorElement.textContent = '';
+
+            if (!fullName) return; // Don't validate if empty
+
+            const parts = fullName.split(/\s+/); // Split by whitespace
+            const hasSymbolsOrNumbers = /[0-9!@#$%^&*(),.?":{}|<>[\]\\;'`~_+=/-]/.test(fullName);
+
+            if (parts.length < 2) {
+                // Show warning for single name part
+                warningElement.textContent = "Consider using your full name (e.g., 'John Doe'). Accounts with incomplete names may be reviewed.";
+                warningElement.classList.remove('hidden');
+            }
+
+            if (hasSymbolsOrNumbers) {
+                // Show warning for symbols/numbers
+                warningElement.textContent = "Names should generally not contain symbols or numbers. Accounts with unusual names may be reviewed.";
+                warningElement.classList.remove('hidden');
+            }
+        }
+
+        function validateProfilePictureName() {
+            const file = document.getElementById('profile-picture').files[0];
+            const fullName = document.getElementById('full-name').value.trim();
+            const warningElement = document.getElementById('profile-picture-warning');
+
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
+
+            if (file && fullName) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        // Basic idea: Create a temporary canvas to potentially analyze pixel data
+                        // However, OCR is complex client-side. Instead, we'll just warn based on filename/content type if needed.
+                        // For now, we'll just rely on the name field validation and this simple reminder.
+                        // A more robust solution would involve server-side OCR.
+
+                        // Simple check: if name is incomplete, remind about image clarity.
+                        const parts = fullName.split(/\s+/);
+                        if (parts.length < 2) {
+                             warningElement.textContent = "If your name has multiple parts, please ensure your profile picture clearly shows your full name.";
+                             warningElement.classList.remove('hidden');
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function validateEditProfileName() {
+            const fullName = document.getElementById('edit-full-name').value.trim();
+            const warningElement = document.getElementById('edit-name-warning');
+            const errorElement = document.getElementById('edit-name-error');
+
+            // Clear previous warnings/errors
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
+            errorElement.classList.add('hidden');
+            errorElement.textContent = '';
+
+            if (!fullName) return; // Don't validate if empty
+
+            const parts = fullName.split(/\s+/);
+            const hasSymbolsOrNumbers = /[0-9!@#$%^&*(),.?":{}|<>[\]\\;'`~_+=/-]/.test(fullName);
+
+            if (parts.length < 2) {
+                warningElement.textContent = "Consider using your full name (e.g., 'John Doe'). Accounts with incomplete names may be reviewed.";
+                warningElement.classList.remove('hidden');
+            }
+
+            if (hasSymbolsOrNumbers) {
+                warningElement.textContent = "Names should generally not contain symbols or numbers. Accounts with unusual names may be reviewed.";
+                warningElement.classList.remove('hidden');
+            }
+        }
+
+        function validateEditProfilePictureName() {
+            const file = document.getElementById('edit-profile-picture').files[0];
+            const fullName = document.getElementById('edit-full-name').value.trim();
+            const warningElement = document.getElementById('edit-profile-picture-warning');
+
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
+
+            if (file && fullName) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                         const parts = fullName.split(/\s+/);
+                        if (parts.length < 2) {
+                             warningElement.textContent = "If your name has multiple parts, please ensure your profile picture clearly shows your full name.";
+                             warningElement.classList.remove('hidden');
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        // --- End Name Validation Functions ---
+
 
         // --- Authentication Logic ---
 
@@ -2027,7 +2196,7 @@
                 await window.userSet(window.userRef(userDb, `users/${userId}`), userData);
 
                 currentUser = userData;
-                showIDScreen(userId);
+                showIDCardDownload(userId); // Show ID card download modal instead of navigating to a separate screen
             } catch (error) {
                 console.error("Registration error:", error);
                 if (error.code === 'PERMISSION_DENIED') {
@@ -2038,49 +2207,140 @@
             }
         }
 
-        // Show ID screen
-        function showIDScreen(userId) {
-            document.getElementById('user-id-display').textContent = userId;
-            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(userId)}&size=200`;
-            document.getElementById('qr-code').src = qrCodeUrl;
-            showScreen('idDisplay');
-        }
+        // Show ID Card Download Modal
+        function showIDCardDownload(userId) {
+             openModal('idCardDownload');
 
-        // Download ID card
-        function downloadIDCard() {
-            const userId = document.getElementById('user-id-display').textContent;
-            const qrCodeSrc = document.getElementById('qr-code').src;
-
-            const canvas = document.createElement('canvas');
+            const canvas = document.getElementById('id-card-canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 400;
-            canvas.height = 300;
 
-            ctx.fillStyle = '#ffffff';
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background
+            ctx.fillStyle = '#ffffff'; // White background
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Draw logo
             const logo = new Image();
             logo.crossOrigin = "Anonymous";
             logo.onload = function () {
-                ctx.drawImage(logo, canvas.width / 2 - 50, 20, 100, 100);
-                ctx.fillStyle = '#000000';
-                ctx.font = 'bold 24px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('EMA ID Card', canvas.width / 2, 150);
-                ctx.font = '18px Arial';
-                ctx.fillText(userId, canvas.width / 2, 180);
+                // Center the logo
+                const logoWidth = 150;
+                const logoHeight = 150;
+                const logoX = (canvas.width - logoWidth) / 2;
+                const logoY = 50; // Position from top
+                ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
 
+                // Draw title
+                ctx.fillStyle = '#4CAF50'; // Green color
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('EMA ID Card', canvas.width / 2, logoY + logoHeight + 50);
+
+                // Draw ID
+                ctx.fillStyle = '#212121'; // Dark text
+                ctx.font = '28px Arial';
+                ctx.fillText(userId, canvas.width / 2, logoY + logoHeight + 100);
+
+                // Draw QR Code Placeholder Text (will be replaced by actual QR)
+                ctx.fillStyle = '#616161'; // Gray text
+                ctx.font = 'italic 20px Arial';
+                ctx.fillText('QR Code will be generated here', canvas.width / 2, logoY + logoHeight + 150);
+
+                // Draw footer note
+                ctx.fillStyle = '#9E9E9E'; // Light gray
+                ctx.font = '16px Arial';
+                ctx.fillText('Present this card for identification', canvas.width / 2, canvas.height - 30);
+
+                // Generate and draw QR Code
+                const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(userId)}&size=150`; // Larger QR for print
                 const qrCode = new Image();
+                qrCode.crossOrigin = "Anonymous";
                 qrCode.onload = function () {
-                    ctx.drawImage(qrCode, canvas.width / 2 - 50, 200, 100, 100);
-                    const link = document.createElement('a');
-                    link.download = `${userId}_ID_Card.png`;
-                    link.href = canvas.toDataURL();
-                    link.click();
+                    // Position QR code below the ID
+                    const qrX = (canvas.width - 150) / 2;
+                    const qrY = logoY + logoHeight + 170; // Below the ID text and placeholder
+                    ctx.drawImage(qrCode, qrX, qrY, 150, 150);
+
+                     // Re-trigger the final draw to ensure QR is included
+                     // This is a simple way to ensure the QR is drawn before the modal becomes active
+                     // In a more complex scenario, you might use Promises or async/await
+                     setTimeout(() => {
+                          // The canvas is now fully drawn with the QR code
+                          // The modal is already open, so the user sees the final result
+                     }, 100); // Short delay to ensure image load and draw
+
                 };
-                qrCode.src = qrCodeSrc;
+                qrCode.onerror = function() {
+                     console.error("Failed to load QR code image for ID card.");
+                     // The rest of the card is still drawn, just without the QR
+                };
+                qrCode.src = qrCodeUrl;
+            };
+            logo.onerror = function() {
+                 console.error("Failed to load logo for ID card.");
+                 // Proceed with drawing the rest, perhaps with a placeholder or text
+                 // For simplicity, we'll just call the onload handler to continue drawing
+                 logo.onload();
             };
             logo.src = 'https://i.ibb.co/jvN2hV16/logo.png';
+        }
+
+        // Print ID Card
+        function printIDCard() {
+             const canvas = document.getElementById('id-card-canvas');
+            const dataUrl = canvas.toDataURL('image/png');
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print EMA ID Card</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            background-color: #f0f0f0;
+                        }
+                        img {
+                            max-width: 100%;
+                            height: auto;
+                            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+                        }
+                        @media print {
+                            body {
+                                background-color: white;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <img src="${dataUrl}" alt="EMA ID Card" />
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            // window.close(); // Optional: close the window after printing
+                        };
+                    </script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // Download ID Card
+        function downloadIDCardFinal() {
+            const canvas = document.getElementById('id-card-canvas');
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `EMA_ID_${currentUser.userId}_Card.png`;
+            link.href = dataUrl;
+            link.click();
         }
 
         // Show home screen
@@ -2122,22 +2382,54 @@
                         img.src = currentUser.profilePicture;
                         img.style.display = 'block';
                     });
-                    initialsElements.forEach(span => span.style.display = 'none');
+                    initialsElements.forEach(span => span.style.display = 'none';
                 } else {
-                    profileImgElements.forEach(img => img.style.display = 'none');
-                    initialsElements.forEach(span => span.style.display = 'block');
+                    profileImgElements.forEach(img => img.style.display = 'none';
+                    initialsElements.forEach(span => span.style.display = 'block';
                 }
 
                 showScreen('home');
-                // Show FAB on home screen
-                quickReportBtn.style.display = 'flex';
+
+                // Apply theme and language after home screen is shown
+                setTimeout(() => {
+                    // Removed theme/language application as requested
+                }, 100);
+
+                // Configure UI based on user type (Guest vs Regular)
+                configureUIForUserType();
 
             } else {
                 showScreen('login');
-                 // Hide FAB if not on home
-                quickReportBtn.style.display = 'none';
             }
         }
+
+        // Configure UI based on user type (Guest vs Regular)
+        function configureUIForUserType() {
+            const isGuest = currentUser.userId === 'GUEST';
+            const userPopupActions = document.getElementById('user-popup-actions');
+
+            if (isGuest) {
+                // Hide edit profile and delete account for guests
+                document.getElementById('edit-profile-btn').style.display = 'none';
+                document.getElementById('delete-account-btn').style.display = 'none';
+
+                // Optionally, you can customize the guest popup further
+                // For example, change the title or add a guest-specific message
+                document.querySelector('#user-popup-modal .modal-header h2').textContent = "Guest User";
+
+            } else {
+                // Ensure edit profile and delete account are visible for regular users
+                document.getElementById('edit-profile-btn').style.display = 'block';
+                document.getElementById('delete-account-btn').style.display = 'block';
+
+                 // Reset title for regular users
+                document.querySelector('#user-popup-modal .modal-header h2').textContent = "User Information";
+            }
+
+            // Show sign out for both
+            document.getElementById('sign-out-btn').style.display = 'block';
+        }
+
 
         // Open User Popup
         function openUserPopup() {
@@ -2438,8 +2730,6 @@
             sessionStorage.removeItem('emaUser');
             closeModal('userPopup');
             showScreen('login');
-            // Hide FAB on logout
-            quickReportBtn.style.display = 'none';
         }
 
         // Delete Account handler
@@ -2467,8 +2757,6 @@
             closeModal('userPopup');
             alert("Your account has been deleted.");
             showScreen('login');
-            // Hide FAB on delete
-            quickReportBtn.style.display = 'none';
         }
 
         // Show error message
@@ -2776,7 +3064,7 @@
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                 .then(function (mediaStream) {
                     qrStream = mediaStream;
-                    qrVideo.srcObject = qrStream;
+                    qrVideo.srcObject = mediaStream;
                     qrVideo.setAttribute("playsinline", true); // Required for iOS Safari
                     qrVideo.play();
                     qrScanning = true;
@@ -2829,16 +3117,16 @@
                         resultElement.textContent = `Scanned: ${code.data}`;
                         resultElement.classList.remove('hidden');
                         // Stop the camera
-                        // stopQRScanner(); // Stop immediately
+                        stopQRScanner();
                         // Simulate entering the ID and clicking login
                         document.getElementById('login-id').value = code.data;
-                        // Use a small delay to ensure the value is set and user sees feedback before calling handleLogin
+                        // Use a small delay to ensure the value is set before calling handleLogin
                         setTimeout(() => {
-                            stopQRScanner(); // Stop after delay
-                            handleLogin(); // Call the existing login handler
-                        }, 500); // 500ms delay
+                             // Call the existing login handler
+                             handleLogin();
+                        }, 300); // Slightly longer delay to allow UI feedback
                         return; // Exit the tick loop
-                    } else if (code.data !== lastScannedResult) {
+                    } else if(code.data !== lastScannedResult) {
                         console.log("Scanned QR code does not match EMA ID format:", code.data);
                         // Optionally, show a message to the user for a short time
                         const resultElement = document.getElementById('qr-result');
@@ -2846,14 +3134,14 @@
                         resultElement.classList.remove('hidden');
                         setTimeout(() => {
                             if (!resultElement.classList.contains('hidden')) {
-                                resultElement.classList.add('hidden');
+                                 resultElement.classList.add('hidden');
                             }
                         }, 2000); // Hide after 2 seconds
                     }
                 }
                 requestAnimationFrame(qrTick); // Continue scanning
             } else if (qrScanning) {
-                requestAnimationFrame(qrTick); // Keep trying if not ready
+                 requestAnimationFrame(qrTick); // Keep trying if not ready
             }
         }
         // --- End QR Code Scanning Logic ---
