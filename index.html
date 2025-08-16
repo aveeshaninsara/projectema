@@ -1,762 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EMA - Elephant Monitoring App</title>
-  <!-- QR Code JS -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    body {
-      background-color: #f5f5f5;
-      color: #1a1a1a;
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      opacity: 1;
-      transition: opacity 0.5s ease-out;
-      text-align: center;
-      z-index: 10;
-      position: relative;
-    }
-
-    .logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .logo img {
-      width: 120px;
-      height: auto;
-    }
-
-    h1, h2, h3 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #1a1a1a;
-      font-weight: 500;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #555;
-    }
-
-    .form-group input, .form-group select {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
-      background-color: #fafafa;
-      font-size: 16px;
-      transition: all 0.3s ease;
-    }
-
-    .form-group input:focus, .form-group select:focus {
-      outline: none;
-      border-color: #0077cc;
-      box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.2);
-    }
-
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      background-color: #1a1a1a;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-bottom: 15px;
-      transition: background-color 0.3s ease;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn:hover {
-      background-color: #333;
-    }
-
-    .btn-secondary {
-      background-color: #e0e0e0;
-      color: #1a1a1a;
-    }
-
-    .btn-secondary:hover {
-      background-color: #d0d0d0;
-    }
-
-    .btn i {
-      margin-right: 8px;
-    }
-
-    .or-divider {
-      display: flex;
-      align-items: center;
-      margin: 25px 0;
-      font-size: 14px;
-      color: #777;
-    }
-
-    .or-divider::before,
-    .or-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background-color: #ddd;
-    }
-
-    .or-divider span {
-      padding: 0 12px;
-    }
-
-    .register-link {
-      color: #0077cc;
-      text-decoration: none;
-      font-size: 14px;
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .register-link:hover {
-      text-decoration: underline;
-    }
-
-    .qr-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 25px 0;
-    }
-
-    .qr-code {
-      width: 180px;
-      height: 180px;
-      margin-bottom: 20px;
-      background-color: white;
-      padding: 10px;
-      border-radius: 8px;
-    }
-
-    .download-btn {
-      width: 100%;
-      padding: 14px;
-      background-color: #1a1a1a;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-bottom: 15px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .download-btn:hover {
-      background-color: #333;
-    }
-
-    .download-btn i {
-      margin-right: 8px;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 30px;
-      padding: 15px;
-      background-color: #f9f9f9;
-      border-radius: 12px;
-    }
-
-    .profile-pic {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 15px;
-    }
-
-    .user-details {
-      flex: 1;
-    }
-
-    .user-name {
-      font-size: 18px;
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .edit-details {
-      color: #0077cc;
-      text-decoration: none;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-    }
-
-    .edit-details:hover {
-      text-decoration: underline;
-    }
-
-    .edit-details i {
-      font-size: 16px;
-      margin-right: 4px;
-    }
-
-    .sign-out {
-      background-color: #1a1a1a;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 12px;
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-    }
-
-    .sign-out:hover {
-      background-color: #333;
-    }
-
-    .sign-out i {
-      font-size: 16px;
-      margin-right: 5px;
-    }
-
-    .footer {
-      margin-top: 30px;
-      text-align: center;
-      color: #777;
-      font-size: 12px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
-    .clear-icon {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #aaa;
-      font-size: 18px;
-    }
-
-    .upload-btn {
-      display: inline-block;
-      margin: 12px 0;
-      padding: 12px 20px;
-      background-color: #0077cc;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .upload-btn:hover {
-      background-color: #005599;
-    }
-
-    .upload-btn i {
-      margin-right: 8px;
-    }
-
-    .file-input {
-      display: none;
-    }
-
-    .preview-container {
-      margin-top: 15px;
-      text-align: center;
-    }
-
-    .preview-container img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ddd;
-    }
-
-    .instructions {
-      font-size: 14px;
-      color: #666;
-      text-align: center;
-      margin: 15px 0;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 15px;
-        margin: 10px;
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>EMA – Elephant Monitoring App</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <!-- QR Code library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      /* Basic Material 3-style mobile-first reset */
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        background: #f5f5f5;
       }
 
-      body {
-        padding: 10px;
+      .curved {
+        border-radius: 12px;
+        background: #fff;
+        padding: 16px;
+        margin: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
 
-      h1, h2, h3 {
-        font-size: 22px;
+      .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
-      .btn, .form-group input, .form-group select {
+      .hidden {
+        display: none;
+      }
+
+      button {
         padding: 12px;
+        border: none;
+        border-radius: 8px;
+        margin: 4px;
+        background: #6200ee;
+        color: #fff;
+        font-size: 1em;
+        width: 100%;
       }
-    }
 
-    /* Splash Screen Specific Styles */
-    #splashScreen {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      background-color: transparent;
-      box-shadow: none;
-      padding: 0;
-      max-width: none;
-      /* Center splash screen logo absolutely */
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 100; /* Above everything during splash */
-    }
+      input,
+      select {
+        width: 96.5%;
+        padding: 12px;
+        margin: 4px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+      }
 
-    #splashScreen .logo {
-      margin-bottom: 0;
-    }
-  </style>
-</head>
-<body>
-  <!-- Splash Screen -->
-  <div id="splashScreen" class="container">
-    <div class="logo">
-      <img src="https://i.ibb.co/jvN2hV16/logo.png" alt="EMA Logo" />
-    </div>
-  </div>
+      .chat-bubble {
+        padding: 12px;
+        margin: 6px;
+        border-radius: 12px;
+        max-width: 80%;
+      }
 
-  <!-- Login Screen -->
-  <div id="loginScreen" class="container hidden">
-    <div class="logo">
-      <img src="https://i.ibb.co/jvN2hV16/logo.png" alt="EMA Logo" />
-    </div>
-    <h2>Welcome to EMA</h2>
-    <div class="form-group">
-      <input type="text" id="loginId" placeholder="EMA-XXXXXX" />
-      <span class="clear-icon" onclick="clearLoginInput()"><i class="fas fa-times"></i></span>
-    </div>
-    <button class="btn" onclick="login()">
-      <i class="fas fa-sign-in-alt"></i> LOGIN
-    </button>
-    <p style="margin-top: 25px; font-size: 14px; color: #777; text-align: center;">Still not registered?</p>
-    <button class="btn" onclick="showRegister()">
-      <i class="fas fa-user-plus"></i> REGISTER
-    </button>
-  </div>
+      .chat-user {
+        background: #e0e0e0;
+        align-self: flex-end;
+      }
 
-  <!-- Register Screen -->
-  <div id="registerScreen" class="container hidden">
-    <h2>Register to EMA</h2>
-    <div class="form-group">
-      <label for="profilePic">Select a Profile Picture</label>
-      <input type="file" id="profilePic" class="file-input" accept="image/*" />
-      <button class="upload-btn" onclick="document.getElementById('profilePic').click()">
-        <i class="fas fa-cloud-upload-alt"></i> Choose Image
-      </button>
-      <div class="preview-container" id="preview"></div>
+      .chat-ai {
+        background: #bbdefb;
+        align-self: flex-start;
+      }
+
+      .typing {
+        font-style: italic;
+        color: #777;
+      }
+
+      .popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash" class="center" style="height:100vh;background:#0;color:#000;">
+      <img id="logo" src="https://i.ibb.co/jvN2hV16/logo.png" style="opacity:0;transition:opacity 1s;max-width:30%;">
     </div>
-    <div class="form-group">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" placeholder="Your Name" required />
-      <span class="clear-icon" onclick="clearField('name')"><i class="fas fa-times"></i></span>
+    <div id="login-screen" class="curved hidden">
+      <h2 class="center">Welcome to EMA</h2>
+      <input type="text" id="emaIdInput" placeholder="Enter Your EMA ID">
+      <button id="accessBtn">
+        <i class="fas fa-right-to-bracket"></i> Access App </button>
+      <button id="registerBtn">
+        <i class="fas fa-user-plus"></i> New User? Register </button>
+      <button id="guestBtn">
+        <i class="fas fa-user-secret"></i> Continue as Guest </button>
+      <button id="forgotBtn">
+        <i class="fas fa-question-circle"></i> Forgot ID? </button>
     </div>
-    <div class="form-group">
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" placeholder="Phone Number" required />
-      <span class="clear-icon" onclick="clearField('phone')"><i class="fas fa-times"></i></span>
-    </div>
-    <div class="form-group">
-      <label for="district">District</label>
-      <select id="district" required>
-        <option value="">Select District</option>
-        <option value="Ampara">Ampara</option>
-        <option value="Anuradhapura">Anuradhapura</option>
-        <option value="Badulla">Badulla</option>
-        <option value="Batticaloa">Batticaloa</option>
-        <option value="Colombo">Colombo</option>
-        <option value="Galle">Galle</option>
-        <option value="Gampaha">Gampaha</option>
-        <option value="Hambantota">Hambantota</option>
-        <option value="Jaffna">Jaffna</option>
-        <option value="Kalutara">Kalutara</option>
-        <option value="Kandy">Kandy</option>
-        <option value="Kegalle">Kegalle</option>
-        <option value="Kilinochchi">Kilinochchi</option>
-        <option value="Kurunegala">Kurunegala</option>
-        <option value="Mannar">Mannar</option>
-        <option value="Matale">Matale</option>
-        <option value="Matara">Matara</option>
-        <option value="Monaragala">Monaragala</option>
-        <option value="Mullaitivu">Mullaitivu</option>
-        <option value="Nuwara Eliya">Nuwara Eliya</option>
-        <option value="Polonnaruwa">Polonnaruwa</option>
-        <option value="Puttalam">Puttalam</option>
-        <option value="Ratnapura">Ratnapura</option>
-        <option value="Trincomalee">Trincomalee</option>
-        <option value="Vavuniya">Vavuniya</option>
+    <div id="register-screen" class="curved hidden">
+      <h2>Register</h2>
+      <input type="text" id="nameInput" placeholder="Full Name">
+      <input type="tel" id="phoneInput" placeholder="Mobile (e.g. 0712345678)">
+      <select id="provinceSelect">
+        <option value="">Select Province</option>
+        <option value="Central">Central</option>
+        <option value="Eastern">Eastern</option>
+        <option value="North Central">North Central</option>
+        <option value="Northern">Northern</option>
+        <option value="North Western">North Western</option>
+        <option value="Sabaragamuwa">Sabaragamuwa</option>
+        <option value="Southern">Southern</option>
+        <option value="Uva">Uva</option>
+        <option value="Western">Western</option>
       </select>
+      <select id="districtSelect">
+        <option value="">Select District</option>
+      </select>
+      <input type="file" id="photoInput" accept="image/*">
+      <button id="submitReg">
+        <i class="fas fa-check"></i> Submit </button>
     </div>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Email" required />
-      <span class="clear-icon" onclick="clearField('email')"><i class="fas fa-times"></i></span>
+    <div id="chat-screen" class="curved hidden" style="flex-direction:column; height:70vh;">
+      <div id="chatHistory" style="flex:1; overflow-y:auto;"></div>
+      <div id="typingIndicator" class="typing hidden">...</div>
+      <input type="text" id="chatInput" placeholder="Enter your registered mobile number">
+      <button id="chatSend">
+        <i class="fas fa-paper-plane"></i> Send </button>
     </div>
-    <button class="btn" onclick="registerUser()">
-      <i class="fas fa-user-check"></i> REGISTER
-    </button>
-    <button class="btn btn-secondary" onclick="showLogin()">
-      <i class="fas fa-arrow-left"></i> BACK TO LOGIN
-    </button>
-  </div>
-
-  <!-- Success Screen -->
-  <div id="successScreen" class="container hidden">
-    <h2>Successfully Registered</h2>
-    <div class="qr-container">
-      <div id="qrCode" class="qr-code"></div>
-      <button class="download-btn" onclick="downloadQR()">
-        <i class="fas fa-download"></i> DOWNLOAD AS AN IMAGE
-      </button>
-      <p class="instructions">
-        Save this ID for easy login on any device. This is the key (EMA-XXXXXX) that you have to connect with others.
-      </p>
-    </div>
-    <div style="text-align: center; margin-top: 25px;">
-      <button class="btn" onclick="goToHome()">
-        <i class="fas fa-home"></i> GO TO HOME
-      </button>
-    </div>
-  </div>
-
-  <!-- Home Screen -->
-  <div id="homeScreen" class="container hidden">
-    <div class="user-info">
-      <div style="display: flex; align-items: center;">
-        <img id="profileImage" class="profile-pic" src="https://i.ibb.co/jvN2hV16/logo.png" alt="Profile" />
-        <div class="user-details">
-          <div class="user-name" id="userName">Hello User</div>
-          <a href="#" class="edit-details" onclick="editProfile()">
-            <i class="fas fa-edit"></i> Edit details
-          </a>
-        </div>
+    <div id="home-screen" class="curved hidden">
+      <div class="center">
+        <div id="userAvatar" class="curved" style="width:60px;height:60px;display:flex;justify-content:center;align-items:center;">U</div>
+        <div id="userIdBadge" style="margin-left:8px;">EMA-XXXXXX</div>
       </div>
-      <button class="sign-out" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
-      </button>
+      <div class="center">[Stats: Reports / Elephants / Locations / Alerts]</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <button>
+          <i class="fas fa-paw"></i>
+          <br>Report Elephant </button>
+        <button>
+          <i class="fas fa-map"></i>
+          <br>View Map </button>
+        <button>
+          <i class="fas fa-history"></i>
+          <br>History </button>
+        <button>
+          <i class="fas fa-bell"></i>
+          <br>Alerts </button>
+        <button>
+          <i class="fas fa-user"></i>
+          <br>Profile </button>
+        <button>
+          <i class="fas fa-cog"></i>
+          <br>Settings </button>
+      </div>
+      <button id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout </button>
     </div>
-    <div class="footer">
-      <p>© 2025 EMA - Elephant Monitoring App</p>
-    </div>
-  </div>
-
-  <script>
-    // --- DOM Elements ---
-    const splashScreen = document.getElementById('splashScreen');
-    const loginScreen = document.getElementById('loginScreen');
-    const registerScreen = document.getElementById('registerScreen');
-    const successScreen = document.getElementById('successScreen');
-    const homeScreen = document.getElementById('homeScreen');
-
-    // --- Splash Screen & Navigation ---
-    // Show Splash Screen with fade effect
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        splashScreen.style.opacity = '0';
+    <!-- Report Popup UI structure placeholders omitted for brevity -->
+    <script>
+      // Firebase setup
+      const firebaseConfig = {
+        apiKey: "AIzaSyAsUj0ZJ29uwettrPEVHHCruMUYKpsG5RA",
+        authDomain: "ema-data-267e0.firebaseapp.com",
+        databaseURL: "https://ema-data-267e0-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "ema-data-267e0",
+        storageBucket: "ema-data-267e0.firebasestorage.app",
+        messagingSenderId: "301777857122",
+        appId: "1:301777857122:web:40f71abdb8c1497dc73f3b",
+        measurementId: "G-9Y0SV5VX2Z"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+      const storage = firebase.storage();
+      const splash = document.getElementById('splash');
+      const logo = document.getElementById('logo');
+      const loginScreen = document.getElementById('login-screen');
+      const registerScreen = document.getElementById('register-screen');
+      const chatScreen = document.getElementById('chat-screen');
+      const homeScreen = document.getElementById('home-screen');
+      window.onload = () => {
+        logo.style.opacity = 1;
         setTimeout(() => {
-          splashScreen.style.display = 'none'; // Completely hide splash
+          splash.classList.add('hidden');
           loginScreen.classList.remove('hidden');
-        }, 500); // Match CSS transition duration
-      }, 2000); // Show splash for 2 seconds
-    });
-
-    function showLogin() {
-      registerScreen.classList.add('hidden');
-      loginScreen.classList.remove('hidden');
-    }
-
-    function showRegister() {
-      loginScreen.classList.add('hidden');
-      registerScreen.classList.remove('hidden');
-    }
-
-    function goToHome() {
-      successScreen.classList.add('hidden');
-      homeScreen.classList.remove('hidden');
-    }
-
-    // --- Input Handling ---
-    function clearLoginInput() {
-      document.getElementById('loginId').value = '';
-    }
-
-    function clearField(id) {
-      document.getElementById(id).value = '';
-    }
-
-    // --- Profile Picture Preview ---
-    document.getElementById('profilePic').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const preview = document.getElementById('preview');
-          preview.innerHTML = `<img src="${event.target.result}" alt="Preview" />`;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // --- Main App Logic (Ready for MongoDB/Backend API) ---
-
-    // Placeholder for current user data
-    let currentUserData = null;
-
-    async function registerUser() {
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const district = document.getElementById('district').value;
-      const email = document.getElementById('email').value.trim();
-      const profileImgFile = document.getElementById('profilePic').files[0];
-
-      if (!name || !phone || !district || !email) {
-        alert("Please fill all required fields");
-        return;
-      }
-
-      let base64Image = null;
-      if (profileImgFile) {
-        try {
-          base64Image = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              // Get only the base64 part
-              const base64String = reader.result.split(',')[1];
-              if (base64String) {
-                resolve(base64String);
-              } else {
-                reject(new Error("Failed to convert image to base64"));
-              }
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(profileImgFile);
-          });
-        } catch (error) {
-          console.error("Error converting image:", error);
-          alert("Error processing profile picture. Please try another image.");
+        }, 2000);
+      };
+      // Phone validation: Sri Lankan mobile starting with "07" + 7 digits
+      document.getElementById('registerBtn').onclick = () => {
+        loginScreen.classList.add('hidden');
+        registerScreen.classList.remove('hidden');
+      };
+      document.getElementById('submitReg').onclick = async () => {
+        const name = document.getElementById('nameInput').value.trim();
+        const phone = document.getElementById('phoneInput').value.trim();
+        const province = document.getElementById('provinceSelect').value;
+        const district = document.getElementById('districtSelect').value;
+        const photoFile = document.getElementById('photoInput').files[0];
+        if (!name || !phone || !province || !district) {
+          alert('Please fill in all required fields!');
           return;
         }
-      }
-
-      const userData = {
-        name,
-        phone,
-        district,
-        email,
-        profileImage: base64Image // Will be null if no image
-      };
-
-      // --- API CALL TO REGISTER USER ---
-      const registerButton = registerScreen.querySelector('.btn'); // Get the register button within the register screen
-      const originalContent = registerButton.innerHTML;
-      registerButton.disabled = true;
-      registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> REGISTERING...';
-
-      try {
-        // TODO: Replace with your actual Netlify Function or backend API endpoint URL
-        // Example: const response = await fetch('/.netlify/functions/registerUser', { ... });
-        const response = await fetch('/api/register', { // Placeholder URL
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(userData)
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          console.log("Registration successful:", data);
-          alert(`Registration successful! Your ID is: ${data.userId}`);
-
-          // --- Generate QR Code for the new User ID ---
-          document.getElementById('qrCode').innerHTML = ''; // Clear previous QR
-          new QRCode(document.getElementById('qrCode'), {
-            text: data.userId,
-            width: 180,
-            height: 180,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
+        // Check if phone already exists
+        const snapshot = await db.ref('users').orderByChild('phone').equalTo(phone).once('value');
+        if (snapshot.exists()) {
+          alert('Phone number already registered.');
+          return;
+        }
+        // Generate EMA ID
+        const newId = 'EMA-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        // Convert image to base64
+        let base64Image = '';
+        if (photoFile) {
+          base64Image = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result); // base64 string
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(photoFile);
           });
-
-          // Transition to success screen
-          registerScreen.classList.add('hidden');
-          successScreen.classList.remove('hidden');
-
-        } else {
-          console.error("Registration API error:", data);
-          alert(`Registration failed: ${data.error || 'Unknown error'}`);
         }
-      } catch (error) {
-        console.error("Network error during registration:", error);
-        alert("Network error. Please check your connection and try again.");
-      } finally {
-        registerButton.disabled = false;
-        registerButton.innerHTML = originalContent;
+        const userData = {
+          name,
+          phone,
+          province,
+          district,
+          profileImage: base64Image || '', // store base64 string here
+          id: newId,
+          created: Date.now()
+        };
+        await db.ref('users/' + newId).set(userData);
+        localStorage.setItem('emaUser', newId);
+        alert('Registered! Your ID: ' + newId);
+        registerScreen.classList.add('hidden');
+        homeScreen.classList.remove('hidden');
+        document.getElementById('userIdBadge').innerText = newId;
+      };
+      document.getElementById('accessBtn').onclick = () => {
+        const id = document.getElementById('emaIdInput').value.trim();
+        if (!id) return alert('Enter ID');
+        db.ref('users/' + id).get().then(snap => {
+          if (snap.exists()) {
+            localStorage.setItem('emaUser', id);
+            loginScreen.classList.add('hidden');
+            homeScreen.classList.remove('hidden');
+            document.getElementById('userIdBadge').innerText = id;
+          } else {
+            alert('ID not found!');
+          }
+        });
+      };
+      document.getElementById('forgotBtn').onclick = () => {
+        loginScreen.classList.add('hidden');
+        chatScreen.classList.remove('hidden');
+        chatScreen.querySelector('#chatHistory').innerHTML = '';
+      };
+      document.getElementById('chatSend').onclick = async () => {
+        const inp = document.getElementById('chatInput');
+        const text = inp.value.trim();
+        if (!text) return;
+        const hist = document.getElementById('chatHistory');
+        hist.innerHTML += ' < div class = "chat-bubble chat-user" > ' + text + ' < /div>';
+        inp.value = '';
+        document.getElementById('typingIndicator').classList.remove('hidden');
+        // simulate AI processing phone lookup
+        setTimeout(async () => {
+          document.getElementById('typingIndicator').classList.add('hidden');
+          if (validLK(text)) {
+            const snap = await db.ref('users').orderByChild('phone').equalTo(text).once('value');
+            if (snap.exists()) {
+              const userId = Object.keys(snap.val())[0];
+              hist.innerHTML += ' < div class = "chat-bubble chat-ai" > Your registered ID is: ' + userId + ' < /div>';
+            } else {
+              hist.innerHTML += ' < div class = "chat-bubble chat-ai" > No ID found
+              for that number. < /div>';
+            }
+          } else {
+            hist.innerHTML += ' < div class = "chat-bubble chat-ai" > Please enter a valid Sri Lankan phone number. < /div>';
+          }
+          hist.scrollTop = hist.scrollHeight;
+        }, 1000);
+      };
+      document.getElementById('logoutBtn').onclick = () => {
+        localStorage.removeItem('emaUser');
+        homeScreen.classList.add('hidden');
+        loginScreen.classList.remove('hidden');
+      };
+      // Report submission, alerts, radar, analytics, agent/admin modules, maps, etc., would continue in similar modular JS—plus integration with Leaflet, WorldTimeAPI for timestamp, and push notifications.
+      async function getSriLankaTime() {
+        const res = await fetch('http://worldtimeapi.org/api/timezone/Asia/Colombo');
+        const data = await res.json();
+        return data.datetime;
       }
-    }
-
-    async function login() {
-      const userId = document.getElementById('loginId').value.trim();
-      if (!userId) {
-        alert("Please enter your EMA ID");
-        return;
-      }
-
-      const loginButton = loginScreen.querySelector('.btn');
-      const originalContent = loginButton.innerHTML;
-      loginButton.disabled = true;
-      loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> LOGGING IN...';
-
-      try {
-        // --- API CALL TO GET USER DATA ---
-        // TODO: Replace with your actual Netlify Function or backend API endpoint URL
-        // Example: const response = await fetch(`/.netlify/functions/getUser?userId=${encodeURIComponent(userId)}`);
-        const response = await fetch(`/api/user/${encodeURIComponent(userId)}`); // Placeholder URL
-
-        const data = await response.json();
-
-        if (response.ok && data.user) {
-          console.log("Login successful:", data.user);
-          currentUserData = data.user; // Store user data
-
-          // Store ID in cookie for auto-login
-          document.cookie = `emaId=${userId}; path=/; max-age=31536000`; // 1 year
-
-          // Show home screen
-          showHome(data.user);
-
-        } else {
-          console.error("Login API error:", data);
-          alert(`Login failed: ${data.error || 'Invalid ID or user not found'}`);
+      const provinceDistricts = {
+        "Central": ["Kandy", "Matale", "Nuwara Eliya"],
+        "Eastern": ["Ampara", "Batticaloa", "Trincomalee"],
+        "North Central": ["Anuradhapura", "Polonnaruwa"],
+        "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
+        "North Western": ["Kurunegala", "Puttalam"],
+        "Sabaragamuwa": ["Kegalle", "Ratnapura"],
+        "Southern": ["Galle", "Hambantota", "Matara"],
+        "Uva": ["Badulla", "Monaragala"],
+        "Western": ["Colombo", "Gampaha", "Kalutara"]
+      };
+      document.getElementById('provinceSelect').addEventListener('change', function() {
+        const province = this.value;
+        const districtSelect = document.getElementById('districtSelect');
+        districtSelect.innerHTML = ' < option value = "" > Select District < /option>'; / / Reset
+        if (province && provinceDistricts[province]) {
+          provinceDistricts[province].forEach(district => {
+            const option = document.createElement('option');
+            option.value = district;
+            option.textContent = district;
+            districtSelect.appendChild(option);
+          });
         }
-      } catch (error) {
-        console.error("Network error during login:", error);
-        alert("Network error. Please check your connection and try again.");
-      } finally {
-        loginButton.disabled = false;
-        loginButton.innerHTML = originalContent;
-      }
-    }
-
-    function showHome(userData) {
-      loginScreen.classList.add('hidden');
-      homeScreen.classList.remove('hidden');
-      document.getElementById('userName').textContent = `Hello ${userData.name}`;
-      document.getElementById('profileImage').src = userData.profileImage ?
-        `image/png;base64,${userData.profileImage}` :
-        'https://i.ibb.co/jvN2hV16/logo.png';
-    }
-
-    function logout() {
-      // Clear cookie
-      document.cookie = "emaId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      currentUserData = null;
-      homeScreen.classList.add('hidden');
-      loginScreen.classList.remove('hidden');
-    }
-
-    function editProfile() {
-      alert("Profile editing will be implemented later.");
-      // Future implementation would likely involve another API call to update user data
-    }
-
-    function downloadQR() {
-      const canvas = document.querySelector('#qrCode canvas');
-      if (canvas) {
-        const link = document.createElement('a');
-        link.download = 'ema-id.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      } else {
-        alert("QR code not available for download");
-      }
-    }
-
-    // --- Auto-login from cookie ---
-    window.addEventListener('DOMContentLoaded', (event) => {
-       // Check for existing login cookie after DOM is fully loaded
-       const cookies = document.cookie.split('; ').find(row => row.startsWith('emaId='));
-       if (cookies) {
-         const userId = cookies.split('=')[1];
-         // Simulate login with stored ID
-         document.getElementById('loginId').value = userId;
-         // Optionally auto-login, or just pre-fill the ID
-         // login(); // Uncomment to auto-login
-       }
-    });
-  </script>
-</body>
+      });
+    </script>
+  </body>
 </html>
