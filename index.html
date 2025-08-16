@@ -1,333 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>EMA – Elephant Monitoring App</title>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    <!-- QR Code library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-      /* Basic Material 3-style mobile-first reset */
-      body,
-      html {
-        margin: 0;
-        padding: 0;
-        font-family: sans-serif;
-        background: #f5f5f5;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EMA – Elephant Monitoring App</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <!-- QR Code library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode"></script>
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <style>
+    /* Basic Material 3-style mobile-first reset */
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      font-family: "Roboto", sans-serif;
+      background: #f5f5f5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      color: #202124;
+    }
+    .curved {
+      border-radius: 12px;
+      background: #fff;
+      padding: 16px;
+      margin: 12px 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+    .center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      margin: 8px 0;
+      background: #1e88e5;
+      color: #fff;
+      font-size: 1.1em;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #1565c0;
+    }
+    input,
+    select {
+      width: 100%;
+      padding: 14px 12px;
+      margin: 8px 0;
+      border: 1.5px solid #cfd8dc;
+      border-radius: 12px;
+      font-size: 1em;
+      outline-offset: 2px;
+      outline-color: #1e88e5;
+      transition: border-color 0.3s ease;
+    }
+    input:focus,
+    select:focus {
+      border-color: #1e88e5;
+    }
+    label.note {
+      font-size: 0.8em;
+      color: #b00020;
+      margin-top: -6px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .chat-bubble {
+      padding: 14px;
+      margin: 8px;
+      border-radius: 20px;
+      max-width: 80%;
+      line-height: 1.3;
+      font-size: 1em;
+      word-wrap: break-word;
+    }
+    .chat-user {
+      background: #e0e0e0;
+      align-self: flex-end;
+      color: #202124;
+    }
+    .chat-ai {
+      background: #bbdefb;
+      align-self: flex-start;
+      color: #202124;
+    }
+    .typing {
+      font-style: italic;
+      color: #777;
+      margin: 0 12px 12px 12px;
+    }
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #splash {
+      height: 100vh;
+      background: transparent !important;
+      color: #000;
+      flex-direction: column;
+      gap: 16px;
+    }
+    #logo {
+      opacity: 0;
+      transition: opacity 1.2s ease;
+      max-width: 120px;
+      max-height: 120px;
+      user-select: none;
+    }
+    #login-screen,
+    #register-screen,
+    #chat-screen,
+    #home-screen {
+      max-width: 400px;
+      margin: 24px auto;
+    }
+    #userAvatar {
+      background: #1e88e5;
+      color: white;
+      font-weight: 700;
+      font-size: 1.5em;
+      user-select: none;
+      text-transform: uppercase;
+    }
+    #home-screen > div.center {
+      margin-bottom: 12px;
+      font-weight: 500;
+      color: #444;
+    }
+    #home-screen button {
+      font-size: 0.9em;
+      padding: 10px 0;
+      text-align: center;
+    }
+    #home-screen div.grid-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    #home-screen div.grid-buttons button {
+      border-radius: 16px;
+      background: #2196f3;
+      color: white;
+      font-weight: 600;
+      padding: 18px 12px;
+      font-size: 1.1em;
+      line-height: 1.2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s ease;
+    }
+    #home-screen div.grid-buttons button:hover {
+      background: #1565c0;
+    }
+    #home-screen div.grid-buttons button i {
+      font-size: 1.7em;
+    }
+    /* Back button for register */
+    #backToLogin {
+      background: transparent;
+      color: #1e88e5;
+      border: 2px solid #1e88e5;
+      font-weight: 700;
+      margin-top: 0;
+      padding: 12px;
+      width: 100%;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    #backToLogin:hover {
+      background: #1e88e5;
+      color: white;
+    }
+    /* Warning note style */
+    .warning-note {
+      font-size: 0.85em;
+      color: #b00020;
+      margin-top: 4px;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div id="splash" class="center" style="flex-direction: column;">
+    <img id="logo" src="https://i.ibb.co/jvN2hV16/logo.png" alt="EMA Logo" />
+  </div>
 
-      .curved {
-        border-radius: 12px;
-        background: #fff;
-        padding: 16px;
-        margin: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
+  <div id="login-screen" class="curved hidden">
+    <h2 class="center">Welcome to EMA</h2>
+    <input
+      type="text"
+      id="emaIdInput"
+      placeholder="Enter Your EMA ID (e.g. EMA-ABC123)"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      maxlength="10"
+    />
+    <button id="accessBtn">
+      <i class="fas fa-right-to-bracket"></i> Access App
+    </button>
+    <button id="registerBtn">
+      <i class="fas fa-user-plus"></i> New User? Register
+    </button>
+    <button id="guestBtn" disabled title="Guest login coming soon">
+      <i class="fas fa-user-secret"></i> Continue as Guest
+    </button>
+    <button id="forgotBtn">
+      <i class="fas fa-question-circle"></i> Forgot ID?
+    </button>
+  </div>
 
-      .center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      button {
-        padding: 12px;
-        border: none;
-        border-radius: 8px;
-        margin: 4px;
-        background: #6200ee;
-        color: #fff;
-        font-size: 1em;
-        width: 100%;
-      }
-
-      input,
-      select {
-        width: 96.5%;
-        padding: 12px;
-        margin: 4px 0;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-      }
-
-      .chat-bubble {
-        padding: 12px;
-        margin: 6px;
-        border-radius: 12px;
-        max-width: 80%;
-      }
-
-      .chat-user {
-        background: #e0e0e0;
-        align-self: flex-end;
-      }
-
-      .chat-ai {
-        background: #bbdefb;
-        align-self: flex-start;
-      }
-
-      .typing {
-        font-style: italic;
-        color: #777;
-      }
-
-      .popup {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="splash" class="center" style="height:100vh;background:#0;color:#000;">
-      <img id="logo" src="https://i.ibb.co/jvN2hV16/logo.png" style="opacity:0;transition:opacity 1s;max-width:30%;">
+  <div id="register-screen" class="curved hidden">
+    <h2>Register</h2>
+    <input
+      type="text"
+      id="nameInput"
+      placeholder="Full Name"
+      autocomplete="name"
+      spellcheck="false"
+    />
+    <input
+      type="tel"
+      id="phoneInput"
+      placeholder="Mobile Number (e.g. 0712345678)"
+      autocomplete="tel"
+      spellcheck="false"
+    />
+    <div class="warning-note">
+      If you’re trying to create a fake account, it will be deleted within 5 days.
+      Please use your real mobile number.
     </div>
-    <div id="login-screen" class="curved hidden">
-      <h2 class="center">Welcome to EMA</h2>
-      <input type="text" id="emaIdInput" placeholder="Enter Your EMA ID">
-      <button id="accessBtn">
-        <i class="fas fa-right-to-bracket"></i> Access App </button>
-      <button id="registerBtn">
-        <i class="fas fa-user-plus"></i> New User? Register </button>
-      <button id="guestBtn">
-        <i class="fas fa-user-secret"></i> Continue as Guest </button>
-      <button id="forgotBtn">
-        <i class="fas fa-question-circle"></i> Forgot ID? </button>
-    </div>
-    <div id="register-screen" class="curved hidden">
-      <h2>Register</h2>
-      <input type="text" id="nameInput" placeholder="Full Name">
-      <input type="tel" id="phoneInput" placeholder="Mobile (e.g. 0712345678)">
-      <select id="provinceSelect">
-        <option value="">Select Province</option>
-        <option value="Central">Central</option>
-        <option value="Eastern">Eastern</option>
-        <option value="North Central">North Central</option>
-        <option value="Northern">Northern</option>
-        <option value="North Western">North Western</option>
-        <option value="Sabaragamuwa">Sabaragamuwa</option>
-        <option value="Southern">Southern</option>
-        <option value="Uva">Uva</option>
-        <option value="Western">Western</option>
-      </select>
-      <select id="districtSelect">
-        <option value="">Select District</option>
-      </select>
-      <input type="file" id="photoInput" accept="image/*">
-      <button id="submitReg">
-        <i class="fas fa-check"></i> Submit </button>
-    </div>
-    <div id="chat-screen" class="curved hidden" style="flex-direction:column; height:70vh;">
-      <div id="chatHistory" style="flex:1; overflow-y:auto;"></div>
-      <div id="typingIndicator" class="typing hidden">...</div>
-      <input type="text" id="chatInput" placeholder="Enter your registered mobile number">
-      <button id="chatSend">
-        <i class="fas fa-paper-plane"></i> Send </button>
-    </div>
-    <div id="home-screen" class="curved hidden">
-      <div class="center">
-        <div id="userAvatar" class="curved" style="width:60px;height:60px;display:flex;justify-content:center;align-items:center;">U</div>
-        <div id="userIdBadge" style="margin-left:8px;">EMA-XXXXXX</div>
+    <select id="provinceSelect" autocomplete="off">
+      <option value="">Select Province</option>
+      <option value="Central">Central</option>
+      <option value="Eastern">Eastern</option>
+      <option value="North Central">North Central</option>
+      <option value="Northern">Northern</option>
+      <option value="North Western">North Western</option>
+      <option value="Sabaragamuwa">Sabaragamuwa</option>
+      <option value="Southern">Southern</option>
+      <option value="Uva">Uva</option>
+      <option value="Western">Western</option>
+    </select>
+
+    <select id="districtSelect" autocomplete="off">
+      <option value="">Select District</option>
+    </select>
+
+    <input type="file" id="photoInput" accept="image/*" />
+    <button id="submitReg">
+      <i class="fas fa-check"></i> Submit Registration
+    </button>
+    <button id="backToLogin"><i class="fas fa-arrow-left"></i> Back to Login</button>
+  </div>
+
+  <div
+    id="chat-screen"
+    class="curved hidden"
+    style="flex-direction: column; height: 70vh;"
+  >
+    <div
+      id="chatHistory"
+      style="flex: 1; overflow-y: auto; border: 1px solid #ccc; border-radius: 12px; padding: 12px; background: #fff;"
+    ></div>
+    <div id="typingIndicator" class="typing hidden">...</div>
+    <input
+      type="text"
+      id="chatInput"
+      placeholder="Enter your registered mobile number"
+      autocomplete="tel"
+    />
+    <button id="chatSend"><i class="fas fa-paper-plane"></i> Send</button>
+  </div>
+
+  <div id="home-screen" class="curved hidden">
+    <div class="center" style="gap: 12px; margin-bottom: 16px;">
+      <div
+        id="userAvatar"
+        class="curved"
+        style="width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;"
+      >
+        U
       </div>
-      <div class="center">[Stats: Reports / Elephants / Locations / Alerts]</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-        <button>
-          <i class="fas fa-paw"></i>
-          <br>Report Elephant </button>
-        <button>
-          <i class="fas fa-map"></i>
-          <br>View Map </button>
-        <button>
-          <i class="fas fa-history"></i>
-          <br>History </button>
-        <button>
-          <i class="fas fa-bell"></i>
-          <br>Alerts </button>
-        <button>
-          <i class="fas fa-user"></i>
-          <br>Profile </button>
-        <button>
-          <i class="fas fa-cog"></i>
-          <br>Settings </button>
+      <div id="userIdBadge" style="font-weight: 600; font-size: 1.2em">
+        EMA-XXXXXX
       </div>
-      <button id="logoutBtn">
-        <i class="fas fa-sign-out-alt"></i> Logout </button>
     </div>
-    <!-- Report Popup UI structure placeholders omitted for brevity -->
-    <script>
-      // Firebase setup
-      const firebaseConfig = {
-        apiKey: "AIzaSyAsUj0ZJ29uwettrPEVHHCruMUYKpsG5RA",
-        authDomain: "ema-data-267e0.firebaseapp.com",
-        databaseURL: "https://ema-data-267e0-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "ema-data-267e0",
-        storageBucket: "ema-data-267e0.firebasestorage.app",
-        messagingSenderId: "301777857122",
-        appId: "1:301777857122:web:40f71abdb8c1497dc73f3b",
-        measurementId: "G-9Y0SV5VX2Z"
-      };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
-      const storage = firebase.storage();
-      const splash = document.getElementById('splash');
-      const logo = document.getElementById('logo');
-      const loginScreen = document.getElementById('login-screen');
-      const registerScreen = document.getElementById('register-screen');
-      const chatScreen = document.getElementById('chat-screen');
-      const homeScreen = document.getElementById('home-screen');
-      window.onload = () => {
-        logo.style.opacity = 1;
-        setTimeout(() => {
-          splash.classList.add('hidden');
-          loginScreen.classList.remove('hidden');
-        }, 2000);
-      };
-      // Phone validation: Sri Lankan mobile starting with "07" + 7 digits
-      document.getElementById('registerBtn').onclick = () => {
-        loginScreen.classList.add('hidden');
-        registerScreen.classList.remove('hidden');
-      };
-      document.getElementById('submitReg').onclick = async () => {
-        const name = document.getElementById('nameInput').value.trim();
-        const phone = document.getElementById('phoneInput').value.trim();
-        const province = document.getElementById('provinceSelect').value;
-        const district = document.getElementById('districtSelect').value;
-        const photoFile = document.getElementById('photoInput').files[0];
-        if (!name || !phone || !province || !district) {
-          alert('Please fill in all required fields!');
-          return;
+    <div class="center" style="margin-bottom: 24px; font-weight: 500; color: #666;">
+      [Stats: Reports / Elephants / Locations / Alerts]
+    </div>
+    <div class="grid-buttons">
+      <button><i class="fas fa-paw"></i><br />Report Elephant</button>
+      <button><i class="fas fa-map"></i><br />View Map</button>
+      <button><i class="fas fa-history"></i><br />History</button>
+      <button><i class="fas fa-bell"></i><br />Alerts</button>
+      <button><i class="fas fa-user"></i><br />Profile</button>
+      <button><i class="fas fa-cog"></i><br />Settings</button>
+    </div>
+    <button id="logoutBtn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </div>
+
+  <script>
+    // Firebase setup
+    const firebaseConfig = {
+      apiKey: "AIzaSyAsUj0ZJ29uwettrPEVHHCruMUYKpsG5RA",
+      authDomain: "ema-data-267e0.firebaseapp.com",
+      databaseURL:
+        "https://ema-data-267e0-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "ema-data-267e0",
+      storageBucket: "ema-data-267e0.firebasestorage.app",
+      messagingSenderId: "301777857122",
+      appId: "1:301777857122:web:40f71abdb8c1497dc73f3b",
+      measurementId: "G-9Y0SV5VX2Z",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const storage = firebase.storage();
+
+    const splash = document.getElementById("splash");
+    const logo = document.getElementById("logo");
+    const loginScreen = document.getElementById("login-screen");
+    const registerScreen = document.getElementById("register-screen");
+    const chatScreen = document.getElementById("chat-screen");
+    const homeScreen = document.getElementById("home-screen");
+
+    window.onload = () => {
+      logo.style.opacity = 1;
+      setTimeout(() => {
+        splash.classList.add("hidden");
+        loginScreen.classList.remove("hidden");
+
+        // Check for persistent login
+        const storedUser = localStorage.getItem("emaUser");
+        if (storedUser) {
+          showHomeScreen(storedUser);
         }
-        // Check if phone already exists
-        const snapshot = await db.ref('users').orderByChild('phone').equalTo(phone).once('value');
-        if (snapshot.exists()) {
-          alert('Phone number already registered.');
-          return;
-        }
-        // Generate EMA ID
-        const newId = 'EMA-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-        // Convert image to base64
-        let base64Image = '';
-        if (photoFile) {
-          base64Image = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result); // base64 string
-            reader.onerror = error => reject(error);
-            reader.readAsDataURL(photoFile);
-          });
-        }
-        const userData = {
-          name,
-          phone,
-          province,
-          district,
-          profileImage: base64Image || '', // store base64 string here
-          id: newId,
-          created: Date.now()
-        };
-        await db.ref('users/' + newId).set(userData);
-        localStorage.setItem('emaUser', newId);
-        alert('Registered! Your ID: ' + newId);
-        registerScreen.classList.add('hidden');
-        homeScreen.classList.remove('hidden');
-        document.getElementById('userIdBadge').innerText = newId;
-      };
-      document.getElementById('accessBtn').onclick = () => {
-        const id = document.getElementById('emaIdInput').value.trim();
-        if (!id) return alert('Enter ID');
-        db.ref('users/' + id).get().then(snap => {
-          if (snap.exists()) {
-            localStorage.setItem('emaUser', id);
-            loginScreen.classList.add('hidden');
-            homeScreen.classList.remove('hidden');
-            document.getElementById('userIdBadge').innerText = id;
-          } else {
-            alert('ID not found!');
-          }
-        });
-      };
-      document.getElementById('forgotBtn').onclick = () => {
-        loginScreen.classList.add('hidden');
-        chatScreen.classList.remove('hidden');
-        chatScreen.querySelector('#chatHistory').innerHTML = '';
-      };
-      document.getElementById('chatSend').onclick = async () => {
-        const inp = document.getElementById('chatInput');
-        const text = inp.value.trim();
-        if (!text) return;
-        const hist = document.getElementById('chatHistory');
-        hist.innerHTML += ' < div class = "chat-bubble chat-user" > ' + text + ' < /div>';
-        inp.value = '';
-        document.getElementById('typingIndicator').classList.remove('hidden');
-        // simulate AI processing phone lookup
-        setTimeout(async () => {
-          document.getElementById('typingIndicator').classList.add('hidden');
-          if (validLK(text)) {
-            const snap = await db.ref('users').orderByChild('phone').equalTo(text).once('value');
-            if (snap.exists()) {
-              const userId = Object.keys(snap.val())[0];
-              hist.innerHTML += ' < div class = "chat-bubble chat-ai" > Your registered ID is: ' + userId + ' < /div>';
-            } else {
-              hist.innerHTML += ' < div class = "chat-bubble chat-ai" > No ID found
-              for that number. < /div>';
-            }
-          } else {
-            hist.innerHTML += ' < div class = "chat-bubble chat-ai" > Please enter a valid Sri Lankan phone number. < /div>';
-          }
-          hist.scrollTop = hist.scrollHeight;
-        }, 1000);
-      };
-      document.getElementById('logoutBtn').onclick = () => {
-        localStorage.removeItem('emaUser');
-        homeScreen.classList.add('hidden');
-        loginScreen.classList.remove('hidden');
-      };
-      // Report submission, alerts, radar, analytics, agent/admin modules, maps, etc., would continue in similar modular JS—plus integration with Leaflet, WorldTimeAPI for timestamp, and push notifications.
-      async function getSriLankaTime() {
-        const res = await fetch('http://worldtimeapi.org/api/timezone/Asia/Colombo');
-        const data = await res.json();
-        return data.datetime;
-      }
-      const provinceDistricts = {
-        "Central": ["Kandy", "Matale", "Nuwara Eliya"],
-        "Eastern": ["Ampara", "Batticaloa", "Trincomalee"],
-        "North Central": ["Anuradhapura", "Polonnaruwa"],
-        "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
-        "North Western": ["Kurunegala", "Puttalam"],
-        "Sabaragamuwa": ["Kegalle", "Ratnapura"],
-        "Southern": ["Galle", "Hambantota", "Matara"],
-        "Uva": ["Badulla", "Monaragala"],
-        "Western": ["Colombo", "Gampaha", "Kalutara"]
-      };
-      document.getElementById('provinceSelect').addEventListener('change', function() {
+      }, 2000);
+    };
+
+    // Province and districts map
+    const provinceDistricts = {
+      Central: ["Kandy", "Matale", "Nuwara Eliya"],
+      Eastern: ["Ampara", "Batticaloa", "Trincomalee"],
+      "North Central": ["Anuradhapura", "Polonnaruwa"],
+      Northern: ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
+      "North Western": ["Kurunegala", "Puttalam"],
+      Sabaragamuwa: ["Kegalle", "Ratnapura"],
+      Southern: ["Galle", "Hambantota", "Matara"],
+      Uva: ["Badulla", "Monaragala"],
+      Western: ["Colombo", "Gampaha", "Kalutara"],
+    };
+
+    document
+      .getElementById("provinceSelect")
+      .addEventListener("change", function () {
         const province = this.value;
-        const districtSelect = document.getElementById('districtSelect');
-        districtSelect.innerHTML = ' < option value = "" > Select District < /option>'; / / Reset
+        const districtSelect = document.getElementById("districtSelect");
+        districtSelect.innerHTML = '<option value="">Select District</option>';
         if (province && provinceDistricts[province]) {
-          provinceDistricts[province].forEach(district => {
-            const option = document.createElement('option');
+          provinceDistricts[province].forEach((district) => {
+            const option = document.createElement("option");
             option.value = district;
             option.textContent = district;
             districtSelect.appendChild(option);
           });
         }
       });
-    </script>
-  </body>
+
+    // Registration button handlers
+    document.getElementById("registerBtn").onclick = () => {
+      loginScreen.classList.add("hidden");
+      registerScreen.classList.remove("hidden");
+    };
+    document.getElementById("backToLogin").onclick = () => {
+      registerScreen.classList.add("hidden");
+      loginScreen.classList.remove("hidden");
+    };
+
+    // Submit registration
+    document.getElementById("submitReg").onclick = async () => {
+      const name = document.getElementById("nameInput").value.trim();
+      const phone = document.getElementById("phoneInput").value.trim();
+      const province = document.getElementById("provinceSelect").value;
+      const district = document.getElementById("districtSelect").value;
+      const photoFile = document.getElementById("photoInput").files[0];
+
+      if (!name || !phone || !province || !district) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      // Phone number simple format check (allow anything for now)
+      if (!phone.match(/^\d{7,15}$/)) {
+        alert(
+          "Please enter a valid mobile number with 7 to 15 digits (numbers only)."
+        );
+        return;
+      }
+
+      // Check phone uniqueness
+      const snapshot = await db
+        .ref("users")
+        .orderByChild("phone")
+        .equalTo(phone)
+        .once("value");
+      if (snapshot.exists()) {
+        alert("This phone number is already registered.");
+        return;
+      }
+
+      // Generate EMA ID
+      const newId = "EMA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+      // Convert image to base64 string if exists
+      let base64Image = "";
+      if (photoFile) {
+        base64Image = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (err) => reject(err);
+          reader.readAsDataURL(photoFile);
+        });
+      }
+
+      const userData = {
+        name,
+        phone,
+        province,
+        district,
+        profileImage: base64Image,
+        id: newId,
+        created: Date.now(),
+      };
+
+      try {
+        await db.ref("users/" + newId).set(userData);
+        localStorage.setItem("emaUser", newId);
+        alert("Registration successful! Your EMA ID is: " + newId);
+        showHomeScreen(newId);
+        registerScreen.classList.add("hidden");
+      } catch (error) {
+        alert("Registration failed. Please try again.");
+        console.error(error);
+      }
+    };
+
+    // Login button
+    document.getElementById("accessBtn").onclick = () => {
+      const id = document.getElementById("emaIdInput").value.trim().toUpperCase();
+      if (!id) {
+        alert("Please enter your EMA ID.");
+        return;
+      }
+      db.ref("users/" + id)
+        .get()
+        .then((snap) => {
+          if (snap.exists()) {
+            localStorage.setItem("emaUser", id);
+            showHomeScreen(id);
+            loginScreen.classList.add("hidden");
+          } else {
+            alert("EMA ID not found. Please check your ID or register.");
+          }
+        });
+    };
+
+    // Show home screen helper
+    async function showHomeScreen(userId) {
+      const snap = await db.ref("users/" + userId).get();
+      if (!snap.exists()) {
+        alert("User not found, logging out.");
+        localStorage.removeItem("emaUser");
+        loginScreen.classList.remove("hidden");
+        homeScreen.classList.add("hidden");
+        return;
+      }
+      const user = snap.val();
+      loginScreen.classList.add("hidden");
+      registerScreen.classList.add("hidden");
+      chatScreen.classList.add("hidden");
+      homeScreen.classList.remove("hidden");
+      document.getElementById("userIdBadge").innerText = user.id;
+
+      // Show initials avatar or photo
+      const avatar = document.getElementById("userAvatar");
+      if (user.profileImage) {
+        avatar.style.backgroundImage = `url(${user.profileImage})`;
+        avatar.style.backgroundSize = "cover";
+        avatar.textContent = "";
+      } else {
+        avatar.style.backgroundImage = "none";
+        avatar.textContent = user.name
+          ? user.name.trim()[0].toUpperCase()
+          : "U";
+      }
+    }
+
+    // Forgot ID Chatbot screen
+    document.getElementById("forgotBtn").onclick = () => {
+      loginScreen.classList.add("hidden");
+      chatScreen.classList.remove("hidden");
+      document.getElementById("chatHistory").innerHTML = "";
+    };
+
+    document.getElementById("chatSend").onclick = async () => {
+      const inp = document.getElementById("chatInput");
+      const text = inp.value.trim();
+      if (!text) return;
+      const hist = document.getElementById("chatHistory");
+      hist.innerHTML +=
+        '<div class="chat-bubble chat-user">' + escapeHtml(text) + "</div>";
+      inp.value = "";
+      document.getElementById("typingIndicator").classList.remove("hidden");
+
+      // Simulate AI processing phone lookup
+      setTimeout(async () => {
+        document.getElementById("typingIndicator").classList.add("hidden");
+        if (validLKPhone(text)) {
+          const snap = await db
+            .ref("users")
+            .orderByChild("phone")
+            .equalTo(text)
+            .once("value");
+          if (snap.exists()) {
+            const userId = Object.keys(snap.val())[0];
+            hist.innerHTML +=
+              '<div class="chat-bubble chat-ai">Your registered ID is: <b>' +
+              escapeHtml(userId) +
+              "</b></div>";
+          } else {
+            hist.innerHTML +=
+              '<div class="chat-bubble chat-ai">No ID found for that number.</div>';
+          }
+        } else {
+          hist.innerHTML +=
+            '<div class="chat-bubble chat-ai">Please enter a valid Sri Lankan phone number.</div>';
+        }
+        hist.scrollTop = hist.scrollHeight;
+      }, 1200);
+    };
+
+    // Escape HTML helper for chat bubbles
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Basic Sri Lankan phone number validation (starts with 07 and 9 digits)
+    function validLKPhone(phone) {
+      return /^07\d{8}$/.test(phone);
+    }
+
+    // Logout
+    document.getElementById("logoutBtn").onclick = () => {
+      localStorage.removeItem("emaUser");
+      homeScreen.classList.add("hidden");
+      loginScreen.classList.remove("hidden");
+    };
+  </script>
+</body>
 </html>
