@@ -1,5 +1,0 @@
-# Ignore node_modules and private Firebase key
-node_modules/
-serviceAccountKey.json
-.env
-
